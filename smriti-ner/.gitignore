@@ -1,0 +1,34 @@
+ # Create .gitignore
+cat > .gitignore << 'EOF'
+# Python
+__pycache__/
+*.pyc
+venv/
+.env
+*.db
+*.sqlite3
+
+# Node
+node_modules/
+dist/
+.cache/
+
+# Flutter
+.Dart_tool/
+build/
+*.apk
+*.ipa
+*.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.pid
+EOF

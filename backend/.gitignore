@@ -1,0 +1,10 @@
+echo "venv/
+__pycache__/
+*.pyc
+.env
+service-account-key.json
+.pytest_cache/
+.vscode/
+.DS_Store
+*.log" > .gitignore
+
