@@ -1,0 +1,13 @@
+{
+  "generated_at": null,
+  "environment": "local",
+  "targets_ms": {
+    "root": 50,
+    "health": 50,
+    "games": 100,
+    "next_round": 200,
+    "attempt": 300,
+    "scores": 200
+  },
+  "results": []
+}

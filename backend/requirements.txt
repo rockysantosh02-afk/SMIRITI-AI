@@ -1,17 +1,33 @@
-fastapi
-uvicorn[standard]
-sqlalchemy
-alembic
-psycopg2-binary
-pydantic
-pydantic-settings
-python-jose[cryptography]
-passlib[bcrypt]
-bcrypt
-python-multipart
-slowapi
-pytest
-pytest-asyncio
-httpx
-redis
-celery
+# Web Framework
+fastapi==0.115.6           # The API framework
+uvicorn[standard]==0.34.0  # The server that runs FastAPI
+
+# Firebase Integration
+firebase-admin==6.6.0      # Backend SDK for Firebase
+pydantic-settings==2.7.1   # Environment-based application settings
+
+# Authentication
+python-jose[cryptography]==3.3.0  # JWT token handling
+passlib[bcrypt]==1.7.4            # Password hashing
+python-multipart==0.0.6            # Form data handling
+
+# AI & LLM
+langchain==0.0.340                 # LLM orchestration
+langchain-google-genai==0.0.5      # Gemini integration
+google-generativeai==0.3.2         # Google's AI SDK
+
+# Real-time Communication
+websockets==12.0                   # WebSocket support
+
+# Rate Limiting
+slowapi==0.1.9                     # API rate limiting
+
+# Testing
+pytest==7.4.3                      # Testing framework
+pytest-asyncio==0.21.1             # Async test support
+pytest-cov==7.1.0                  # Test coverage reporting
+httpx==0.28.1                      # FastAPI test client transport
+
+# Background Tasks (Reminders)
+celery==5.3.4                      # Task queue
+redis==5.0.0                       # Redis client

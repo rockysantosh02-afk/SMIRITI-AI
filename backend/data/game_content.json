@@ -1,0 +1,101 @@
+{
+  "matching_image": {
+    "title": "Match the Image",
+    "domain": "VISUAL_MEMORY",
+    "description": "Remember and match familiar everyday images.",
+    "is_memory_generated": false,
+    "content": [
+      {"level": 1, "prompt": "Which image did you just see?", "options": ["mango", "bicycle", "lamp"], "expected_answer": "mango", "expected_time_ms": 15000},
+      {"level": 2, "prompt": "Match the earlier image to its pair.", "options": ["lotus", "rickshaw", "sari", "tabla"], "expected_answer": "tabla", "expected_time_ms": 12000},
+      {"level": 3, "prompt": "Which image appeared in the sequence?", "options": ["diya", "peacock", "sitar", "train", "boat"], "expected_answer": "sitar", "expected_time_ms": 10000}
+    ]
+  },
+  "family_quiz": {
+    "title": "Family Quiz",
+    "domain": "RECALL",
+    "description": "Identify familiar people from memory prompts.",
+    "is_memory_generated": true,
+    "content": [
+      {"level": 1, "prompt": "Who is this family member?", "options": ["mother", "father"], "expected_answer": "mother", "expected_time_ms": 15000},
+      {"level": 2, "prompt": "Which family member is connected to this memory?", "options": ["daughter", "son", "sister"], "expected_answer": "daughter", "expected_time_ms": 12000},
+      {"level": 3, "prompt": "Identify the person from the family memory graph.", "options": ["grandmother", "uncle", "cousin", "brother"], "expected_answer": "grandmother", "expected_time_ms": 10000}
+    ]
+  },
+  "place_correctly": {
+    "title": "Place It Correctly",
+    "domain": "SPATIAL",
+    "description": "Place familiar objects in their correct positions.",
+    "is_memory_generated": false,
+    "content": [
+      {"level": 1, "prompt": "Place the cup on the table.", "options": ["table", "floor", "chair"], "expected_answer": "table", "expected_time_ms": 15000},
+      {"level": 2, "prompt": "Place the lamp beside the bed.", "options": ["beside_bed", "under_bed", "door"], "expected_answer": "beside_bed", "expected_time_ms": 12000},
+      {"level": 3, "prompt": "Place the key to the right of the book.", "options": ["right_of_book", "left_of_book", "behind_book"], "expected_answer": "right_of_book", "expected_time_ms": 10000}
+    ]
+  },
+  "find_differences": {
+    "title": "Find the Differences",
+    "domain": "ATTENTION",
+    "description": "Spot changes between two familiar scenes.",
+    "is_memory_generated": false,
+    "content": [
+      {"level": 1, "prompt": "Find the one difference in the scene.", "options": ["window", "door", "plant"], "expected_answer": "plant", "expected_time_ms": 20000},
+      {"level": 2, "prompt": "Find two differences in the scene.", "options": ["clock", "chair", "flower", "book"], "expected_answer": ["clock", "flower"], "expected_time_ms": 18000},
+      {"level": 3, "prompt": "Find three differences in the detailed scene.", "options": ["sun", "bicycle", "sign", "tree", "bench"], "expected_answer": ["sun", "sign", "bench"], "expected_time_ms": 15000}
+    ]
+  },
+  "sequence_pattern": {
+    "title": "Complete the Pattern",
+    "domain": "REASONING",
+    "description": "Discover the rule and complete a familiar sequence.",
+    "is_memory_generated": false,
+    "content": [
+      {"level": 1, "prompt": "What comes next: 2, 4, 6, ?", "options": ["7", "8", "9"], "expected_answer": "8", "expected_time_ms": 15000},
+      {"level": 2, "prompt": "What comes next: 3, 6, 12, ?", "options": ["15", "18", "24"], "expected_answer": "24", "expected_time_ms": 12000},
+      {"level": 3, "prompt": "What comes next: 1, 4, 9, 16, ?", "options": ["20", "24", "25", "30"], "expected_answer": "25", "expected_time_ms": 10000}
+    ]
+  },
+  "odd_one_out": {
+    "title": "Odd One Out",
+    "domain": "REASONING",
+    "description": "Identify the item that does not belong.",
+    "is_memory_generated": false,
+    "content": [
+      {"level": 1, "prompt": "Which one is different?", "options": ["apple", "banana", "carrot"], "expected_answer": "carrot", "expected_time_ms": 15000},
+      {"level": 2, "prompt": "Which one is not a mode of transport?", "options": ["bus", "train", "river", "car"], "expected_answer": "river", "expected_time_ms": 12000},
+      {"level": 3, "prompt": "Which one does not belong with the others?", "options": ["triangle", "square", "circle", "blue"], "expected_answer": "blue", "expected_time_ms": 10000}
+    ]
+  },
+  "number_compare": {
+    "title": "Number Compare",
+    "domain": "NUMERACY",
+    "description": "Compare quantities in simple everyday situations.",
+    "is_memory_generated": false,
+    "content": [
+      {"level": 1, "prompt": "Which number is greater: 7 or 4?", "options": ["7", "4"], "expected_answer": "7", "expected_time_ms": 12000},
+      {"level": 2, "prompt": "What is 8 + 5?", "options": ["11", "12", "13"], "expected_answer": "13", "expected_time_ms": 12000},
+      {"level": 3, "prompt": "What is 24 divided by 3?", "options": ["6", "8", "9", "12"], "expected_answer": "8", "expected_time_ms": 10000}
+    ]
+  },
+  "picture_recall": {
+    "title": "Picture Recall",
+    "domain": "VISUAL_MEMORY",
+    "description": "Recall details from a briefly shown scene.",
+    "is_memory_generated": false,
+    "content": [
+      {"level": 1, "prompt": "What color was the umbrella?", "options": ["red", "green", "blue"], "expected_answer": "red", "expected_time_ms": 15000},
+      {"level": 2, "prompt": "How many birds were in the garden?", "options": ["one", "two", "three"], "expected_answer": "two", "expected_time_ms": 12000},
+      {"level": 3, "prompt": "Which object was closest to the window?", "options": ["vase", "radio", "basket", "book"], "expected_answer": "vase", "expected_time_ms": 10000}
+    ]
+  },
+  "daily_routine": {
+    "title": "Daily Routine Recall",
+    "domain": "RECALL",
+    "description": "Remember the order of familiar daily activities.",
+    "is_memory_generated": false,
+    "content": [
+      {"level": 1, "prompt": "What usually comes first in the morning?", "options": ["wake_up", "dinner", "sleep"], "expected_answer": "wake_up", "expected_time_ms": 15000},
+      {"level": 2, "prompt": "Which activity came after breakfast?", "options": ["walk", "sleep", "dinner"], "expected_answer": "walk", "expected_time_ms": 12000},
+      {"level": 3, "prompt": "Put the routine's final activity in place.", "options": ["read", "lunch", "bedtime"], "expected_answer": "bedtime", "expected_time_ms": 10000}
+    ]
+  }
+}

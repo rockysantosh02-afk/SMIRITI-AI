@@ -6,6 +6,12 @@ class Settings(BaseSettings):
 
     REDIS_URL: str = "redis://localhost:6379/0"
 
+    FIREBASE_PROJECT_ID: str = ""
+
+    FIREBASE_STORAGE_BUCKET: str = ""
+
+    FIREBASE_CREDENTIALS_PATH: str = "service-account-key.json"
+
     SECRET_KEY: str = "CHANGE_THIS_SECRET_KEY"
 
     ALGORITHM: str = "HS256"
@@ -16,7 +22,7 @@ class Settings(BaseSettings):
 
     DEVICE_TOKEN_EXPIRE_DAYS: int = 180
 
-    GEMINI_API_KEY: str = ""
+    GEMINI_API_KEY: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

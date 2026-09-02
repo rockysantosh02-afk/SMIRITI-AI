@@ -1,0 +1,8 @@
+"""Default load-test parameters."""
+
+USERS = 10
+MAX_USERS = 50
+WARMUP_SECONDS = 300
+DURATION_SECONDS = 900
+P95_TARGET_MS = 500
+P99_TARGET_MS = 1000

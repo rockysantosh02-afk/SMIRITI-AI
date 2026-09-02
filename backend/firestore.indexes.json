@@ -1,0 +1,14 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "reminders",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {"fieldPath": "patient_id", "order": "ASCENDING"},
+        {"fieldPath": "status", "order": "ASCENDING"},
+        {"fieldPath": "scheduled_time", "order": "ASCENDING"}
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

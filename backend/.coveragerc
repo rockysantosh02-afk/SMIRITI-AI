@@ -1,0 +1,15 @@
+[run]
+branch = True
+source =
+    core_logic
+    app/core
+    app/services
+omit =
+    */tests/*
+    */venv/*
+    */venv312/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if TYPE_CHECKING:
