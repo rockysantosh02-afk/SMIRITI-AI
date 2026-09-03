@@ -6,7 +6,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from app.core.firebase_admin import verify_firebase_token
 from app.core.firestore_service import FirestoreService
 from app.core.security import create_access_token
-from app.core.dependencies import get_current_active_user
+from app.core.dependencies import get_current_user
 from app.models.auth_models import (
     FirebaseLoginRequest,
     FirebaseLoginResponse,
@@ -27,11 +27,10 @@ def firebase_login(request: FirebaseLoginRequest) -> FirebaseLoginResponse:
     service = FirestoreService()
     uid = str(claims["uid"])
     user = service.get_user(uid)
-    role = str((user or {}).get("role", "patient"))
     if user is None:
-        service.create_user(uid, {"email": claims.get("email"), "name": claims.get("name"), "role": role, "is_active": True})
-    token = create_access_token({"sub": uid, "firebase_uid": uid, "role": role})
-    return FirebaseLoginResponse(access_token=token, user_id=uid, role=role, firebase_uid=uid)
+        service.create_user(uid, {"email": claims.get("email"), "name": claims.get("name"), "is_active": True})
+    token = create_access_token({"sub": uid, "uid": uid, "email": claims.get("email")})
+    return FirebaseLoginResponse(access_token=token, user_id=uid)
 
 
 @router.post("/firebase-verify", response_model=FirebaseVerifyResponse)
@@ -44,7 +43,7 @@ def firebase_verify(
     claims = verify_firebase_token(credentials.credentials)
     if claims is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired Firebase token")
-    return FirebaseVerifyResponse(user=UserResponse(uid=str(claims["uid"]), email=claims.get("email"), name=claims.get("name"), role=str(claims.get("role", "patient")), language=claims.get("language")))
+    return FirebaseVerifyResponse(user=UserResponse(uid=str(claims["uid"]), email=claims.get("email")))
 
 
 @router.post("/logout")
@@ -54,12 +53,9 @@ def logout() -> dict[str, str]:
 
 
 @router.get("/me", response_model=UserResponse)
-def me(current_user: dict = Depends(get_current_active_user)) -> UserResponse:
-    """Return the active authenticated user's Firestore profile."""
+def me(current_user: dict = Depends(get_current_user)) -> UserResponse:
+    """Return the authenticated user's identity."""
     return UserResponse(
-        uid=str(current_user.get("uid", current_user.get("id", ""))),
+        uid=str(current_user["uid"]),
         email=current_user.get("email"),
-        name=current_user.get("name"),
-        role=str(current_user.get("role", "patient")),
-        language=current_user.get("language"),
     )

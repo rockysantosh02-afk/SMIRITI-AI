@@ -15,9 +15,9 @@ def test_client() -> TestClient:
 
 @pytest.fixture
 def test_user() -> dict[str, str]:
-    return {"uid": "integration-user", "role": "patient", "email": "test@example.com"}
+    return {"uid": "integration-user", "email": "test@example.com"}
 
 
 @pytest.fixture
 def test_patient() -> dict[str, str]:
-    return {"patient_id": "integration-patient", "caregiver_uid": "integration-user"}
+    return {"user_id": "integration-user"}

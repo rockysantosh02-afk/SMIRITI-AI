@@ -1,14 +1,12 @@
-"""Reminder due-date and escalation business logic."""
+"""Reminder due-date and self-directed follow-up business logic."""
 
 import logging
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
-from uuid import uuid4
 
 from firebase_admin import firestore
 
 from app.core.firebase_admin import get_firestore
-from app.core.websocket_manager import websocket_manager
 
 logger = logging.getLogger(__name__)
 
@@ -34,45 +32,30 @@ def should_escalate(reminder: Dict[str, Any], now: Optional[datetime] = None) ->
     return scheduled is not None and scheduled <= current
 
 
-def check_due_reminders() -> List[Dict[str, Any]]:
-    """Find active reminders whose scheduled time has passed and escalate them."""
+def check_due_reminders(user_id: str | None = None) -> List[Dict[str, Any]]:
+    """Find due reminders, optionally limited to one authenticated user."""
     now = datetime.now(timezone.utc)
     due: List[Dict[str, Any]] = []
-    for snapshot in get_firestore().collection("reminders").where("status", "==", "active").stream():
+    query = get_firestore().collection("reminders").where("status", "==", "active")
+    if user_id is not None:
+        query = query.where("user_id", "==", user_id)
+    for snapshot in query.stream():
         reminder = {"id": snapshot.id, **(snapshot.to_dict() or {})}
         if should_escalate(reminder, now):
-            due.append(reminder)
-            process_escalation(snapshot.id)
+            result = process_missed_reminder(reminder)
+            due.append({**reminder, "status": "missed", **result})
     return due
 
 
-def process_escalation(reminder_id: str) -> None:
-    """Mark a missed reminder, create an alert, and broadcast it to caregivers."""
+def process_missed_reminder(reminder: Dict[str, Any]) -> Dict[str, str]:
+    """Mark a reminder missed and return a kind, self-directed follow-up."""
     client = get_firestore()
-    reference = client.collection("reminders").document(reminder_id)
-    snapshot = reference.get()
-    if not snapshot.exists:
-        raise ValueError(f"Reminder not found: {reminder_id}")
-    reminder = snapshot.to_dict() or {}
-    if reminder.get("status") == "acknowledged":
-        return
-    reference.update({"status": "escalated", "escalated_at": firestore.SERVER_TIMESTAMP})
-    alert_id = create_alert(
-        str(reminder.get("patient_id", "")),
-        f"Missed reminder: {reminder.get('label', 'scheduled task')}",
-        "high",
-    )
-    import asyncio
-
-    message = {"type": "reminder_escalated", "reminder_id": reminder_id, "alert_id": alert_id}
-    try:
-        asyncio.get_running_loop().create_task(websocket_manager.broadcast(str(reminder.get("patient_id", "")), message))
-    except RuntimeError:
-        logger.info("No active event loop for reminder broadcast %s", reminder_id)
-
-
-def create_alert(patient_id: str, message: str, severity: str) -> str:
-    """Create a patient alert and return its generated ID."""
-    reference = get_firestore().collection("alerts").document(uuid4().hex)
-    reference.set({"patient_id": patient_id, "message": message, "severity": severity, "created_at": firestore.SERVER_TIMESTAMP})
-    return reference.id
+    message = "It's okay to miss a reminder sometimes. Want to try again?"
+    if str(reminder.get("language", reminder.get("preferred_language", "en"))).startswith("hi"):
+        message = "कभी-कभी रिमाइंडर छूट जाना ठीक है। क्या आप फिर से कोशिश करना चाहेंगे?"
+    reminder_id = str(reminder.get("id", reminder.get("reminder_id", "")))
+    if reminder_id:
+        client.collection("reminders").document(reminder_id).update(
+            {"status": "missed", "follow_up_message": message, "updated_at": firestore.SERVER_TIMESTAMP}
+        )
+    return {"follow_up_message": message}

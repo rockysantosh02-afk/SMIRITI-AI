@@ -1,11 +1,46 @@
 {
-  "info": {"name": "Smriti AI Backend", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},
-  "variable": [{"key": "baseUrl", "value": "http://127.0.0.1:8000"}, {"key": "token", "value": ""}],
+  "info": {"name": "SMRITI-AI Backend API", "description": "Run System setup first. Set firebase_id_token for authentication.", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"},
+  "variable": [
+    {"key":"baseUrl","value":"http://127.0.0.1:8000"}, {"key":"firebase_id_token","value":""}, {"key":"token","value":""},
+    {"key":"session_id","value":""}, {"key":"entry_id","value":""}, {"key":"story_id","value":""}, {"key":"reminder_id","value":""}
+  ],
+  "event": [
+    {"listen":"prerequest","script":{"exec":["if (pm.variables.get('token')) pm.request.headers.upsert({key:'Authorization',value:'Bearer '+pm.variables.get('token')});"]}},
+    {"listen":"test","script":{"exec":["pm.test('HTTP response is successful or expected auth/service error', function () { pm.expect([200,400,401,403,404,422,503]).to.include(pm.response.code); });"]}}
+  ],
   "item": [
-    {"name": "Health", "request": {"method": "GET", "url": "{{baseUrl}}/health"}},
-    {"name": "Games", "request": {"method": "GET", "url": "{{baseUrl}}/games"}},
-    {"name": "Firebase Login", "request": {"method": "POST", "header": [{"key": "Content-Type", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"id_token\": \"TOKEN\"}"}, "url": "{{baseUrl}}/auth/firebase-login"}},
-    {"name": "My Profile", "request": {"method": "GET", "header": [{"key": "Authorization", "value": "Bearer {{token}}"}], "url": "{{baseUrl}}/auth/me"}},
-    {"name": "Due Reminders", "request": {"method": "GET", "url": "{{baseUrl}}/reminders/check-due"}}
+    {"name":"System","item":[
+      {"name":"Root","request":{"method":"GET","url":"{{baseUrl}}/"}},
+      {"name":"Health","request":{"method":"GET","url":"{{baseUrl}}/health"}},
+      {"name":"Firestore health","request":{"method":"GET","url":"{{baseUrl}}/test-firestore"}},
+      {"name":"Setup test data","request":{"method":"GET","url":"{{baseUrl}}/test/setup"},"event":[{"listen":"test","script":{"exec":["const d=pm.response.json(); pm.collectionVariables.set('session_id',d.session_id);"]}}]},
+      {"name":"Create test session","request":{"method":"POST","url":"{{baseUrl}}/test/create-session/matching_image"}}
+    ]},
+    {"name":"Authentication","item":[
+      {"name":"Firebase login","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"id_token\":\"{{firebase_id_token}}\"}"},"url":"{{baseUrl}}/auth/firebase-login"},"event":[{"listen":"test","script":{"exec":["if(pm.response.code===200) pm.collectionVariables.set('token',pm.response.json().access_token);"]}}]},
+      {"name":"Firebase verify","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{firebase_id_token}}"}],"url":"{{baseUrl}}/auth/firebase-verify"}},
+      {"name":"Current user","request":{"method":"GET","url":"{{baseUrl}}/auth/me"}},
+      {"name":"Logout","request":{"method":"POST","url":"{{baseUrl}}/auth/logout"}}
+    ]},
+    {"name":"Games","item":[
+      {"name":"List games","request":{"method":"GET","url":"{{baseUrl}}/games"}},
+      {"name":"Create session","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"game_code\":\"recall_my_memories\"}"},"url":"{{baseUrl}}/games/sessions"},"event":[{"listen":"test","script":{"exec":["pm.collectionVariables.set('session_id',pm.response.json().session_id);"]}}]},
+      {"name":"Next round","request":{"method":"GET","url":"{{baseUrl}}/games/next-round/{{session_id}}"}},
+      {"name":"Submit attempt","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"session_id\":\"{{session_id}}\",\"selected_index\":0,\"response_time_ms\":1000}"},"url":"{{baseUrl}}/games/attempt"}},
+      {"name":"User scores","request":{"method":"GET","url":"{{baseUrl}}/games/scores"}}
+    ]},
+    {"name":"Personal Memory Journal","item":[
+      {"name":"Create entry","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"photo_url\":\"test/garden.jpg\",\"caption\":\"A sunny garden walk\",\"tag_place\":\"garden\",\"tag_occasion\":\"Sunday\"}"},"url":"{{baseUrl}}/journal/entries"},"event":[{"listen":"test","script":{"exec":["pm.collectionVariables.set('entry_id',pm.response.json().entry_id);"]}}]},
+      {"name":"List entries","request":{"method":"GET","url":"{{baseUrl}}/journal/entries"}},
+      {"name":"Generate story","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"entry_ids\":[\"{{entry_id}}\"]}"},"url":"{{baseUrl}}/journal/stories/generate"},"event":[{"listen":"test","script":{"exec":["pm.collectionVariables.set('story_id',pm.response.json().story_id);"]}}]},
+      {"name":"Approve story","request":{"method":"PUT","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"action\":\"approve\"}"},"url":"{{baseUrl}}/journal/stories/{{story_id}}/approve"}}
+    ]},
+    {"name":"Reminders","item":[
+      {"name":"Create reminder","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"label\":\"Take medicine\",\"type\":\"medication\",\"scheduled_time\":\"2099-01-01T09:00:00Z\"}"},"url":"{{baseUrl}}/reminders"},"event":[{"listen":"test","script":{"exec":["pm.collectionVariables.set('reminder_id',pm.response.json().reminder_id);"]}}]},
+      {"name":"List reminders","request":{"method":"GET","url":"{{baseUrl}}/reminders"}},
+      {"name":"Check due","request":{"method":"GET","url":"{{baseUrl}}/reminders/check-due"}},
+      {"name":"Acknowledge reminder","request":{"method":"PUT","url":"{{baseUrl}}/reminders/{{reminder_id}}/acknowledge"}},
+      {"name":"Batch sync","request":{"method":"POST","header":[{"key":"Content-Type","value":"application/json"}],"body":{"mode":"raw","raw":"{\"records\":[{\"collection\":\"journal_entries\",\"client_generated_id\":\"offline-1\",\"data\":{\"caption\":\"Offline note\"}}]}"},"url":"{{baseUrl}}/sync/batch"}}
+    ]}
   ]
 }

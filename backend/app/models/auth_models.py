@@ -14,16 +14,11 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user_id: str
-    role: str
-    firebase_uid: str
 
 
 class FirebaseUserInfo(BaseModel):
     uid: str
     email: Optional[str] = None
-    name: Optional[str] = None
-    role: str = "patient"
-    language: Optional[str] = None
 
 
 class UserResponse(FirebaseUserInfo):

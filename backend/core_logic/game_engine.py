@@ -49,8 +49,8 @@ class GameEngine:
     ) -> Dict[str, Any]:
         """Return a round for a game and difficulty level.
 
-        Memory-generated games use available memory graph people when supplied;
-        otherwise their seeded static round is returned.
+        Recall games use the user's journal entries when supplied; otherwise
+        their seeded static round is returned.
         """
         if game_code not in self.games:
             raise ValueError(f"Unknown game code: {game_code}")
@@ -61,20 +61,16 @@ class GameEngine:
         round_data = dict(game.content[difficulty - 1])
         round_data["memory_generated"] = False
         if game.is_memory_generated and memory_graph:
-            people = memory_graph.get("persons") or memory_graph.get("people") or []
-            if people:
-                person = people[0]
-                if isinstance(person, dict):
-                    name = person.get("name", "this person")
-                    relationship = person.get("relationship")
-                else:
-                    name = str(person)
-                    relationship = None
-                round_data["prompt"] = f"Who is {name} in your memory?"
-                round_data["expected_answer"] = relationship or name
+            entries = memory_graph.get("entries") or []
+            if entries:
+                entry = entries[0]
+                caption = entry.get("caption") or entry.get("tag_occasion") or entry.get("tag_place") or "this journal entry"
+                answer = entry.get("tag_object") or entry.get("tag_place") or caption
+                round_data["prompt"] = f"What do you remember about {caption}?"
+                round_data["expected_answer"] = answer
                 round_data["memory_generated"] = True
-                if relationship and relationship not in round_data.get("options", []):
-                    round_data["options"] = [relationship] + list(round_data.get("options", []))
+                if answer not in round_data.get("options", []):
+                    round_data["options"] = [answer] + list(round_data.get("options", []))
         round_data["game_code"] = game_code
         round_data["domain"] = game.domain
         return round_data

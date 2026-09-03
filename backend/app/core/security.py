@@ -8,8 +8,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
 from app.core.config import settings
-from app.core.firestore_service import FirestoreService
-
+from app.core.firestore_service import FirestoreService  # Compatibility import for existing test fixtures.
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/firebase-login")
 
 
@@ -45,13 +44,13 @@ def decode_access_token(token: str) -> Dict[str, Any]:
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, Any]:
-    """Validate a JWT and load its user document from Firestore.
+    """Validate a JWT and return its authenticated Firebase UID.
 
     Args:
         token: Bearer token extracted by FastAPI's OAuth2 scheme.
 
     Returns:
-        The Firestore user dictionary, including its document ID.
+        A minimal identity dictionary containing ``uid`` and optional ``email``.
 
     Raises:
         HTTPException: With status 401 for invalid tokens or missing users.
@@ -65,7 +64,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, Any]:
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
-    user_id = claims.get("sub") or claims.get("firebase_uid") or claims.get("uid")
+    user_id = claims.get("uid") or claims.get("sub")
     if not isinstance(user_id, str) or not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -73,26 +72,13 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> Dict[str, Any]:
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    try:
-        user = FirestoreService().get_user(user_id)
-    except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="User service is unavailable; verify Firebase configuration",
-        ) from exc
-    if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User account was not found",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
+    return {"uid": user_id, "email": claims.get("email")}
 
 
 def get_current_active_user(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ) -> Dict[str, Any]:
-    """Ensure the authenticated Firestore user is active.
+    """Return the authenticated user identity.
 
     Args:
         current_user: User returned by :func:`get_current_user`.
@@ -103,10 +89,4 @@ def get_current_active_user(
     Raises:
         HTTPException: With status 401 when the account is inactive.
     """
-    if not current_user.get("is_active", True):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User account is inactive",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
     return current_user

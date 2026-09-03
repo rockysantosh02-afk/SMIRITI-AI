@@ -10,15 +10,15 @@
       {"level": 3, "prompt": "Which image appeared in the sequence?", "options": ["diya", "peacock", "sitar", "train", "boat"], "expected_answer": "sitar", "expected_time_ms": 10000}
     ]
   },
-  "family_quiz": {
-    "title": "Family Quiz",
+  "recall_my_memories": {
+    "title": "Recall My Memories",
     "domain": "RECALL",
-    "description": "Identify familiar people from memory prompts.",
+    "description": "Recall details from your own journal entries.",
     "is_memory_generated": true,
     "content": [
-      {"level": 1, "prompt": "Who is this family member?", "options": ["mother", "father"], "expected_answer": "mother", "expected_time_ms": 15000},
-      {"level": 2, "prompt": "Which family member is connected to this memory?", "options": ["daughter", "son", "sister"], "expected_answer": "daughter", "expected_time_ms": 12000},
-      {"level": 3, "prompt": "Identify the person from the family memory graph.", "options": ["grandmother", "uncle", "cousin", "brother"], "expected_answer": "grandmother", "expected_time_ms": 10000}
+      {"level": 1, "prompt": "What do you remember about this journal entry?", "options": ["morning", "garden"], "expected_answer": "morning", "expected_time_ms": 15000},
+      {"level": 2, "prompt": "Which detail belongs to your journal entry?", "options": ["garden", "market", "school"], "expected_answer": "garden", "expected_time_ms": 12000},
+      {"level": 3, "prompt": "Recall a detail from your journal entry.", "options": ["garden", "station", "library", "park"], "expected_answer": "garden", "expected_time_ms": 10000}
     ]
   },
   "place_correctly": {

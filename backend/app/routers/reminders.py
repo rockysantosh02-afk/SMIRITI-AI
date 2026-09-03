@@ -1,4 +1,4 @@
-"""Reminder scheduling, acknowledgement, and escalation endpoints."""
+"""Reminder scheduling, acknowledgement, and self-directed follow-up endpoints."""
 
 from datetime import datetime
 from typing import Any, Dict, List
@@ -9,55 +9,48 @@ from firebase_admin import firestore
 from pydantic import BaseModel
 
 from app.core.firestore_service import FirestoreService
+from app.core.dependencies import get_current_user
 from app.dependencies import get_firestore_service
-from app.services.reminder_logic import check_due_reminders, process_escalation
+from app.services.reminder_logic import check_due_reminders
 
 router = APIRouter(prefix="/reminders", tags=["reminders"])
 
 
 class ReminderRequest(BaseModel):
-    patient_id: str
     label: str
     type: str
     scheduled_time: datetime
 
 
 @router.post("")
-def create_reminder(request: ReminderRequest, service: FirestoreService = Depends(get_firestore_service)) -> Dict[str, str]:
-    """Create a reminder and schedule its local notification metadata."""
+def create_reminder(request: ReminderRequest, service: FirestoreService = Depends(get_firestore_service), current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, str]:
+    """Create a reminder owned by the authenticated user."""
     reminder_id = uuid4().hex
-    service.client.collection("reminders").document(reminder_id).set({**request.model_dump(), "status": "active", "created_at": firestore.SERVER_TIMESTAMP})
+    service.client.collection("reminders").document(reminder_id).set({**request.model_dump(), "user_id": current_user["uid"], "status": "active", "created_at": firestore.SERVER_TIMESTAMP})
     return {"reminder_id": reminder_id, "status": "scheduled"}
 
 
 @router.get("/check-due")
-def check_due() -> Dict[str, Any]:
-    """Check due reminders; intended for periodic Celery invocation."""
-    due = check_due_reminders()
+def check_due(current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
+    """Check reminders belonging to the authenticated user."""
+    due = check_due_reminders(current_user["uid"])
     return {"checked": len(due), "reminders": due}
 
 
-@router.get("/{patient_id}")
-def list_reminders(patient_id: str, service: FirestoreService = Depends(get_firestore_service)) -> List[Dict[str, Any]]:
-    """Return active reminders for a patient."""
-    return [{"id": item.id, **(item.to_dict() or {})} for item in service.client.collection("reminders").where("patient_id", "==", patient_id).where("status", "==", "active").stream()]
+@router.get("")
+def list_reminders(service: FirestoreService = Depends(get_firestore_service), current_user: Dict[str, Any] = Depends(get_current_user)) -> List[Dict[str, Any]]:
+    """Return active reminders owned by the authenticated user."""
+    return [{"id": item.id, **(item.to_dict() or {})} for item in service.client.collection("reminders").where("user_id", "==", current_user["uid"]).where("status", "==", "active").stream()]
 
 
 @router.put("/{reminder_id}/acknowledge")
-def acknowledge_reminder(reminder_id: str, service: FirestoreService = Depends(get_firestore_service)) -> Dict[str, str]:
+def acknowledge_reminder(reminder_id: str, service: FirestoreService = Depends(get_firestore_service), current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, str]:
     """Record an acknowledgement and mark a reminder complete."""
     reference = service.client.collection("reminders").document(reminder_id)
-    if not reference.get().exists:
+    snapshot = reference.get()
+    if not snapshot.exists or (snapshot.to_dict() or {}).get("user_id") != current_user["uid"]:
         raise HTTPException(status_code=404, detail="Reminder not found")
     reference.update({"status": "acknowledged", "acknowledged_at": firestore.SERVER_TIMESTAMP})
     return {"reminder_id": reminder_id, "status": "acknowledged"}
 
 
-@router.post("/{reminder_id}/escalate")
-def escalate_reminder(reminder_id: str) -> Dict[str, str]:
-    """Manually escalate a reminder and notify connected caregivers."""
-    try:
-        process_escalation(reminder_id)
-    except ValueError as exc:
-        raise HTTPException(status_code=404, detail=str(exc)) from exc
-    return {"reminder_id": reminder_id, "status": "escalated"}

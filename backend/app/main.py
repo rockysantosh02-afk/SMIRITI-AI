@@ -8,7 +8,7 @@ from app.core.firestore_service import FirestoreServiceError
 from app.core.firebase_admin import FirebaseInitializationError, get_firestore
 from app.exceptions import ForbiddenException, NotFoundException, ServerException, SmritiException, UnauthorizedException, ValidationException
 from app.logging_config import configure_logging
-from app.routers import auth, games, memory, reminders
+from app.routers import auth, games, journal, reminders, sync, test_helpers
 
 configure_logging()
 import logging
@@ -62,8 +62,10 @@ async def test_firestore():
 
 app.include_router(auth.router)
 app.include_router(games.router)
-app.include_router(memory.router)
+app.include_router(test_helpers.router)
+app.include_router(journal.router)
 app.include_router(reminders.router)
+app.include_router(sync.router)
 
 
 @app.on_event("startup")

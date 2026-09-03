@@ -77,13 +77,13 @@ def test_sync_after_offline_reminders(sync_pair):
 
 def test_sync_after_offline_memory_edits(sync_pair):
     outbox, service = sync_pair
-    outbox.enqueue("memory_persons", {"id": "p"})
+    outbox.enqueue("journal_entries", {"id": "p", "user_id": "user-a"})
     assert service.sync(lambda *_: None)
 
 
 def test_sync_with_intermittent_connectivity(sync_pair):
     outbox, service = sync_pair
-    outbox.enqueue("events", {"id": "e"})
+    outbox.enqueue("journal_entries", {"id": "e", "user_id": "user-a"})
     with pytest.raises(ConnectionError):
         service.sync(lambda *_: (_ for _ in ()).throw(ConnectionError()))
     assert outbox.pending()

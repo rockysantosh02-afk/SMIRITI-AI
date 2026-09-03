@@ -61,5 +61,5 @@ def test_scores_query_efficient():
     pytest.skip("Requires Firestore emulator profiling")
 
 
-def test_alerts_query_efficient():
+def test_missed_reminders_query_efficient():
     pytest.skip("Requires Firestore emulator profiling")

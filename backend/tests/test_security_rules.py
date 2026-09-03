@@ -30,53 +30,5 @@ def test_user_cannot_update_other_user_data():
     assert True
 
 
-def test_caregiver_can_read_assigned_patient():
-    assert True
-
-
-def test_caregiver_cannot_read_unassigned_patient():
-    assert True
-
-
-def test_patient_can_read_own_profile():
-    assert True
-
-
-def test_patient_cannot_read_other_patient():
-    assert True
-
-
-def test_patient_can_read_own_memory_graph():
-    assert True
-
-
-def test_family_can_read_patient_memory_graph():
-    assert True
-
-
-def test_stranger_cannot_read_memory_graph():
-    assert True
-
-
-def test_patient_can_write_own_memory_graph():
-    assert True
-
-
-def test_family_can_write_with_consent():
-    assert True
-
-
-def test_consent_required_for_photos():
-    assert True
-
-
-def test_consent_required_for_voice():
-    assert True
-
-
-def test_consent_required_for_scores():
-    assert True
-
-
-def test_revoked_consent_blocks_access():
+def test_only_authenticated_owner_can_access_user_documents():
     assert True

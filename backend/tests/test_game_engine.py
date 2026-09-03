@@ -23,19 +23,19 @@ def test_round_matches_requested_difficulty(engine: GameEngine) -> None:
     assert round_data["domain"] == "NUMERACY"
 
 
-def test_memory_game_uses_memory_graph(engine: GameEngine) -> None:
+def test_recall_game_uses_journal_entry(engine: GameEngine) -> None:
     round_data = engine.get_next_round(
-        "family_quiz", 1, {"persons": [{"name": "Asha", "relationship": "daughter"}]}
+        "recall_my_memories", 1, {"entries": [{"caption": "my garden visit", "tag_object": "camera"}]}
     )
     assert round_data["memory_generated"] is True
-    assert round_data["expected_answer"] == "daughter"
-    assert "daughter" in round_data["options"]
+    assert round_data["expected_answer"] == "camera"
+    assert "camera" in round_data["options"]
 
 
-def test_memory_game_falls_back_to_seeded_content(engine: GameEngine) -> None:
-    round_data = engine.get_next_round("family_quiz", 2, {})
+def test_recall_game_falls_back_to_seeded_content(engine: GameEngine) -> None:
+    round_data = engine.get_next_round("recall_my_memories", 2, {})
     assert round_data["memory_generated"] is not True
-    assert round_data["expected_answer"] == "daughter"
+    assert round_data["expected_answer"] == "garden"
 
 
 def test_score_round_accepts_option_index(engine: GameEngine) -> None:

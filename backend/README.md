@@ -1,8 +1,13 @@
 ## Firebase authentication tests
 
+The backend serves the single-user dashboard application. There is no
+caregiver, family-member, or other second-party role; authenticated users can
+access only documents whose `user_id` matches their Firebase UID.
+
 1. Copy `.env.example` to `.env` and fill in the Firebase settings.
-2. Place the downloaded `service-account-key.json` in this directory, or set
-	`FIREBASE_CREDENTIALS_PATH` to its path.
+2. Place the downloaded `service-account-key.json` in this directory, set
+	`FIREBASE_CREDENTIALS_PATH` or `GOOGLE_APPLICATION_CREDENTIALS` to its path,
+	or use Application Default Credentials with `gcloud auth application-default login`.
 3. Create a Firebase test user with Email/Password in Firebase Console.
 4. Obtain an ID token by signing in with the Firebase client SDK, then call:
 

@@ -1,6 +1,7 @@
 """Firebase Admin SDK setup and access helpers."""
 
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +27,29 @@ def _credential_path() -> Path:
     return Path(__file__).resolve().parents[2] / configured_path
 
 
+def _load_credentials() -> credentials.Base:
+    """Load a service account file or fall back to Application Default Credentials."""
+    configured_path = _credential_path()
+    environment_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+    candidate = Path(environment_path) if environment_path else configured_path
+    if candidate.is_file():
+        return credentials.Certificate(str(candidate))
+
+    try:
+        application_default = credentials.ApplicationDefault()
+        application_default.get_credential()
+        return application_default
+    except Exception as exc:
+        logger.error(
+            "Firebase credentials unavailable. Checked %s and Application Default Credentials.",
+            candidate,
+        )
+        raise FirebaseInitializationError(
+            "Firebase credentials unavailable. Add backend/service-account-key.json, "
+            "set GOOGLE_APPLICATION_CREDENTIALS, or configure Application Default Credentials."
+        ) from exc
+
+
 def _get_firebase_app() -> firebase_admin.App:
     global _firebase_app
 
@@ -36,15 +60,8 @@ def _get_firebase_app() -> firebase_admin.App:
         _firebase_app = firebase_admin.get_app()
         return _firebase_app
 
-    key_path = _credential_path()
-    if not key_path.is_file():
-        logger.error("Firebase service account file not found: %s", key_path)
-        raise FirebaseInitializationError(
-            f"Firebase service account file not found: {key_path}"
-        )
-
     try:
-        firebase_credential = credentials.Certificate(str(key_path))
+        firebase_credential = _load_credentials()
         options: dict[str, Any] = {}
         if settings.FIREBASE_STORAGE_BUCKET:
             options["storageBucket"] = settings.FIREBASE_STORAGE_BUCKET
@@ -80,6 +97,8 @@ def verify_firebase_token(id_token: str, check_revoked: bool = False) -> dict[st
     except (auth.InvalidIdTokenError, auth.ExpiredIdTokenError, auth.RevokedIdTokenError) as exc:
         logger.warning("Firebase ID token validation failed: %s", exc)
         return None
+    except FirebaseInitializationError:
+        raise
     except Exception:
         logger.exception("Unexpected error while validating Firebase ID token")
         return None

@@ -1,10 +1,14 @@
-"""Small rule-based safety guard for generated memory content."""
+"""Conservative validation for AI-generated journal content."""
 
 import re
 from typing import Any, Dict, List, Optional
 
-_BLOCKED_TERMS = ("explicit", "sexual", "abuse", "violence", "violent", "weapon")
-_MAX_CONTENT_LENGTH = 5000
+_BLOCKED_TERMS = (
+    "explicit", "sexual", "abuse", "violence", "violent", "weapon",
+    "illness", "disease", "death", "dead", "died", "dying", "funeral",
+    "suicide", "self-harm", "murder",
+)
+_MAX_WORDS = 80
 
 
 def is_safe_content(text: str) -> bool:
@@ -13,15 +17,23 @@ def is_safe_content(text: str) -> bool:
     return not any(re.search(rf"\b{re.escape(term)}\b", normalized) for term in _BLOCKED_TERMS)
 
 
+def passes_content_guard(text: str) -> tuple[bool, str]:
+    """Return ``(True, '')`` for safe text, or ``(False, reason)`` otherwise."""
+    if len(text.split()) > _MAX_WORDS:
+        return False, "content exceeds the maximum of 80 words"
+    normalized = text.casefold()
+    if any(re.search(rf"\b{re.escape(term)}\b", normalized) for term in _BLOCKED_TERMS):
+        return False, "content contains distressing or unsafe language"
+    return True, ""
+
+
 def check_content(text: str, relationship: Optional[str] = None, allowed_relationships: Optional[List[str]] = None) -> Dict[str, Any]:
     """Return a safety result with actionable reasons for rejected content."""
     reasons: List[str] = []
     normalized = text.casefold()
-    if len(text) > _MAX_CONTENT_LENGTH:
-        reasons.append("content exceeds the maximum allowed length")
-    blocked = [term for term in _BLOCKED_TERMS if re.search(rf"\b{re.escape(term)}\b", normalized)]
-    if blocked:
-        reasons.append("content contains distressing or unsafe language")
+    passed, reason = passes_content_guard(text)
+    if not passed:
+        reasons.append(reason)
     if allowed_relationships is not None and relationship not in allowed_relationships:
         reasons.append("relationship is not allowed for this memory")
     return {"safe": not reasons, "reasons": reasons}

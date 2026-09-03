@@ -1,4 +1,4 @@
-"""In-process websocket connection manager for caregiver alerts."""
+"""In-process websocket connection manager for user notifications."""
 
 from typing import Any, Dict, Set
 
@@ -6,34 +6,34 @@ from fastapi import WebSocket
 
 
 class WebSocketManager:
-    """Track connections by patient and broadcast JSON events."""
+    """Track connections by user and broadcast JSON events."""
 
     def __init__(self) -> None:
         self._connections: Dict[str, Set[WebSocket]] = {}
 
-    async def connect(self, patient_id: str, websocket: WebSocket) -> None:
-        """Accept and register a websocket for a patient."""
+    async def connect(self, user_id: str, websocket: WebSocket) -> None:
+        """Accept and register a websocket for a user."""
         await websocket.accept()
-        self._connections.setdefault(patient_id, set()).add(websocket)
+        self._connections.setdefault(user_id, set()).add(websocket)
 
-    def disconnect(self, patient_id: str, websocket: WebSocket) -> None:
+    def disconnect(self, user_id: str, websocket: WebSocket) -> None:
         """Remove a websocket connection."""
-        connections = self._connections.get(patient_id)
+        connections = self._connections.get(user_id)
         if connections is not None:
             connections.discard(websocket)
             if not connections:
-                self._connections.pop(patient_id, None)
+                self._connections.pop(user_id, None)
 
-    async def broadcast(self, patient_id: str, message: Dict[str, Any]) -> None:
-        """Send an alert to all connected caregivers for a patient."""
+    async def broadcast(self, user_id: str, message: Dict[str, Any]) -> None:
+        """Send a notification to the user's connections."""
         stale = []
-        for websocket in self._connections.get(patient_id, set()):
+        for websocket in self._connections.get(user_id, set()):
             try:
                 await websocket.send_json(message)
             except Exception:
                 stale.append(websocket)
         for websocket in stale:
-            self.disconnect(patient_id, websocket)
+            self.disconnect(user_id, websocket)
 
 
 websocket_manager = WebSocketManager()

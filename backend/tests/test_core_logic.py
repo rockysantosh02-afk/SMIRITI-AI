@@ -106,12 +106,12 @@ def test_different_difficulty_returns_different_content():
 
 
 def test_memory_generated_game_with_data():
-    result = get_next_round("family_quiz", 1, {"persons": [{"name": "Maya", "relationship": "sister"}]})
-    assert result["memory_generated"] and result["expected_answer"] == "sister"
+    result = get_next_round("recall_my_memories", 1, {"entries": [{"caption": "garden visit", "tag_place": "garden"}]})
+    assert result["memory_generated"] and result["expected_answer"] == "garden"
 
 
 def test_memory_generated_game_without_data_fallback():
-    result = get_next_round("family_quiz", 1)
+    result = get_next_round("recall_my_memories", 1)
     assert result["memory_generated"] is False and result["expected_answer"]
 
 
@@ -141,7 +141,7 @@ def test_distressing_content_blocked():
 
 
 def test_too_long_content_blocked():
-    assert not check_content("x" * 5001)["safe"]
+    assert not check_content("x " * 81)["safe"]
 
 
 def test_wrong_relationship_blocked():
@@ -150,8 +150,8 @@ def test_wrong_relationship_blocked():
 
 
 def test_content_guard_returns_reasons():
-    result = check_content("violent " + "x" * 5001, "stranger", ["mother"])
-    assert len(result["reasons"]) == 3
+    result = check_content("violent " + "x " * 81, "stranger", ["mother"])
+    assert len(result["reasons"]) == 2
 
 
 def test_below_threshold_no_escalation():
