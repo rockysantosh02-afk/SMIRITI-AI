@@ -5,34 +5,15 @@ from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
 from firebase_admin import firestore
-from pydantic import BaseModel, Field
 
 from app.core.dependencies import get_current_user
 from app.core.firestore_service import FirestoreService
 from app.dependencies import get_firestore_service
+from app.schemas.api import JournalEntryRequest, StoryAction, StoryRequest
 from app.services.content_guard import passes_content_guard
 from app.services.story_generator import generate_journal_story
 
 router = APIRouter(prefix="/journal", tags=["journal"])
-
-
-class JournalEntryRequest(BaseModel):
-    photo_url: str | None = None
-    voice_note_url: str | None = None
-    tag_place: str | None = None
-    tag_object: str | None = None
-    tag_occasion: str | None = None
-    caption: str | None = None
-    ai_story_text: str | None = None
-    ai_story_passed_content_guard: bool = False
-
-
-class StoryRequest(BaseModel):
-    entry_ids: List[str] = Field(default_factory=list)
-
-
-class StoryAction(BaseModel):
-    action: str
 
 
 def _owned_entry(service: FirestoreService, entry_id: str, user_id: str) -> Dict[str, Any]:

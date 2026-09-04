@@ -1,95 +1,118 @@
-# Firestore Data Model
+ # Smriti AI – Firestore Data Model
 
-## Ownership and roles
+**Version:** v2.0 (single‑user design)  
+**Last updated:** 2026-09-04
 
-Simriti is a single-user application. Every Firestore document contains a required `user_id` field whose value is the Firebase Authentication UID of the document owner. A user can read and write only their own documents.
+> **Important:** This schema has **no** `families`, `caregiver_uids`, or `family_uids` fields.  
+> Every document belongs to exactly one user (identified by `user_id`), and **only that user** can read/write it.
 
-There is no second-party role in this model: no caregiver, family member, delegated viewer, shared account, or other user can access another user's data.
+---
 
 ## Collections
 
-### `users/{user_id}`
+### `users`
+One document per signed‑in user.
 
-Stores the authenticated user's profile and preferences.
+| Field | Type | Description |
+|-------|------|-------------|
+| `user_id` | string | Firebase Auth UID (document ID) |
+| `display_name` | string | User's chosen name |
+| `email` | string | Email address |
+| `preferred_language` | string | `en`, `hi`, `as`, `bn` |
+| `text_size_multiplier` | number | 1.0 – 1.5 (user adjustable) |
+| `created_at` | timestamp | Account creation time |
+| `consent` | map | `{photo_consent: bool, voice_consent: bool, score_consent: bool}` each with timestamp |
 
-Required fields:
+---
 
-- `user_id`: string, the Firebase Authentication UID; normally the document ID as well.
+### `game_sessions`
+One document per completed game round.
 
-Additional profile and preference fields may be added without changing ownership semantics.
+| Field | Type | Description |
+|-------|------|-------------|
+| `session_id` | string | Document ID (or client_generated_id) |
+| `user_id` | string | Owner of this session |
+| `game_id` | string | e.g., `matching_image` |
+| `domain` | string | `VISUAL_MEMORY`, `ATTENTION`, `SPATIAL`, `RECALL`, `REASONING`, `NUMERACY` |
+| `accuracy` | number | 0–1 (correct / total) |
+| `response_time_ms` | integer | Total time for the round |
+| `difficulty_level` | integer | 1–5 |
+| `played_at` | timestamp | When the round finished |
+| `synced_at` | timestamp (nullable) | Null = not yet synced |
 
-### `patients/{patient_id}`
+---
 
-Stores the user's personal profile record and application state associated with that user.
+### `cognitive_scores`
+One document per domain per user – updated after each session.
 
-Required fields:
+| Field | Type | Description |
+|-------|------|-------------|
+| `user_id` | string | Owner |
+| `domain` | string | Same domains as above |
+| `composite_score` | number | 0–1 (60% accuracy + 30% speed + 10% trend) |
+| `accuracy_ewma` | number | Smoothed accuracy |
+| `speed_score` | number | 0–1 |
+| `trend` | number | –1 to 1 |
+| `current_level` | integer | 1–5 |
+| `last_reason` | string | Warm, human‑readable explanation |
+| `updated_at` | timestamp | Last update |
 
-- `patient_id`: string, the document identifier.
-- `user_id`: string, the owning Firebase Authentication UID.
+---
 
-A patient record is private to its owner. It is not a shared or delegated record.
+### `journal_entries`
+The user's own photos, voice notes, and memories.
 
-### `journal_entries/{entry_id}`
+| Field | Type | Description |
+|-------|------|-------------|
+| `entry_id` | string | Document ID (or client_generated_id) |
+| `user_id` | string | Owner |
+| `photo_url` | string (nullable) | Firebase Storage URL |
+| `voice_note_url` | string (nullable) | Firebase Storage URL |
+| `tag_place` | string | User‑provided place label |
+| `tag_object` | string | User‑provided object label |
+| `tag_occasion` | string | User‑provided occasion label |
+| `caption` | string | Short text |
+| `ai_story_text` | string (nullable) | AI‑generated reflection |
+| `ai_story_passed_content_guard` | boolean | True if safe |
+| `created_at` | timestamp | When entry was created |
+| `synced_at` | timestamp (nullable) | Null = not yet synced |
 
-Stores one user-owned journal entry.
+---
 
-Required fields:
+### `reminders`
+Daily medication, appointment, or routine reminders.
 
-- `entry_id`: string, the document identifier.
-- `user_id`: string, the owning Firebase Authentication UID.
-- `photo_url` or `voice_note_url`: string, the source media URL; at least one source is expected.
-- `tag_place`: string or null, an optional place tag.
-- `tag_object`: string or null, an optional object tag.
-- `tag_occasion`: string or null, an optional occasion tag.
-- `caption`: string or null, the user's caption.
-- `ai_story_text`: string or null, generated story text.
-- `ai_story_passed_content_guard`: boolean, whether generated content passed the content guard.
-- `created_at`: timestamp, when the entry was created.
+| Field | Type | Description |
+|-------|------|-------------|
+| `reminder_id` | string | Document ID (or client_generated_id) |
+| `user_id` | string | Owner |
+| `title` | string | e.g., "Take medicine" |
+| `type` | string | `medication`, `routine`, `appointment` |
+| `scheduled_time` | timestamp | When to fire |
+| `recurrence` | string (nullable) | `daily`, `weekly`, or null |
+| `status` | string | `pending`, `completed`, `missed`, `dismissed` |
+| `follow_up_sent` | boolean | True if gentle follow‑up was shown |
+| `created_at` | timestamp | When created |
+| `synced_at` | timestamp (nullable) | Null = not yet synced |
 
-`photo_url` and `voice_note_url` are alternative media fields. The remaining tag and text fields can be empty when not applicable.
+---
 
-### `reminders/{reminder_id}`
+### `consents`
+Audit log of consent actions.
 
-Stores reminders configured by the user.
+| Field | Type | Description |
+|-------|------|-------------|
+| `user_id` | string | Owner |
+| `consent_type` | string | `photo`, `voice`, `score` |
+| `granted` | boolean | True if given |
+| `timestamp` | timestamp | When action occurred |
 
-Required fields:
+---
 
-- `reminder_id`: string, the document identifier.
-- `user_id`: string, the owning Firebase Authentication UID.
+## Security Rules (Summary)
 
-Scheduling, status, title, and notification fields are application-specific and remain private to the owner.
+- Every read/write must match `request.auth.uid == resource.data.user_id`.
+- No collection has `caregiver_uids` or `family_uids` fields.
+- All writes to `game_sessions`, `journal_entries`, `reminders` require `user_id` to match the authenticated user.
 
-### `user_scores/{score_id}`
-
-Stores cognitive scores for the authenticated user.
-
-Required fields:
-
-- `user_id`: string, the owning Firebase Authentication UID.
-- `domain`: string, the cognitive domain being scored.
-
-### `game_sessions/{session_id}` and `game_attempts/{attempt_id}`
-
-Store the user's game sessions and submitted attempts.
-
-Required fields:
-
-- `user_id`: string, the owning Firebase Authentication UID.
-
-Session and attempt references must not be used to join data across users.
-
-### `journal_stories/{story_id}`
-
-Stores stories generated from the user's own journal entries.
-
-Required fields:
-
-- `story_id`: string, the document identifier.
-- `user_id`: string, the owning Firebase Authentication UID.
-- `entry_ids`: list of journal entry identifiers owned by the same user.
-- `content`: string, the generated story.
-- `status`: string, the user's story review status.
-
-## Security boundary
-
-Firestore rules require authentication and verify the document's `user_id` against the authenticated UID for every read and write. Unknown collections are denied by the catch-all rule.
+For the full Firestore rules file, see `backend/firestore.rules` (Part 1).

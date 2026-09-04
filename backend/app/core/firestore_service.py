@@ -89,6 +89,11 @@ class FirestoreService:
             data = dict(score_data)
             data["user_id"] = user_id
             data["domain"] = domain
+            data.setdefault("score_id", f"{user_id}_{domain}")
+            data.setdefault("attempt_count", 0)
+            data.setdefault("difficulty_level", 1)
+            data.setdefault("reason", "This level looks like a good match for now.")
+            data.setdefault("composite_score", data.get("composite", 0.0))
             data["updated_at"] = firestore.SERVER_TIMESTAMP
             self.client.collection("user_scores").document(f"{user_id}_{domain}").set(data, merge=True)
         except GoogleCloudError as exc:

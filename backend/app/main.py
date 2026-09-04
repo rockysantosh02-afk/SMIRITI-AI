@@ -6,6 +6,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.firestore_service import FirestoreServiceError
 from app.core.firebase_admin import FirebaseInitializationError, get_firestore
+from app.core.config import settings
 from app.exceptions import ForbiddenException, NotFoundException, ServerException, SmritiException, UnauthorizedException, ValidationException
 from app.logging_config import configure_logging
 from app.routers import auth, games, journal, reminders, sync, test_helpers
@@ -20,14 +21,25 @@ app = FastAPI(
     version="0.1.0"
 )
 
+allowed_origins = [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",") if origin.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=allowed_origins,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    """Add low-risk browser protections without logging request secrets."""
+    response = await call_next(request)
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("X-Frame-Options", "DENY")
+    response.headers.setdefault("Referrer-Policy", "no-referrer")
+    return response
 
 
 @app.get("/")
@@ -53,11 +65,11 @@ async def test_firestore():
     try:
         next(get_firestore().collection("users").limit(1).stream(), None)
         return {"status": "connected", "service": "firestore"}
-    except Exception as exc:
+    except Exception:
         logger.exception("Firestore connectivity check failed")
         raise FirestoreServiceError(
-            f"Firestore connectivity check failed: {exc}"
-        ) from exc
+            "Firestore is not configured or unavailable"
+        ) from None
 
 
 app.include_router(auth.router)

@@ -1,0 +1,50 @@
+name: dashboard_app
+description: A single-user cognitive wellness dashboard for elders
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase - compatible versions
+  firebase_core: ^2.17.0
+  firebase_auth: ^4.10.0
+  firebase_auth_web: ^5.9.0
+  google_sign_in: ^6.1.4
+
+  # UI & State
+  provider: ^6.0.5
+  flutter_riverpod: ^2.3.6
+
+  # Database (SQLite) - Drift
+  drift: ^2.14.1
+  drift_flutter: ^0.1.0
+  sqlite3_flutter_libs: ^0.5.18
+  path_provider: ^2.1.1
+  path: ^1.9.0
+
+  # Connectivity
+  connectivity_plus: ^5.0.2
+
+  # Utilities
+  flutter_dotenv: ^5.1.0
+  shared_preferences: ^2.2.2
+  intl: ^0.18.1
+  uuid: ^4.2.1
+
+  # Cupertino icons
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  drift_dev: ^2.14.1
+  build_runner: ^2.4.7
+
+flutter:
+  uses-material-design: true

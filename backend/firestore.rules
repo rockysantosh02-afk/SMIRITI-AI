@@ -13,44 +13,58 @@ service cloud.firestore {
         && request.resource.data.user_id == request.auth.uid;
     }
 
+    // Existing owners may update fields, but never transfer ownership.
+    function ownsUpdate() {
+      return ownsExistingDocument()
+        && request.resource.data.user_id == request.auth.uid;
+    }
+
     match /users/{uid} {
       // User profiles are private to their authenticated owner.
-      allow read, update, delete: if ownsExistingDocument();
+      allow read, delete: if ownsExistingDocument();
+      allow update: if ownsUpdate();
       allow create: if ownsNewDocument();
     }
     match /patients/{patientId} {
       // Patient records are private to the user who owns them.
-      allow read, update, delete: if ownsExistingDocument();
+      allow read, delete: if ownsExistingDocument();
+      allow update: if ownsUpdate();
       allow create: if ownsNewDocument();
     }
     match /journal_entries/{entryId} {
       // Journal entries and their media metadata are private to their owner.
-      allow read, update, delete: if ownsExistingDocument();
+      allow read, delete: if ownsExistingDocument();
+      allow update: if ownsUpdate();
       allow create: if ownsNewDocument();
     }
     match /reminders/{reminderId} {
       // Reminders are private to the user who created them.
-      allow read, update, delete: if ownsExistingDocument();
+      allow read, delete: if ownsExistingDocument();
+      allow update: if ownsUpdate();
       allow create: if ownsNewDocument();
     }
     match /user_scores/{scoreId} {
       // Cognitive scores are private to the user they describe.
-      allow read, update, delete: if ownsExistingDocument();
+      allow read, delete: if ownsExistingDocument();
+      allow update: if ownsUpdate();
       allow create: if ownsNewDocument();
     }
     match /game_sessions/{sessionId} {
       // A user can access only their own game sessions.
-      allow read, update, delete: if ownsExistingDocument();
+      allow read, delete: if ownsExistingDocument();
+      allow update: if ownsUpdate();
       allow create: if ownsNewDocument();
     }
     match /game_attempts/{attemptId} {
       // A user can access only their own game attempts.
-      allow read, update, delete: if ownsExistingDocument();
+      allow read, delete: if ownsExistingDocument();
+      allow update: if ownsUpdate();
       allow create: if ownsNewDocument();
     }
     match /journal_stories/{storyId} {
       // Generated stories are private to their owner.
-      allow read, update, delete: if ownsExistingDocument();
+      allow read, delete: if ownsExistingDocument();
+      allow update: if ownsUpdate();
       allow create: if ownsNewDocument();
     }
     match /{document=**} {

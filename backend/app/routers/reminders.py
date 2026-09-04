@@ -6,20 +6,14 @@ from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException
 from firebase_admin import firestore
-from pydantic import BaseModel
 
 from app.core.firestore_service import FirestoreService
 from app.core.dependencies import get_current_user
 from app.dependencies import get_firestore_service
+from app.schemas.api import ReminderRequest
 from app.services.reminder_logic import check_due_reminders
 
 router = APIRouter(prefix="/reminders", tags=["reminders"])
-
-
-class ReminderRequest(BaseModel):
-    label: str
-    type: str
-    scheduled_time: datetime
 
 
 @router.post("")

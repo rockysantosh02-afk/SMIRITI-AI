@@ -4,13 +4,12 @@ import argparse
 import json
 
 from app.core.firebase_admin import get_firestore, verify_firebase_token
-from app.core.security import create_access_token, decode_access_token
 
 
-def view_collection(name: str, patient_id: str | None = None) -> None:
+def view_collection(name: str, user_id: str | None = None) -> None:
     query = get_firestore().collection(name)
-    if patient_id:
-        query = query.where("patient_id", "==", patient_id)
+    if user_id:
+        query = query.where("user_id", "==", user_id)
     print(json.dumps([{"id": item.id, **(item.to_dict() or {})} for item in query.stream()], default=str, indent=2))
 
 
@@ -19,14 +18,10 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command", required=True)
     viewer = subparsers.add_parser("view-data")
     viewer.add_argument("collection")
-    viewer.add_argument("--patient-id")
-    token = subparsers.add_parser("jwt")
-    token.add_argument("uid")
+    viewer.add_argument("--user-id")
     args = parser.parse_args()
     if args.command == "view-data":
-        view_collection(args.collection, args.patient_id)
-    else:
-        print(create_access_token({"sub": args.uid}))
+        view_collection(args.collection, args.user_id)
 
 
 if __name__ == "__main__":

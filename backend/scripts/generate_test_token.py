@@ -1,6 +1,4 @@
-import argparse
-from app.core.security import create_access_token
+"""Print instructions for obtaining a real Firebase ID token."""
 
-parser = argparse.ArgumentParser()
-parser.add_argument("uid", nargs="?", default="test-user")
-print(create_access_token({"sub": parser.parse_args().uid, "role": "patient"}))
+print("This backend accepts Firebase ID tokens only.")
+print("Sign in with the Firebase client SDK and send Authorization: Bearer <ID_TOKEN>.")

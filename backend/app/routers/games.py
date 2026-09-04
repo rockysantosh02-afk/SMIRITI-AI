@@ -4,27 +4,17 @@ from typing import Any, Dict
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
 from firebase_admin import firestore
 
 from app.core.firestore_service import FirestoreService
 from app.core.dependencies import get_current_user
 from app.dependencies import get_firestore_service
-from core_logic.adaptive_difficulty import AdaptiveDifficultyEngine
+from app.schemas.api import AttemptRequest, GameSessionRequest
+from app.services.adaptive_difficulty import AdaptiveDifficultyEngine
 from core_logic.game_engine import GAMES, get_next_round, score_round
 
 router = APIRouter(prefix="/games", tags=["games"])
 _engines: Dict[str, AdaptiveDifficultyEngine] = {}
-
-
-class GameSessionRequest(BaseModel):
-    game_code: str
-
-
-class AttemptRequest(BaseModel):
-    session_id: str
-    selected_index: int = Field(ge=0)
-    response_time_ms: int = Field(ge=0)
 
 
 @router.get("")
@@ -49,9 +39,13 @@ def create_session(
     """
     if request.game_code not in GAMES:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Game not found")
-    session_id = uuid4().hex
+    session_id = request.client_generated_id or uuid4().hex
+    game = GAMES[request.game_code]
     service.client.collection("game_sessions").document(session_id).set(
-        {"user_id": current_user["uid"], "game_code": request.game_code, "difficulty": 1,
+        {"session_id": session_id, "user_id": current_user["uid"], "game_id": request.game_code,
+         "game_code": request.game_code, "domain": game.domain, "accuracy": None,
+         "response_time_ms": None, "played_at": None, "difficulty_level": 1,
+         "difficulty": 1, "client_generated_id": request.client_generated_id,
          "status": "active", "created_at": firestore.SERVER_TIMESTAMP}
     )
     _engines[session_id] = AdaptiveDifficultyEngine()
@@ -96,12 +90,21 @@ def submit_attempt(
     result = score_round(round_data, request.selected_index)
     engine = _engines.setdefault(request.session_id, AdaptiveDifficultyEngine())
     decision = engine.update(str(GAMES[str(session["game_code"])].domain), result["correct"], request.response_time_ms / 1000, result["expected_time_ms"] / 1000)
-    service.client.collection("game_attempts").add(
-        {"user_id": current_user["uid"], "session_id": request.session_id, "correct": result["correct"], "response_time_ms": request.response_time_ms,
-         "difficulty": difficulty, "created_at": firestore.SERVER_TIMESTAMP}
+    attempt_id = uuid4().hex
+    service.client.collection("game_attempts").document(attempt_id).set(
+        {"attempt_id": attempt_id, "user_id": current_user["uid"], "session_id": request.session_id,
+         "correct": result["correct"], "response_time_ms": request.response_time_ms,
+         "difficulty_level": difficulty, "created_at": firestore.SERVER_TIMESTAMP}
     )
-    session_ref.update({"difficulty": decision.new_level, "updated_at": firestore.SERVER_TIMESTAMP})
-    service.update_cognitive_score(current_user["uid"], decision.domain, {"composite": decision.composite_score, "accuracy": decision.accuracy, "speed_score": decision.speed_score, "trend": decision.trend})
+    session_ref.update({"difficulty": decision.new_level, "difficulty_level": decision.new_level,
+                        "accuracy": decision.accuracy, "response_time_ms": request.response_time_ms,
+                        "updated_at": firestore.SERVER_TIMESTAMP})
+    service.update_cognitive_score(current_user["uid"], decision.domain, {
+        "score_id": f"{current_user['uid']}_{decision.domain}",
+        "composite_score": decision.composite_score, "difficulty_level": decision.new_level,
+        "reason": decision.reason, "attempt_count": decision.attempt_count,
+        "accuracy": decision.accuracy, "speed_score": decision.speed_score, "trend": decision.consistency,
+    })
     return {**result, "decision": decision.__dict__, "difficulty": decision.new_level}
 
 

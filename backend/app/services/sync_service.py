@@ -29,5 +29,9 @@ class SyncService:
     def merge_append_only(local: List[Dict[str, Any]], remote: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         """Merge append-only records by stable ID without duplicates."""
         merged = {str(item.get("id")): item for item in remote}
-        merged.update({str(item.get("id")): item for item in local})
+        for item in local:
+            key = str(item.get("id"))
+            if key in merged and merged[key].get("user_id") != item.get("user_id"):
+                continue
+            merged[key] = item
         return list(merged.values())

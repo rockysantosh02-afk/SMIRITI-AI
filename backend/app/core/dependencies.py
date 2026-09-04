@@ -7,7 +7,7 @@ from fastapi import Depends
 from app.core.security import (
     get_current_active_user,
     get_current_user,
-    oauth2_scheme,
+    bearer_scheme,
 )
 
 
@@ -22,5 +22,5 @@ __all__ = [
     "get_authenticated_user",
     "get_current_active_user",
     "get_current_user",
-    "oauth2_scheme",
+    "bearer_scheme",
 ]

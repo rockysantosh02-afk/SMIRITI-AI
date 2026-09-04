@@ -6,9 +6,7 @@ uvicorn[standard]==0.34.0  # The server that runs FastAPI
 firebase-admin==6.6.0      # Backend SDK for Firebase
 pydantic-settings==2.7.1   # Environment-based application settings
 
-# Authentication
-python-jose[cryptography]==3.3.0  # JWT token handling
-passlib[bcrypt]==1.7.4            # Password hashing
+# Authentication is provided by Firebase Authentication and firebase-admin.
 python-multipart==0.0.6            # Form data handling
 
 # AI & LLM
