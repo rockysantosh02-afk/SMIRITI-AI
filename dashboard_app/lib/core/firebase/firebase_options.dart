@@ -11,13 +11,13 @@ class DefaultFirebaseOptions {
   /// Web Firebase configuration
   /// Values sourced from: docs/firebase_web_config.txt
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: "AIzaSyAH1XV7ybgyrgy518cCaxVVBICnghCtXSs",
+    apiKey: "YOUR_FIREBASE_WEB_API_KEY",
     authDomain: "smiriti-ai.firebaseapp.com",
     projectId: "smiriti-ai",
     storageBucket: "smiriti-ai.firebasestorage.app",
-    messagingSenderId: "348047548865",
-    appId: "1:348047548865:web:f6192bcac51960eec7cf40",
-    measurementId: "G-7CCH2PGGYN",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_FIREBASE_APP_ID",
+    measurementId: "YOUR_MEASUREMENT_ID",
   );
 
   /// Android Firebase configuration
