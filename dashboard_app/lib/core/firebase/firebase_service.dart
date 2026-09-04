@@ -19,8 +19,9 @@ class FirebaseService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     clientId: kIsWeb 
-        ? "348047548865.apps.googleusercontent.com"  // Web client ID
+        ? "348047548865-l1g7h67ajv34ian0rvs963ha4pls0fo4.apps.googleusercontent.com"
         : null,
+    serverClientId: "348047548865-l1g7h67ajv34ian0rvs963ha4pls0fo4.apps.googleusercontent.com",
   );
 
   /// Get the current authenticated user, if any

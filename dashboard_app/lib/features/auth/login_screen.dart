@@ -117,10 +117,14 @@ class _LoginScreenState extends State<LoginScreen> {
       _triggerSync();
       _navigateToDashboard();
     } on AuthException catch (e) {
+      debugPrint('[LoginScreen] AuthException during Google sign-in: ${e.message}');
       setState(() {
-        _errorMessage = e.message;
+        if (e.message != 'Google sign-in was cancelled') {
+          _errorMessage = e.message;
+        }
       });
     } catch (e) {
+      debugPrint('[LoginScreen] Unexpected error during Google sign-in: $e');
       setState(() {
         _errorMessage = 'Could not sign in with Google. Please try again.';
       });

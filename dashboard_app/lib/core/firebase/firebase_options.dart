@@ -11,30 +11,23 @@ class DefaultFirebaseOptions {
   /// Web Firebase configuration
   /// Values sourced from: docs/firebase_web_config.txt
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: "YOUR_FIREBASE_WEB_API_KEY",
-    authDomain: "smiriti-ai.firebaseapp.com",
-    projectId: "smiriti-ai",
-    storageBucket: "smiriti-ai.firebasestorage.app",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_FIREBASE_APP_ID",
-    measurementId: "YOUR_MEASUREMENT_ID",
-  );
-
-  /// Android Firebase configuration
-  /// 
-  /// To enable Android Firebase:
-  /// 1. Go to Firebase Console > Project Settings > General
-  /// 2. Add an Android app with package name: com.smriti.ai.dashboard
-  /// 3. Download google-services.json
-  /// 4. Place it in: dashboard_app/android/app/google-services.json
-  /// 5. Uncomment the android section in pubspec.yaml google-services dependency
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: "YOUR_ANDROID_API_KEY",
+    apiKey: "AIzaSyAH1XV7wbgyrgy518cCaxVVBICnghCtXSs",
     authDomain: "smiriti-ai.firebaseapp.com",
     projectId: "smiriti-ai",
     storageBucket: "smiriti-ai.firebasestorage.app",
     messagingSenderId: "348047548865",
-    appId: "1:348047548865:android:YOUR_APP_ID",
+    appId: "1:348047548865:web:f6192bcac51960eec7cf40",
+    measurementId: "G-7CCH2PGGYN",
+  );
+
+  /// Android Firebase configuration
+  static const FirebaseOptions android = FirebaseOptions(
+    apiKey: "AIzaSyAjGO43AMuqkxqfniHaAPbx0e2LJyibpnI",
+    authDomain: "smiriti-ai.firebaseapp.com",
+    projectId: "smiriti-ai",
+    storageBucket: "smiriti-ai.firebasestorage.app",
+    messagingSenderId: "348047548865",
+    appId: "1:348047548865:android:3be687dcbb98598fc7cf40",
   );
 
   /// iOS Firebase configuration
