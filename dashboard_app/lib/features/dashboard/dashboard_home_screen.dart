@@ -14,6 +14,7 @@ import '../auth/login_screen.dart';
 import '../games/games_hub_screen.dart';
 import '../memory/family_member_screen.dart';
 import '../journal/journal_screen.dart';
+import '../voice/screens/voice_assistant_screen.dart';
 
 /// Dashboard Home Screen for Smriti AI
 /// 
@@ -328,7 +329,9 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
                 icon: Icons.mic_rounded,
                 label: 'Voice Assistant',
                 color: const Color(0xFF4682B4), // Steel blue
-                onTap: () => _showComingSoon('Voice Assistant'),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const VoiceAssistantScreen()),
+                ),
               ),
             ),
           ],

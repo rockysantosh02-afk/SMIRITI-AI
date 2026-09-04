@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/database/app_database.dart';
 import '../../core/database/repositories/journal_repository.dart';
 import 'journal_story_service.dart';
+import '../voice/services/voice_service.dart';
 
 /// Screen for creating or editing a private Personal Memory Journal entry.
 ///
@@ -14,10 +15,12 @@ import 'journal_story_service.dart';
 /// - Outbox synchronization enqueued without cloud delay.
 /// - Optional AI Story Generator powered by JournalStoryService.
 /// - 80dp touch targets, high contrast, warm guidance.
+/// - Push-to-talk Voice Dictation for hands-free memory authoring.
 class JournalEntryScreen extends StatefulWidget {
   final JournalRepository? repository;
   final ImagePicker? imagePicker;
   final JournalStoryService? storyService;
+  final IVoiceService? voiceService;
   final JournalEntry? existingEntry;
 
   const JournalEntryScreen({
@@ -25,8 +28,21 @@ class JournalEntryScreen extends StatefulWidget {
     this.repository,
     this.imagePicker,
     this.storyService,
+    this.voiceService,
     this.existingEntry,
   });
+
+  /// Safely append dictated text to existing text.
+  /// - If existing text is empty, returns clean dictated text.
+  /// - If existing text is non-empty, returns "$cleanExisting\n$cleanDictated".
+  /// - If dictated text is empty, returns existing text unchanged.
+  static String appendDictatedText(String existing, String dictated) {
+    final cleanDictated = dictated.trim();
+    if (cleanDictated.isEmpty) return existing;
+    final cleanExisting = existing.trim();
+    if (cleanExisting.isEmpty) return cleanDictated;
+    return '$cleanExisting\n$cleanDictated';
+  }
 
   @override
   State<JournalEntryScreen> createState() => _JournalEntryScreenState();
@@ -36,6 +52,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
   late final JournalRepository _repository;
   late final ImagePicker _picker;
   late final JournalStoryService _storyService;
+  late final IVoiceService _voiceService;
 
   late final TextEditingController _titleController;
   late final TextEditingController _bodyController;
@@ -45,6 +62,8 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
   String _storySource = 'ai';
   bool _isSaving = false;
   bool _isGeneratingStory = false;
+  bool _isDictating = false;
+  String _dictationLivePreview = '';
 
   final List<String> _reminiscencePrompts = [
     'Tell me about a happy memory (এটা সুখৰ স্মৃতি কওক)',
@@ -59,6 +78,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
     _repository = widget.repository ?? JournalRepository(DatabaseProvider.instance);
     _picker = widget.imagePicker ?? ImagePicker();
     _storyService = widget.storyService ?? JournalStoryService();
+    _voiceService = widget.voiceService ?? VoiceService();
 
     _titleController = TextEditingController(text: widget.existingEntry?.title ?? '');
     _bodyController = TextEditingController(text: widget.existingEntry?.body ?? '');
@@ -70,7 +90,59 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
   void dispose() {
     _titleController.dispose();
     _bodyController.dispose();
+    if (widget.voiceService == null) {
+      _voiceService.dispose();
+    }
     super.dispose();
+  }
+
+  void _handleVoiceDictation() {
+    if (_isDictating) {
+      _stopDictation();
+    } else {
+      _startDictation();
+    }
+  }
+
+  void _startDictation() {
+    setState(() {
+      _isDictating = true;
+      _dictationLivePreview = '';
+    });
+
+    _voiceService.startListening(
+      onResult: (words) {
+        if (mounted) {
+          setState(() {
+            _dictationLivePreview = words;
+          });
+        }
+      },
+      onComplete: () {
+        if (mounted) {
+          _finalizeDictation(_dictationLivePreview);
+        }
+      },
+    );
+  }
+
+  void _stopDictation() {
+    _voiceService.stopListening();
+    _finalizeDictation(_dictationLivePreview);
+  }
+
+  void _finalizeDictation(String text) {
+    if (!_isDictating) return;
+
+    final updated = JournalEntryScreen.appendDictatedText(_bodyController.text, text);
+    if (mounted) {
+      setState(() {
+        _isDictating = false;
+        _dictationLivePreview = '';
+        _bodyController.text = updated;
+        _bodyController.selection = TextSelection.collapsed(offset: updated.length);
+      });
+    }
   }
 
   Future<void> _handleGenerateStory() async {
@@ -568,54 +640,98 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
 
               const SizedBox(height: 24),
 
-              // 5. Voice Note Preparation (Clean Option B architecture)
+              // 5. Voice Dictation ("Speak Your Memory" / "কণ্ঠৰে স্মৃতি কওক")
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.surfaceColor,
+                  color: _isDictating
+                      ? AppTheme.primaryColor.withValues(alpha: 0.08)
+                      : AppTheme.surfaceColor,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: AppTheme.primaryColor.withValues(alpha: 0.2),
+                    color: _isDictating
+                        ? AppTheme.primaryColor
+                        : AppTheme.primaryColor.withValues(alpha: 0.2),
+                    width: _isDictating ? 2 : 1,
                   ),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: AppTheme.secondaryColor.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.mic_none_rounded,
-                        color: AppTheme.primaryColor,
-                        size: 28,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    const Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'কণ্ঠ বাৰ্তা (Voice Note)',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppTheme.textColor,
+                    Row(
+                      children: [
+                        Material(
+                          color: _isDictating ? Colors.red.shade600 : AppTheme.primaryColor,
+                          shape: const CircleBorder(),
+                          elevation: _isDictating ? 4 : 2,
+                          child: InkWell(
+                            key: const Key('voice_dictation_button'),
+                            customBorder: const CircleBorder(),
+                            onTap: _handleVoiceDictation,
+                            child: Padding(
+                              padding: const EdgeInsets.all(16), // Comfortable touch target
+                              child: Icon(
+                                _isDictating ? Icons.stop_rounded : Icons.mic_rounded,
+                                color: Colors.white,
+                                size: 32,
+                              ),
                             ),
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Voice note recording will connect in Voice Assistant phase (Phase 3.3).',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: AppTheme.subtitleColor,
-                            ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _isDictating
+                                    ? 'শুনি থকা হৈছে... (Listening...)'
+                                    : 'কণ্ঠৰে স্মৃতি কওক (Speak Your Memory)',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: _isDictating
+                                      ? Colors.red.shade700
+                                      : AppTheme.textColor,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _isDictating
+                                    ? 'থামিবলৈ বুটামটো টিপক (Tap button to stop)'
+                                    : 'ক\'লে আপোনাৰ কথা তলৰ ডায়ৰীত যোগ হ\'ব (Dictate directly into memory)',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: AppTheme.subtitleColor,
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                    if (_dictationLivePreview.isNotEmpty) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(
+                            color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Text(
+                          '$_dictationLivePreview...',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontStyle: FontStyle.italic,
+                            color: AppTheme.primaryColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

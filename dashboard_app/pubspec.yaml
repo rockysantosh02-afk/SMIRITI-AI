@@ -38,6 +38,7 @@ dependencies:
   shared_preferences: ^2.2.2
   intl: ^0.18.1
   uuid: ^4.2.1
+  speech_to_text: ^6.6.0
 
   # Cupertino icons
   cupertino_icons: ^1.0.6
