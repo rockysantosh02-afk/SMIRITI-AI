@@ -5,7 +5,6 @@ services:
   - type: web
     name: smriti-ai-backend
     runtime: docker
-    dockerfilePath: ./Dockerfile
+    dockerfilePath: ./backend/Dockerfile
     healthCheckPath: /
-    envVars:
-
+    envVars: []
