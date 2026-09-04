@@ -13,6 +13,7 @@ import '../../core/sync/sync_debug_indicator.dart';
 import '../auth/login_screen.dart';
 import '../games/games_hub_screen.dart';
 import '../memory/family_member_screen.dart';
+import '../journal/journal_screen.dart';
 
 /// Dashboard Home Screen for Smriti AI
 /// 
@@ -342,7 +343,9 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
                 icon: Icons.book_rounded,
                 label: 'My Journal',
                 color: const Color(0xFF8B4513), // Saddle brown
-                onTap: () => _showComingSoon('My Journal'),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const JournalScreen()),
+                ),
               ),
             ),
             const SizedBox(width: 16),
