@@ -29,3 +29,6 @@ httpx==0.28.1                      # FastAPI test client transport
 # Background Tasks (Reminders)
 celery==5.3.4                      # Task queue
 redis==5.0.0                       # Redis client
+
+# Python 3.14 compatibility: protobuf 5.x supports Python 3.14, 4.x does not
+protobuf>=5.0.0
