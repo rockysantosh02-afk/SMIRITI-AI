@@ -1,0 +1,14 @@
+# Render Blueprint for Smriti AI Backend
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: smriti-ai-backend
+    runtime: python
+    pythonVersion: "3.12"
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12"
