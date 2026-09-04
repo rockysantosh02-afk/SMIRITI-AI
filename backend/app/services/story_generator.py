@@ -3,7 +3,67 @@
 from typing import Any, Dict, List
 
 from app.core.config import settings
-from app.services.content_guard import guard_content
+from app.services.content_guard import guard_content, passes_content_guard
+
+
+def generate_story_from_memory(title: str | None, content: str | None, language: str = "English") -> str:
+    """Generate a warm, short, encouraging AI story from journal title and content."""
+    clean_title = (title or "").strip()
+    clean_content = (content or "").strip()
+    topic = clean_title or clean_content or "this special day"
+
+    prompt = (
+        f"You are a gentle, encouraging companion for an elderly person. "
+        f"Write a warm, simple, first-person reflection in {language} in 2-4 short sentences (under 60 words). "
+        f"Theme: Title: {clean_title or 'A Treasured Moment'}, Details: {clean_content or 'A happy time'}. "
+        "Keep the tone peaceful, nostalgic, and emotionally uplifting. "
+        "Do NOT mention illness, dementia, loss, death, doctor, medication, or medical diagnoses."
+    )
+
+    if settings.GEMINI_API_KEY:
+        try:
+            import google.generativeai as genai
+
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            candidate = model.generate_content(prompt).text.strip()
+            passed, _ = passes_content_guard(candidate)
+            if passed:
+                return candidate
+        except Exception:
+            pass
+
+    # Language-aware gentle templates
+    lang_lower = language.lower()
+    if "assam" in lang_lower or lang_lower == "as":
+        text = (
+            f"মই এই স্মৃতিটো বৰ মৰমেৰে সোঁৱৰণ কৰোঁ। "
+            f"{topic} মনত পেলালে মনটো আনন্দ আৰু শান্তিত ভৰি পৰে। "
+            f"প্ৰতিটো স্মৃতি হৃদয়ৰ এটি আপুৰুগীয়া সম্পদ।"
+        )
+    elif "bengal" in lang_lower or lang_lower == "bn":
+        text = (
+            f"আমি এই স্মৃতিটি অত্যন্ত স্নেহের সাথে মনে রাখি। "
+            f"{topic} মনে পড়লেই মনটা শান্তি ও আনন্দে ভরে ওঠে। "
+            f"প্রতিটি স্মৃতি হৃদয়ের এক অমূল্য সম্পদ।"
+        )
+    elif "hindi" in lang_lower or lang_lower == "hi":
+        text = (
+            f"मैं इस प्यारी याद को हमेशा संजो कर रखता हूँ। "
+            f"{topic} को याद करके मन में सुखद शांति भर जाती है। "
+            f"यह एक बेहद सुंदर और अनमोल स्मृति है।"
+        )
+    else:
+        text = (
+            f"I cherish this beautiful memory dearly. "
+            f"Thinking back to {topic} brings a gentle warmth and peace to my heart. "
+            f"Every memory we treasure remains a lovely gift in our lives."
+        )
+
+    passed, _ = passes_content_guard(text)
+    if not passed:
+        return "Every memory we keep is a precious part of our journey. Remembering this brings peace and warmth to my heart."
+    return text
 
 
 def generate_journal_story(caption: str | None, tag_place: str | None, tag_occasion: str | None, language: str = "English") -> str:

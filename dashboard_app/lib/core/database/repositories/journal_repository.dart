@@ -17,6 +17,7 @@ class JournalRepository {
     required String body,
     String? mood,
     String? photoPath,
+    String? generatedStory,
   }) async {
     final id = 'journal_${DateTime.now().millisecondsSinceEpoch}';
     final now = DateTime.now();
@@ -30,6 +31,7 @@ class JournalRepository {
           body: Value(body),
           mood: Value(mood),
           photoPath: Value(photoPath),
+          generatedStory: Value(generatedStory),
           createdAt: Value(now),
           updatedAt: Value(now),
           synced: const Value(false),
@@ -47,6 +49,7 @@ class JournalRepository {
             'body': body,
             if (mood != null) 'mood': mood,
             if (photoPath != null) 'photoPath': photoPath,
+            if (generatedStory != null) 'generatedStory': generatedStory,
           })),
           createdAt: Value(now),
         ),
@@ -63,6 +66,7 @@ class JournalRepository {
     required String body,
     String? mood,
     String? photoPath,
+    String? generatedStory,
   }) async {
     final existing = await _db.getJournalEntryById(id);
     if (existing == null) return;
@@ -77,6 +81,7 @@ class JournalRepository {
           body: Value(body),
           mood: Value(mood),
           photoPath: Value(photoPath),
+          generatedStory: Value(generatedStory ?? existing.generatedStory),
           updatedAt: Value(now),
           synced: const Value(false),
         ),
@@ -93,6 +98,47 @@ class JournalRepository {
             'body': body,
             if (mood != null) 'mood': mood,
             if (photoPath != null) 'photoPath': photoPath,
+            if ((generatedStory ?? existing.generatedStory) != null)
+              'generatedStory': generatedStory ?? existing.generatedStory,
+          })),
+          createdAt: Value(now),
+        ),
+      );
+    });
+  }
+
+  /// Saves or updates the AI-generated story for an existing journal entry.
+  Future<void> saveGeneratedStory({
+    required String id,
+    required String story,
+  }) async {
+    final existing = await _db.getJournalEntryById(id);
+    if (existing == null) return;
+
+    final now = DateTime.now();
+
+    await _db.batch((batch) {
+      batch.update(
+        _db.journalEntries,
+        JournalEntriesCompanion(
+          generatedStory: Value(story),
+          updatedAt: Value(now),
+          synced: const Value(false),
+        ),
+        where: (t) => t.id.equals(id),
+      );
+      batch.insert(
+        _db.outbox,
+        OutboxCompanion(
+          entityType: const Value('journal_entry'),
+          entityId: Value(id),
+          operation: const Value('update'),
+          payload: Value(jsonEncode({
+            'title': existing.title,
+            'body': existing.body,
+            if (existing.mood != null) 'mood': existing.mood,
+            if (existing.photoPath != null) 'photoPath': existing.photoPath,
+            'generatedStory': story,
           })),
           createdAt: Value(now),
         ),
@@ -158,6 +204,7 @@ class JournalRepository {
       body: existing.body,
       mood: existing.mood,
       photoPath: existing.photoPath,
+      generatedStory: existing.generatedStory,
       createdAt: existing.createdAt,
       updatedAt: existing.updatedAt,
       synced: true,

@@ -36,6 +36,16 @@ class StoryAction(BaseModel):
     action: str
 
 
+class GenerateStoryRequest(BaseModel):
+    title: str | None = None
+    content: str | None = None
+    language: str = "English"
+
+
+class GenerateStoryResponse(BaseModel):
+    story: str
+
+
 class ReminderRequest(BaseModel):
     label: str
     type: str

@@ -5,23 +5,27 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/database/app_database.dart';
 import '../../core/database/repositories/journal_repository.dart';
+import 'journal_story_service.dart';
 
-/// Screen for writing or editing a personal memory journal entry.
+/// Screen for creating or editing a private Personal Memory Journal entry.
 ///
 /// Strictly single-user and offline-first:
-/// - Allows entering title, memory narrative, and picking/capturing a local photo.
-/// - Prompts with warm reminiscence suggestions.
-/// - Saves immediately to Drift SQLite and enqueues Outbox sync mutation.
+/// - Immediate local SQLite persistence via JournalRepository.
+/// - Outbox synchronization enqueued without cloud delay.
+/// - Optional AI Story Generator powered by JournalStoryService.
+/// - 80dp touch targets, high contrast, warm guidance.
 class JournalEntryScreen extends StatefulWidget {
   final JournalRepository? repository;
-  final JournalEntry? existingEntry;
   final ImagePicker? imagePicker;
+  final JournalStoryService? storyService;
+  final JournalEntry? existingEntry;
 
   const JournalEntryScreen({
     super.key,
     this.repository,
-    this.existingEntry,
     this.imagePicker,
+    this.storyService,
+    this.existingEntry,
   });
 
   @override
@@ -31,12 +35,15 @@ class JournalEntryScreen extends StatefulWidget {
 class _JournalEntryScreenState extends State<JournalEntryScreen> {
   late final JournalRepository _repository;
   late final ImagePicker _picker;
+  late final JournalStoryService _storyService;
 
   late final TextEditingController _titleController;
   late final TextEditingController _bodyController;
 
   String? _photoPath;
+  String? _generatedStory;
   bool _isSaving = false;
+  bool _isGeneratingStory = false;
 
   final List<String> _reminiscencePrompts = [
     'Tell me about a happy memory (এটা সুখৰ স্মৃতি কওক)',
@@ -50,10 +57,12 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
     super.initState();
     _repository = widget.repository ?? JournalRepository(DatabaseProvider.instance);
     _picker = widget.imagePicker ?? ImagePicker();
+    _storyService = widget.storyService ?? JournalStoryService();
 
     _titleController = TextEditingController(text: widget.existingEntry?.title ?? '');
     _bodyController = TextEditingController(text: widget.existingEntry?.body ?? '');
     _photoPath = widget.existingEntry?.photoPath;
+    _generatedStory = widget.existingEntry?.generatedStory;
   }
 
   @override
@@ -61,6 +70,107 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
     _titleController.dispose();
     _bodyController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleGenerateStory() async {
+    if (_isGeneratingStory) return;
+
+    final title = _titleController.text.trim();
+    final body = _bodyController.text.trim();
+
+    if (title.isEmpty && body.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: AppTheme.secondaryColor,
+          content: Text(
+            'অনুগ্ৰহ কৰি কাহিনী তৈয়াৰ কৰাৰ আগতে অলপ স্মৃতি লিখক।\n(Please write a little memory before creating a story.)',
+            style: TextStyle(
+              fontSize: 16,
+              color: AppTheme.textColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isGeneratingStory = true);
+
+    try {
+      final result = await _storyService.generateStory(
+        title: title,
+        content: body,
+      );
+
+      if (!mounted) return;
+
+      if (result.success && result.story != null) {
+        setState(() {
+          _generatedStory = result.story;
+          _isGeneratingStory = false;
+        });
+
+        // If this entry is already saved in SQLite, persist the story immediately
+        if (widget.existingEntry != null) {
+          await _repository.saveGeneratedStory(
+            id: widget.existingEntry!.id,
+            story: result.story!,
+          );
+        }
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: Color(0xFF2E8B57), // Sea green
+              content: Row(
+                children: [
+                  Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 26),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'আপোনাৰ সুন্দৰ কাহিনী প্ৰস্তুত হ\'ল!\n(Your story is ready!)',
+                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
+      } else {
+        setState(() => _isGeneratingStory = false);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: AppTheme.surfaceColor,
+              content: Text(
+                result.errorMessage ??
+                    'আমি এই মুহূৰ্তত কাহিনী সৃষ্টি কৰিব নোৱাৰিলোঁ। আপোনাৰ স্মৃতি সুৰক্ষিত হৈ আছে।\n(We could not create a story right now. Your memory is safely saved.)',
+                style: const TextStyle(fontSize: 16, color: AppTheme.textColor, fontWeight: FontWeight.w600),
+              ),
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isGeneratingStory = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: AppTheme.surfaceColor,
+            content: Text(
+              'আমি এই মুহূৰ্তত কাহিনী সৃষ্টি কৰিব নোৱাৰিলোঁ। আপোনাৰ স্মৃতি সুৰক্ষিত হৈ আছে।\n(We could not create a story right now. Your memory is safely saved.)',
+              style: TextStyle(fontSize: 16, color: AppTheme.textColor, fontWeight: FontWeight.w600),
+            ),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 
   Future<void> _pickImage(ImageSource source) async {
@@ -131,6 +241,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
           title: effectiveTitle,
           body: body,
           photoPath: _photoPath,
+          generatedStory: _generatedStory,
         );
       } else {
         // Create new memory
@@ -138,6 +249,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
           title: effectiveTitle,
           body: body,
           photoPath: _photoPath,
+          generatedStory: _generatedStory,
         );
       }
 
@@ -506,9 +618,131 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-              // 6. Save Button (Min 80dp tall)
+              // 6. AI Story Generator Section (Phase 3.2)
+              const Text(
+                'স্মৃতিৰ কাহিনী (AI Story):',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textColor,
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              if (_generatedStory != null && _generatedStory!.isNotEmpty) ...[
+                Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.35),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(
+                            Icons.auto_awesome_rounded,
+                            color: AppTheme.primaryColor,
+                            size: 26,
+                          ),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              '✨ আপোনাৰ কাহিনী (Your Story)',
+                              style: TextStyle(
+                                fontSize: 19,
+                                fontWeight: FontWeight.bold,
+                                color: AppTheme.primaryColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        _generatedStory!,
+                        key: const Key('generated_story_text'),
+                        style: const TextStyle(
+                          fontSize: 19,
+                          height: 1.45,
+                          color: AppTheme.textColor,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          key: const Key('regenerate_story_button'),
+                          onPressed: _isGeneratingStory ? null : _handleGenerateStory,
+                          icon: _isGeneratingStory
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryColor),
+                                )
+                              : const Icon(Icons.refresh_rounded, size: 22, color: AppTheme.primaryColor),
+                          label: Text(
+                            _isGeneratingStory ? 'কাহিনী তৈয়াৰ কৰা হৈছে... (Creating...)' : 'নতুন গল্প বনাওক (Create a New Story)',
+                            style: const TextStyle(fontSize: 16, color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ] else ...[
+                SizedBox(
+                  height: 70,
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    key: const Key('generate_story_button'),
+                    onPressed: _isGeneratingStory ? null : _handleGenerateStory,
+                    icon: _isGeneratingStory
+                        ? const SizedBox(
+                            width: 26,
+                            height: 26,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.auto_awesome_rounded, size: 30),
+                    label: Text(
+                      _isGeneratingStory
+                          ? 'কাহিনী তৈয়াৰ কৰা হৈছে...\n(Creating your story...)'
+                          : 'গল্প বনাওক\n(✨ Create a Story)',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        height: 1.2,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryColor,
+                      foregroundColor: Colors.white,
+                      elevation: 3,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+
+              const SizedBox(height: 16),
+
+              // 7. Save Button (Min 80dp tall)
               SizedBox(
                 height: 80,
                 child: ElevatedButton.icon(

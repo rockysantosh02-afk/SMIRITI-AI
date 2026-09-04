@@ -9,11 +9,31 @@ from firebase_admin import firestore
 from app.core.dependencies import get_current_user
 from app.core.firestore_service import FirestoreService
 from app.dependencies import get_firestore_service
-from app.schemas.api import JournalEntryRequest, StoryAction, StoryRequest
+from app.schemas.api import (
+    GenerateStoryRequest,
+    GenerateStoryResponse,
+    JournalEntryRequest,
+    StoryAction,
+    StoryRequest,
+)
 from app.services.content_guard import passes_content_guard
-from app.services.story_generator import generate_journal_story
+from app.services.story_generator import generate_journal_story, generate_story_from_memory
 
 router = APIRouter(prefix="/journal", tags=["journal"])
+
+
+@router.post("/generate-story", response_model=GenerateStoryResponse)
+def generate_story_direct(
+    request: GenerateStoryRequest,
+    current_user: Dict[str, Any] = Depends(get_current_user),
+) -> GenerateStoryResponse:
+    """Generate a warm, encouraging first-person AI story from a journal memory."""
+    story = generate_story_from_memory(
+        title=request.title,
+        content=request.content,
+        language=request.language or "English",
+    )
+    return GenerateStoryResponse(story=story)
 
 
 def _owned_entry(service: FirestoreService, entry_id: str, user_id: str) -> Dict[str, Any]:

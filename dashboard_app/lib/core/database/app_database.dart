@@ -56,6 +56,7 @@ class JournalEntries extends Table {
   TextColumn get photoPath => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
+  TextColumn get generatedStory => text().nullable()();
   BoolColumn get synced => boolean().withDefault(const Constant(false))();
   BoolColumn get deleted => boolean().withDefault(const Constant(false))();
 
@@ -121,7 +122,19 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.e);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (m) async {
+          await m.createAll();
+        },
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.addColumn(journalEntries, journalEntries.generatedStory);
+          }
+        },
+      );
 
   static QueryExecutor _openConnection() {
     return driftDatabase(
@@ -210,6 +223,7 @@ class AppDatabase extends _$AppDatabase {
         body: entry.body.value,
         mood: entry.mood.value,
         photoPath: entry.photoPath.value,
+        generatedStory: entry.generatedStory.value,
         createdAt: entry.createdAt.value,
         updatedAt: entry.updatedAt.value,
         synced: entry.synced.value,

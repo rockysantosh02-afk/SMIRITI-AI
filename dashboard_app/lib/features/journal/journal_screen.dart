@@ -414,6 +414,55 @@ class _JournalScreenState extends State<JournalScreen> {
                 ),
               ],
 
+              // AI Generated Story Section (Phase 3.2)
+              if (entry.generatedStory != null && entry.generatedStory!.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryColor.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppTheme.primaryColor.withValues(alpha: 0.3),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.auto_awesome_rounded,
+                            color: AppTheme.primaryColor,
+                            size: 22,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '✨ আপোনাৰ কাহিনী (Your Story)',
+                            style: TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: AppTheme.primaryColor.withValues(alpha: 0.95),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        entry.generatedStory!,
+                        style: const TextStyle(
+                          fontSize: 17,
+                          height: 1.45,
+                          color: AppTheme.textColor,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
               const SizedBox(height: 12),
 
               // Tap hint
