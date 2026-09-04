@@ -198,3 +198,4 @@ README.html
 
 # Grep
 .grep*
+dashboard_app/android/compat/*.jar

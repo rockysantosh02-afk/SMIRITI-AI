@@ -56,6 +56,7 @@ class ReminderRequest(BaseModel):
 class SyncRecord(BaseModel):
     collection: str
     client_generated_id: str = Field(min_length=1)
+    operation: str = Field(default="create")
     data: dict[str, Any] = Field(default_factory=dict)
 
 

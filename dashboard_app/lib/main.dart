@@ -25,6 +25,7 @@ import 'features/games/screens/recalling_memories_screen.dart';
 import 'features/memory/family_member_screen.dart';
 import 'features/journal/journal_screen.dart';
 import 'features/voice/screens/voice_assistant_screen.dart';
+import 'features/reminders/reminders_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -102,6 +103,7 @@ class _SmritiAppState extends State<SmritiApp> {
         '/memories': (context) => const FamilyMemberScreen(),
         '/journal': (context) => const JournalScreen(),
         '/voice': (context) => const VoiceAssistantScreen(),
+        '/reminders': (context) => const RemindersScreen(),
       },
       
       // Handle unknown routes - redirect to login

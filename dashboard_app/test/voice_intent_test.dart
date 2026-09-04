@@ -88,16 +88,16 @@ void main() {
       expect(resHi.intent, equals(VoiceIntent.openGames));
     });
 
-    // --- 5. Reminders Notice (Graceful, no Phase 3.4 trigger) ---
-    test('Reminders inquiry returns graceful coming-soon notice without route', () {
+    // --- 5. Reminders (Phase 3.4 Navigation) ---
+    test('Reminders command returns openReminders intent with /reminders route', () {
       final resEn = matcher.match('show reminders', languageCode: 'en');
       expect(resEn.intent, equals(VoiceIntent.openReminders));
-      expect(resEn.targetRoute, isNull);
-      expect(resEn.feedbackMessage, contains('Reminders will be available soon'));
+      expect(resEn.targetRoute, equals('/reminders'));
+      expect(resEn.feedbackMessage, contains('Opening Reminders'));
 
       final resAs = matcher.match('সোঁৱৰণী', languageCode: 'as');
       expect(resAs.intent, equals(VoiceIntent.openReminders));
-      expect(resAs.targetRoute, isNull);
+      expect(resAs.targetRoute, equals('/reminders'));
       expect(resAs.feedbackMessage, contains('ৰিমাইণ্ডাৰ'));
     });
 

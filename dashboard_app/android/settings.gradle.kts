@@ -1,3 +1,30 @@
+// Bridge legacy jcenter() calls from older plugins (e.g. speech_to_text) to mavenCentral() under Gradle 9
+try {
+    val registry = groovy.lang.GroovySystem.getMetaClassRegistry()
+    val repoClasses = listOf(
+        Class.forName("org.gradle.api.artifacts.dsl.RepositoryHandler"),
+        Class.forName("org.gradle.api.internal.artifacts.dsl.DefaultRepositoryHandler")
+    )
+    for (clazz in repoClasses) {
+        val metaClass = registry.getMetaClass(clazz)
+        val emc = if (metaClass is groovy.lang.ExpandoMetaClass) {
+            metaClass
+        } else {
+            groovy.lang.ExpandoMetaClass(clazz, false, true).apply {
+                initialize()
+                registry.setMetaClass(clazz, this)
+            }
+        }
+        emc.registerInstanceMethod("jcenter", object : groovy.lang.Closure<Any>(null) {
+            fun doCall(): Any? {
+                return (delegate as? org.gradle.api.artifacts.dsl.RepositoryHandler)?.mavenCentral()
+            }
+        })
+    }
+} catch (e: Throwable) {
+    println("Note: jcenter bridge registration: $e")
+}
+
 pluginManagement {
     val flutterSdkPath =
         run {

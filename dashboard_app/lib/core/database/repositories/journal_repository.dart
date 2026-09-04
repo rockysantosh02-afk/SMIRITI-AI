@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:drift/drift.dart';
+import 'package:uuid/uuid.dart';
 
 import '../app_database.dart';
 
@@ -8,6 +9,7 @@ import '../app_database.dart';
 /// All write operations (create/update/delete) enqueue sync events to the Outbox.
 class JournalRepository {
   final AppDatabase _db;
+  final _uuid = const Uuid();
 
   JournalRepository(this._db);
 
@@ -19,8 +21,8 @@ class JournalRepository {
     String? photoPath,
     String? generatedStory,
   }) async {
-    final id = 'journal_${DateTime.now().millisecondsSinceEpoch}';
     final now = DateTime.now();
+    final id = 'journal_${now.millisecondsSinceEpoch}_${_uuid.v4()}';
 
     await _db.batch((batch) {
       batch.insert(

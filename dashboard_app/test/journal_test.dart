@@ -104,6 +104,22 @@ void main() {
       expect(outboxItems[2].entityId, equals(id));
     });
 
+    test('rapidly created entries receive unique IDs without collision (Fix 5)', () async {
+      final ids = <String>{};
+      for (var i = 0; i < 20; i++) {
+        final id = await repository.create(
+          title: 'Memory $i',
+          body: 'Content for rapid memory $i',
+        );
+        expect(ids.contains(id), isFalse, reason: 'Collision detected on ID: $id');
+        ids.add(id);
+      }
+
+      expect(ids.length, equals(20));
+      final allEntries = await repository.getAll();
+      expect(allEntries.length, equals(20));
+    });
+
     // ==========================================
     // 2. Journal Screen Widget Tests
     // ==========================================
@@ -291,6 +307,47 @@ void main() {
       expect(outboxItems, isEmpty);
 
       await tester.pump(const Duration(seconds: 3));
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+    });
+
+    testWidgets('JournalEntryScreen rapid save taps trigger only single save without duplicates (Fix 4)',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: JournalEntryScreen(repository: repository),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final titleInput = find.byKey(const Key('journal_title_input'));
+      await tester.enterText(titleInput, 'Rapid Tap Title');
+
+      final bodyInput = find.byKey(const Key('journal_body_input'));
+      await tester.enterText(bodyInput, 'Rapid Tap Content');
+
+      final saveButton = find.byKey(const Key('save_memory_button'));
+
+      // Tap multiple times rapidly
+      await tester.tap(saveButton);
+      await tester.tap(saveButton, warnIfMissed: false);
+      await tester.tap(saveButton, warnIfMissed: false);
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
+
+      final entries = await repository.getAll();
+      expect(entries.length, equals(1));
+      expect(entries.first.title, equals('Rapid Tap Title'));
+
+      final outboxItems = await database.select(database.outbox).get();
+      expect(outboxItems.length, equals(1));
+
+      await tester.pump(const Duration(seconds: 2));
       await tester.pumpWidget(const SizedBox());
       await tester.pump();
     });

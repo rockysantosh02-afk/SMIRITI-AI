@@ -74,13 +74,13 @@ class VoiceIntentMatcher {
       );
     }
 
-    // 5. Reminders Notice (Phase 3.4 coming soon notice - no routing)
+    // 5. Open Reminders Intent
     if (_matchesAny(clean, _remindersKeywords)) {
       return VoiceIntentResult(
         intent: VoiceIntent.openReminders,
         rawText: rawText,
-        feedbackMessage: VoicePrompts.get(VoicePrompts.remindersNotice, languageCode),
-        targetRoute: null,
+        feedbackMessage: VoicePrompts.get(VoicePrompts.openingReminders, languageCode),
+        targetRoute: '/reminders',
       );
     }
 

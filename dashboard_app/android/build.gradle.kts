@@ -24,6 +24,14 @@ subprojects {
         afterEvaluate {
             (project.extensions.findByName("android") as? com.android.build.gradle.BaseExtension)?.apply {
                 compileSdkVersion(36)
+                if (project.name == "speech_to_text") {
+                    sourceSets.getByName("main").java.srcDir(rootProject.file("compat"))
+                    project.tasks.withType<JavaCompile>().configureEach {
+                        doLast {
+                            destinationDirectory.asFile.orNull?.resolve("io")?.deleteRecursively()
+                        }
+                    }
+                }
             }
         }
     }

@@ -79,6 +79,13 @@ class VoicePrompts {
     'en': 'Opening Games...',
   };
 
+  static const Map<String, String> openingReminders = {
+    'as': 'ৰিমাইণ্ডাৰ খোলা হৈছে... (Opening Reminders...)',
+    'bn': 'অনুস্মারক খোলা হচ্ছে... (Opening Reminders...)',
+    'hi': 'रिमाइंडर खुल रहे हैं... (Opening Reminders...)',
+    'en': 'Opening Reminders...',
+  };
+
   static const Map<String, String> remindersNotice = {
     'as': 'ৰিমাইণ্ডাৰ অতি সোনকালে উপলব্ধ হ\'ব।\n(Reminders will be available soon.)',
     'bn': 'অনুস্মারক খুব শীঘ্রই উপলব্ধ হবে।\n(Reminders will be available soon.)',

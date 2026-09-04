@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
@@ -15,10 +17,20 @@ configure_logging()
 import logging
 logger = logging.getLogger(__name__)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize process-level application state without requiring Firebase."""
+    logger.info("Smriti AI API started")
+    yield
+    logger.info("Smriti AI API stopped")
+
+
 app = FastAPI(
     title="SMRITI-AI API",
     description="Backend services for Smriti AI cognitive care experiences.",
-    version="0.1.0"
+    version="0.1.0",
+    lifespan=lifespan,
 )
 
 allowed_origins = [origin.strip() for origin in settings.ALLOWED_ORIGINS.split(",") if origin.strip()]
@@ -72,24 +84,25 @@ async def test_firestore():
         ) from None
 
 
+@app.get("/ready")
+async def readiness_check():
+    """Verify backend readiness including Firestore connectivity if configured."""
+    try:
+        get_firestore()
+        return {"status": "ready", "service": "smriti-ai", "firestore": "configured"}
+    except Exception as e:
+        return JSONResponse(
+            status_code=503,
+            content={"status": "not_ready", "service": "smriti-ai", "error": str(e)},
+        )
+
+
 app.include_router(auth.router)
 app.include_router(games.router)
 app.include_router(test_helpers.router)
 app.include_router(journal.router)
 app.include_router(reminders.router)
 app.include_router(sync.router)
-
-
-@app.on_event("startup")
-async def startup() -> None:
-    """Initialize process-level application state without requiring Firebase."""
-    logger.info("Smriti AI API started")
-
-
-@app.on_event("shutdown")
-async def shutdown() -> None:
-    """Release process-level resources."""
-    logger.info("Smriti AI API stopped")
 
 
 def _error_response(status_code: int, detail: str) -> JSONResponse:

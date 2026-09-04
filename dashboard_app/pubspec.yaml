@@ -39,6 +39,8 @@ dependencies:
   intl: ^0.18.1
   uuid: ^4.2.1
   speech_to_text: ^6.6.0
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.1
 
   # Cupertino icons
   cupertino_icons: ^1.0.6

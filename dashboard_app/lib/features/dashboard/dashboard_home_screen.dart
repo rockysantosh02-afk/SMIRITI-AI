@@ -15,6 +15,7 @@ import '../games/games_hub_screen.dart';
 import '../memory/family_member_screen.dart';
 import '../journal/journal_screen.dart';
 import '../voice/screens/voice_assistant_screen.dart';
+import '../reminders/reminders_screen.dart';
 
 /// Dashboard Home Screen for Smriti AI
 /// 
@@ -357,7 +358,9 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
                 icon: Icons.alarm_rounded,
                 label: 'Reminders',
                 color: const Color(0xFFCD853F), // Peru/tan
-                onTap: () => _showComingSoon('Reminders'),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const RemindersScreen()),
+                ),
               ),
             ),
           ],

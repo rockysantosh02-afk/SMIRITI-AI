@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import '../../core/config/app_config.dart';
 import '../../core/firebase/firebase_service.dart';
 import '../../core/sync/http_client.dart';
 
@@ -43,10 +43,7 @@ class JournalStoryService {
     Future<String?> Function()? getIdToken,
     Connectivity? connectivity,
   })  : _client = client ?? DioHttpClient(Dio()),
-        _baseUrl = baseUrl ??
-            (dotenv.isInitialized
-                ? (dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000')
-                : 'http://localhost:8000'),
+        _baseUrl = baseUrl ?? AppConfig.apiBaseUrl,
         _getIdToken = getIdToken,
         _connectivity = connectivity;
 

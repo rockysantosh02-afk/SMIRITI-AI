@@ -277,6 +277,8 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
   }
 
   Future<void> _saveEntry() async {
+    if (_isSaving) return;
+
     final title = _titleController.text.trim();
     final body = _bodyController.text.trim();
 

@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
+import 'package:uuid/uuid.dart';
 
 import '../app_database.dart';
 
@@ -6,6 +9,7 @@ import '../app_database.dart';
 /// All write operations enqueue sync events to the Outbox.
 class GameRepository {
   final AppDatabase _db;
+  static const _uuid = Uuid();
 
   GameRepository(this._db);
 
@@ -14,8 +18,8 @@ class GameRepository {
     required String gameId,
     required int difficultyLevel,
   }) async {
-    final id = '${gameId}_${DateTime.now().millisecondsSinceEpoch}';
     final now = DateTime.now();
+    final id = '${gameId}_${now.millisecondsSinceEpoch}_${_uuid.v4().substring(0, 8)}';
 
     await _db.batch((batch) {
       batch.insert(
@@ -36,7 +40,15 @@ class GameRepository {
           entityType: const Value('game_session'),
           entityId: Value(id),
           operation: const Value('create'),
-          payload: Value('{"gameId":"$gameId","difficultyLevel":$difficultyLevel}'),
+          payload: Value(jsonEncode({
+            'gameId': gameId,
+            'game_id': gameId,
+            'game_code': gameId,
+            'difficultyLevel': difficultyLevel,
+            'difficulty_level': difficultyLevel,
+            'difficulty': difficultyLevel,
+            'started_at': now.toIso8601String(),
+          })),
           createdAt: Value(now),
         ),
       );
@@ -54,8 +66,8 @@ class GameRepository {
     required int responseTimeMs,
     required int difficultyLevel,
   }) async {
-    final id = 'attempt_${DateTime.now().millisecondsSinceEpoch}';
     final now = DateTime.now();
+    final id = 'attempt_${now.millisecondsSinceEpoch}_${_uuid.v4().substring(0, 8)}';
 
     await _db.batch((batch) {
       batch.insert(
@@ -78,9 +90,20 @@ class GameRepository {
           entityType: const Value('attempt'),
           entityId: Value(id),
           operation: const Value('create'),
-          payload: Value(
-            '{"sessionId":"$sessionId","roundNumber":$roundNumber,"correct":$correct}',
-          ),
+          payload: Value(jsonEncode({
+            'sessionId': sessionId,
+            'session_id': sessionId,
+            'gameId': gameId,
+            'game_id': gameId,
+            'roundNumber': roundNumber,
+            'round_number': roundNumber,
+            'correct': correct,
+            'responseTimeMs': responseTimeMs,
+            'response_time_ms': responseTimeMs,
+            'difficultyLevel': difficultyLevel,
+            'difficulty_level': difficultyLevel,
+            'created_at': now.toIso8601String(),
+          })),
           createdAt: Value(now),
         ),
       );
@@ -120,9 +143,16 @@ class GameRepository {
           entityType: const Value('game_session'),
           entityId: Value(sessionId),
           operation: const Value('update'),
-          payload: Value(
-            '{"completedAt":"${now.toIso8601String()}","roundsPlayed":$roundsPlayed,"accuracy":$accuracy}',
-          ),
+          payload: Value(jsonEncode({
+            'completedAt': now.toIso8601String(),
+            'completed_at': now.toIso8601String(),
+            'roundsPlayed': roundsPlayed,
+            'rounds_played': roundsPlayed,
+            'accuracy': accuracy,
+            'game_id': session.gameId,
+            'gameId': session.gameId,
+            'difficulty_level': session.difficultyLevel,
+          })),
           createdAt: Value(now),
         ),
       );

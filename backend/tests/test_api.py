@@ -86,3 +86,128 @@ def test_reminder_missed_follow_up_and_no_escalation_endpoint(api_client):
     check = api_client.get("/reminders/check-due", headers=headers)
     assert check.status_code == 200 and check.json()["reminders"][0]["status"] == "missed"
     assert api_client.post(f"/reminders/{reminder.json()['reminder_id']}/escalate", headers=headers).status_code == 404
+
+
+def test_sync_operations_update_and_delete(api_client, fake_service):
+    headers = auth_headers(api_client)
+
+    # 1. Create a journal entry via sync
+    create_payload = {
+        "records": [
+            {
+                "collection": "journal_entries",
+                "client_generated_id": "op-entry-1",
+                "operation": "create",
+                "data": {"title": "Original Title", "body": "Original Body"},
+            }
+        ]
+    }
+    res1 = api_client.post("/sync/batch", headers=headers, json=create_payload).json()
+    assert res1["results"][0]["status"] == "success"
+    doc1 = fake_service.client.collection("journal_entries").document("op-entry-1").get().to_dict()
+    assert doc1["title"] == "Original Title"
+    assert doc1["deleted"] is False
+
+    # 2. Update the journal entry via sync
+    update_payload = {
+        "records": [
+            {
+                "collection": "journal_entries",
+                "client_generated_id": "op-entry-1",
+                "operation": "update",
+                "data": {"title": "Updated Title", "body": "Updated Body"},
+            }
+        ]
+    }
+    res2 = api_client.post("/sync/batch", headers=headers, json=update_payload).json()
+    assert res2["results"][0]["status"] == "success"
+    doc2 = fake_service.client.collection("journal_entries").document("op-entry-1").get().to_dict()
+    assert doc2["title"] == "Updated Title"
+    assert doc2["body"] == "Updated Body"
+
+    # 3. Soft-delete the journal entry via sync
+    delete_payload = {
+        "records": [
+            {
+                "collection": "journal_entries",
+                "client_generated_id": "op-entry-1",
+                "operation": "delete",
+                "data": {},
+            }
+        ]
+    }
+    res3 = api_client.post("/sync/batch", headers=headers, json=delete_payload).json()
+    assert res3["results"][0]["status"] == "success"
+    doc3 = fake_service.client.collection("journal_entries").document("op-entry-1").get().to_dict()
+    assert doc3["deleted"] is True
+
+
+def test_sync_game_attempts(api_client, fake_service):
+    headers = auth_headers(api_client)
+    payload = {
+        "records": [
+            {
+                "collection": "game_attempts",
+                "client_generated_id": "attempt-sync-1",
+                "operation": "create",
+                "data": {
+                    "session_id": "sess-123",
+                    "game_id": "recall_my_memories",
+                    "round_number": 1,
+                    "correct": True,
+                    "response_time_ms": 1200,
+                    "difficulty_level": 1,
+                },
+            }
+        ]
+    }
+    res = api_client.post("/sync/batch", headers=headers, json=payload).json()
+    assert res["results"][0]["status"] == "success"
+    assert "attempt-sync-1" in res["successful_record_ids"]
+    stored = fake_service.client.collection("game_attempts").document("attempt-sync-1").get().to_dict()
+    assert stored["user_id"] == "test-user"
+    assert stored["correct"] is True
+
+
+def test_pull_endpoints_authenticated_and_isolated(api_client, fake_service):
+    headers = auth_headers(api_client)
+
+    # Seed records for test-user and another user
+    fake_service.client.collection("journal_entries").document("entry-user-a").set({
+        "user_id": "test-user",
+        "title": "My Note",
+        "body": "User A content",
+        "created_at": "2026-01-01T10:00:00Z",
+        "updated_at": "2026-01-01T10:00:00Z",
+        "deleted": False,
+    })
+    fake_service.client.collection("journal_entries").document("entry-user-b").set({
+        "user_id": "other-user",
+        "title": "Other Note",
+        "body": "User B secret",
+        "created_at": "2026-01-01T10:00:00Z",
+        "updated_at": "2026-01-01T10:00:00Z",
+        "deleted": False,
+    })
+
+    # Pull journal-entries for test-user
+    resp = api_client.get("/sync/journal-entries", headers=headers)
+    assert resp.status_code == 200
+    items = resp.json()["items"]
+    assert len(items) == 1
+    assert items[0]["id"] == "entry-user-a"
+    assert items[0]["title"] == "My Note"
+
+    # Test generic collection pull
+    generic_resp = api_client.get("/sync/journal_entries", headers=headers)
+    assert generic_resp.status_code == 200
+    assert generic_resp.json()["count"] == 1
+
+
+def test_readiness_endpoint(api_client):
+    resp = api_client.get("/ready")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["status"] == "ready"
+    assert data["service"] == "smriti-ai"
+
