@@ -314,9 +314,8 @@ class _JournalScreenState extends State<JournalScreen> {
   Widget _buildMemoryCard(JournalEntry entry) {
     final dateFormat = DateFormat('d MMMM yyyy, h:mm a');
     final formattedDate = dateFormat.format(entry.createdAt);
-    final hasPhoto = entry.photoPath != null &&
-        entry.photoPath!.isNotEmpty &&
-        File(entry.photoPath!).existsSync();
+    final hasPhotoPath = entry.photoPath != null && entry.photoPath!.isNotEmpty;
+    final photoExists = hasPhotoPath && File(entry.photoPath!).existsSync();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 18),
@@ -337,17 +336,21 @@ class _JournalScreenState extends State<JournalScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Photo Thumbnail (if attached)
-              if (hasPhoto) ...[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: Image.file(
-                    File(entry.photoPath!),
-                    height: 180,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              // Photo Thumbnail (or graceful fallback if file missing)
+              if (hasPhotoPath) ...[
+                if (photoExists)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: Image.file(
+                      File(entry.photoPath!),
+                      height: 180,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => _buildPhotoFallback(),
+                    ),
+                  )
+                else
+                  _buildPhotoFallback(),
                 const SizedBox(height: 14),
               ],
 
@@ -435,6 +438,41 @@ class _JournalScreenState extends State<JournalScreen> {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhotoFallback() {
+    return Container(
+      height: 100,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppTheme.backgroundColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppTheme.subtitleColor.withValues(alpha: 0.2),
+        ),
+      ),
+      child: const Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.broken_image_rounded,
+              size: 28,
+              color: AppTheme.subtitleColor,
+            ),
+            SizedBox(width: 10),
+            Text(
+              'ছবি উপলব্ধ নহয় (Photo not found on device)',
+              style: TextStyle(
+                fontSize: 15,
+                color: AppTheme.subtitleColor,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -93,8 +93,15 @@ void main() {
       // Outbox should contain create, update, delete
       final outboxItems = await database.select(database.outbox).get();
       expect(outboxItems.length, equals(3));
+      expect(outboxItems[0].operation, equals('create'));
+      expect(outboxItems[0].entityType, equals('journal_entry'));
+      expect(outboxItems[0].entityId, equals(id));
       expect(outboxItems[1].operation, equals('update'));
+      expect(outboxItems[1].entityType, equals('journal_entry'));
+      expect(outboxItems[1].entityId, equals(id));
       expect(outboxItems[2].operation, equals('delete'));
+      expect(outboxItems[2].entityType, equals('journal_entry'));
+      expect(outboxItems[2].entityId, equals(id));
     });
 
     // ==========================================
@@ -143,6 +150,35 @@ void main() {
 
       expect(find.text('Bihu Celebration with Family'), findsOneWidget);
       expect(find.textContaining('We made pitha'), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump(const Duration(milliseconds: 100));
+    });
+
+    testWidgets('JournalScreen safely handles missing photo file without crashing',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      // Create entry with non-existent photo file path
+      await repository.create(
+        title: 'Memory with Missing Photo',
+        body: 'The photo file was deleted or moved.',
+        photoPath: '/non/existent/path/deleted_image_12345.jpg',
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: JournalScreen(repository: repository),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Verify title is rendered and graceful fallback indicator is shown
+      expect(find.text('Memory with Missing Photo'), findsOneWidget);
+      expect(find.textContaining('Photo not found on device'), findsOneWidget);
 
       await tester.pumpWidget(const SizedBox());
       await tester.pump(const Duration(milliseconds: 100));
@@ -221,6 +257,40 @@ void main() {
       expect(outboxItems.first.operation, equals('create'));
 
       await tester.pump(const Duration(seconds: 2));
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+    });
+
+    testWidgets('JournalEntryScreen validation prevents saving completely empty entry',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: JournalEntryScreen(repository: repository),
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Tap save without entering anything
+      final saveButton = find.byKey(const Key('save_memory_button'));
+      await tester.tap(saveButton);
+      await tester.pump();
+
+      // Verify gentle validation message appears
+      expect(find.textContaining('Please add a little memory before saving'), findsOneWidget);
+
+      // Verify no records were saved
+      final entries = await repository.getAll();
+      expect(entries, isEmpty);
+
+      final outboxItems = await database.select(database.outbox).get();
+      expect(outboxItems, isEmpty);
+
+      await tester.pump(const Duration(seconds: 3));
       await tester.pumpWidget(const SizedBox());
       await tester.pump();
     });

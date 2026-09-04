@@ -96,13 +96,13 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
     final title = _titleController.text.trim();
     final body = _bodyController.text.trim();
 
-    // Validation: Require at least some title or body
+    // Validation: Require at least some title, body, or photo
     if (title.isEmpty && body.isEmpty && _photoPath == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: AppTheme.secondaryColor,
           content: Text(
-            'অনুগ্ৰহ কৰি সংৰক্ষণ কৰাৰ আগতে অলপ স্মৃতি লিখক।\n(Please write a little memory before saving.)',
+            'অনুগ্ৰহ কৰি সংৰক্ষণ কৰাৰ আগতে অলপ স্মৃতি যোগ কৰক।\n(Please add a little memory before saving.)',
             style: TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.bold,
@@ -327,18 +327,65 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
               ),
               const SizedBox(height: 10),
 
-              if (_photoPath != null && File(_photoPath!).existsSync()) ...[
+              if (_photoPath != null) ...[
                 Stack(
                   alignment: Alignment.topRight,
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(16),
-                      child: Image.file(
-                        File(_photoPath!),
-                        height: 220,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
+                      child: File(_photoPath!).existsSync()
+                          ? Image.file(
+                              File(_photoPath!),
+                              height: 220,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Container(
+                                height: 120,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.backgroundColor,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: const Center(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.broken_image_rounded, size: 28, color: AppTheme.subtitleColor),
+                                      SizedBox(width: 8),
+                                      Text(
+                                        'ছবি প্ৰদৰ্শন কৰিব পৰা নগ\'ল (Could not display photo)',
+                                        style: TextStyle(fontSize: 15, color: AppTheme.subtitleColor),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Container(
+                              height: 120,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: AppTheme.backgroundColor,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: AppTheme.subtitleColor.withValues(alpha: 0.25),
+                                ),
+                              ),
+                              child: const Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.broken_image_rounded, size: 28, color: AppTheme.subtitleColor),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'ছবি উপলব্ধ নহয় (Photo not found on device)',
+                                      style: TextStyle(fontSize: 15, color: AppTheme.subtitleColor),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                     ),
                     Container(
                       margin: const EdgeInsets.all(8),
