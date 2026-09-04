@@ -40,11 +40,12 @@ abstract class IVoiceService {
 
 /// Production implementation of [IVoiceService] wrapping [stt.SpeechToText].
 ///
-/// Strict Privacy & Elderly Accessibility Guarantees:
+/// Strict Privacy & Technical Guarantees:
+/// - **Smriti AI application boundary**: Smriti AI does not record, save, or upload raw microphone audio.
 /// - **Push-to-talk only**: Activates only upon explicit user button tap.
-/// - **Never always listening**: No wake words, no background recording.
-/// - **No raw audio storage**: Does not write microphone audio to disk or upload to any server.
-/// - **Device locale inspection**: Discovers installed speech locales and falls back safely.
+/// - **No wake words, no background recording**: Microphone is inactive until user interaction.
+/// - **Device-delegated speech recognition**: Speech-to-text conversion is handled by the device's native speech recognition service; whether it functions offline depends on the device and installed language packs.
+/// - **Local intent matching**: All intent matching from recognized text is executed 100% locally on device without network or external LLM calls.
 class VoiceService with ChangeNotifier implements IVoiceService {
   final stt.SpeechToText _speech;
   final VoiceIntentMatcher _matcher;

@@ -271,5 +271,27 @@ void main() {
       expect(mockVoice.startListeningCount, equals(1));
       expect(mockVoice.stopListeningCount, equals(1));
     });
+
+    testWidgets('Displays accurate privacy statement clarifying app vs device speech service',
+        (tester) async {
+      final mockVoice = MockVoiceService();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: VoiceAssistantScreen(voiceService: mockVoice),
+        ),
+      );
+      await tester.pump();
+
+      // Verify accurate privacy statement and device service clarification
+      expect(
+        find.textContaining('Smriti AI does not record, save, or upload your voice recordings'),
+        findsOneWidget,
+      );
+      expect(
+        find.textContaining("Speech recognition is handled by your device's speech service"),
+        findsOneWidget,
+      );
+    });
   });
 }

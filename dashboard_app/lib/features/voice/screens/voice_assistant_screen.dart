@@ -195,6 +195,9 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
               _buildQuickHints(),
 
               const SizedBox(height: 12),
+
+              // Transparent Privacy Notice for Elders & Caregivers
+              _buildPrivacyNotice(),
             ],
           ),
         ),
@@ -521,6 +524,58 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
           }).toList(),
         ),
       ],
+    );
+  }
+
+  Widget _buildPrivacyNotice() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceColor.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.primaryColor.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Icon(
+                Icons.privacy_tip_outlined,
+                size: 22,
+                color: AppTheme.primaryColor,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  VoicePrompts.get(VoicePrompts.privacyStatement, _selectedLanguage),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppTheme.textColor,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.only(left: 32),
+            child: Text(
+              VoicePrompts.get(VoicePrompts.offlineClarification, _selectedLanguage),
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppTheme.subtitleColor,
+                height: 1.3,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -100,6 +100,22 @@ class VoicePrompts {
     'en': 'Voice commands are not available right now. You can continue using the buttons.',
   };
 
+  // --- Privacy & Engine Declarations ---
+
+  static const Map<String, String> privacyStatement = {
+    'as': 'Smriti AI-য়ে আপোনাৰ মাত বা কণ্ঠ বাৰ্তা সংৰক্ষণ বা আপলোড নকৰে। কণ্ঠ চিনাক্তকৰণ আপোনাৰ ডিভাইচৰ ভইচ সেৱাৰ দ্বাৰা কৰা হয়।',
+    'bn': 'Smriti AI আপনার ভয়েস রেকর্ড, সংরক্ষণ বা আপলোড করে না। ভয়েস শনাক্তকরণ আপনার ডিভাইসের ভয়েস পরিষেবা দ্বারা পরিচালিত হয়।',
+    'hi': 'Smriti AI आपकी आवाज़ को रिकॉर्ड, सहेज या अपलोड नहीं करता है। आवाज़ पहचान आपके डिवाइस की सेवा द्वारा नियंत्रित की जाती है।',
+    'en': 'Smriti AI does not record, save, or upload your voice recordings. Speech recognition is handled by your device\'s speech service.',
+  };
+
+  static const Map<String, String> offlineClarification = {
+    'as': 'কণ্ঠ চিনাক্তকৰণ অফলাইনত কাম কৰিব নে নকৰে সেয়া আপোনাৰ ডিভাইচ আৰু ইনষ্টল কৰা ভাষা সমৰ্থনৰ ওপৰত নিৰ্ভৰ কৰে।',
+    'bn': 'ভয়েস শনাক্তকরণ অফলাইনে কাজ করবে কিনা তা আপনার ডিভাইস এবং ইনস্টল করা ভাষার সমর্থনের ওপর নির্ভর করে।',
+    'hi': 'आवाज़ पहचान ऑफ़लाइन काम करेगी या नहीं यह आपके डिवाइस और इंस्टॉल की गई भाषा सहायता पर निर्भर करता है।',
+    'en': 'Whether speech recognition works offline depends on your device and installed language support.',
+  };
+
   static String get(Map<String, String> map, String languageCode) {
     return map[languageCode] ?? map['en'] ?? '';
   }
