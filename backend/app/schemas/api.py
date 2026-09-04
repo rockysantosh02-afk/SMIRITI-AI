@@ -44,6 +44,7 @@ class GenerateStoryRequest(BaseModel):
 
 class GenerateStoryResponse(BaseModel):
     story: str
+    source: str = "ai"
 
 
 class ReminderRequest(BaseModel):

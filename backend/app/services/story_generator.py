@@ -6,7 +6,12 @@ from app.core.config import settings
 from app.services.content_guard import guard_content, passes_content_guard
 
 
-def generate_story_from_memory(title: str | None, content: str | None, language: str = "English") -> str:
+def generate_story_from_memory(
+    title: str | None,
+    content: str | None,
+    language: str = "English",
+    return_source: bool = False,
+) -> str | tuple[str, str]:
     """Generate a warm, short, encouraging AI story from journal title and content."""
     clean_title = (title or "").strip()
     clean_content = (content or "").strip()
@@ -29,7 +34,7 @@ def generate_story_from_memory(title: str | None, content: str | None, language:
             candidate = model.generate_content(prompt).text.strip()
             passed, _ = passes_content_guard(candidate)
             if passed:
-                return candidate
+                return (candidate, "ai") if return_source else candidate
         except Exception:
             pass
 
@@ -62,8 +67,9 @@ def generate_story_from_memory(title: str | None, content: str | None, language:
 
     passed, _ = passes_content_guard(text)
     if not passed:
-        return "Every memory we keep is a precious part of our journey. Remembering this brings peace and warmth to my heart."
-    return text
+        fallback_safe = "Every memory we keep is a precious part of our journey. Remembering this brings peace and warmth to my heart."
+        return (fallback_safe, "fallback") if return_source else fallback_safe
+    return (text, "fallback") if return_source else text
 
 
 def generate_journal_story(caption: str | None, tag_place: str | None, tag_occasion: str | None, language: str = "English") -> str:

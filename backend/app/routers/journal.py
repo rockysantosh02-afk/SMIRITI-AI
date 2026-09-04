@@ -28,12 +28,17 @@ def generate_story_direct(
     current_user: Dict[str, Any] = Depends(get_current_user),
 ) -> GenerateStoryResponse:
     """Generate a warm, encouraging first-person AI story from a journal memory."""
-    story = generate_story_from_memory(
+    story_result = generate_story_from_memory(
         title=request.title,
         content=request.content,
         language=request.language or "English",
+        return_source=True,
     )
-    return GenerateStoryResponse(story=story)
+    if isinstance(story_result, tuple):
+        story, source = story_result
+    else:
+        story, source = story_result, "ai"
+    return GenerateStoryResponse(story=story, source=source)
 
 
 def _owned_entry(service: FirestoreService, entry_id: str, user_id: str) -> Dict[str, Any]:

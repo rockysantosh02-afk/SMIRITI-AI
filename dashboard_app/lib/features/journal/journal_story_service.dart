@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
+import '../../core/firebase/firebase_service.dart';
 import '../../core/sync/http_client.dart';
 
 /// Result wrapper for AI story generation.
@@ -13,15 +14,17 @@ class StoryResult {
   final String? story;
   final String? errorMessage;
   final bool isOffline;
+  final String source;
 
-  const StoryResult.ok(this.story)
+  const StoryResult.ok(this.story, {this.source = 'ai'})
       : success = true,
         errorMessage = null,
         isOffline = false;
 
   const StoryResult.fail(this.errorMessage, {this.isOffline = false})
       : success = false,
-        story = null;
+        story = null,
+        source = 'none';
 }
 
 /// Service for generating warm, encouraging AI stories from journal entries.
@@ -47,6 +50,17 @@ class JournalStoryService {
         _getIdToken = getIdToken,
         _connectivity = connectivity;
 
+  Future<String?> _resolveToken() async {
+    if (_getIdToken != null) {
+      return await _getIdToken!();
+    }
+    try {
+      return await FirebaseService.instance.getIdToken();
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Generates a warm, short story from memory title and content.
   Future<StoryResult> generateStory({
     required String title,
@@ -71,11 +85,10 @@ class JournalStoryService {
 
     // 2. Call backend
     try {
-      final getIdToken = _getIdToken;
-      final token = getIdToken != null ? await getIdToken() : null;
+      final token = await _resolveToken();
       final headers = <String, dynamic>{
         'Content-Type': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       };
 
       final response = await _client.post(
@@ -95,8 +108,11 @@ class JournalStoryService {
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
         final story = data is Map ? data['story'] as String? : null;
+        final source = (data is Map && data['source'] is String)
+            ? data['source'] as String
+            : 'ai';
         if (story != null && story.trim().isNotEmpty) {
-          return StoryResult.ok(story.trim());
+          return StoryResult.ok(story.trim(), source: source);
         }
       }
 
@@ -105,6 +121,12 @@ class JournalStoryService {
       );
     } on DioException catch (e) {
       debugPrint('[JournalStoryService] DioException: $e');
+      if (e.response?.statusCode == 401) {
+        return const StoryResult.fail(
+          'গল্প সৃষ্টি কৰিবলৈ অনুগ্ৰহ কৰি চাইন ইন কৰক।\n(Please sign in to create a story from your memory.)',
+        );
+      }
+
       final isConnectionIssue = e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout ||
           e.type == DioExceptionType.sendTimeout ||

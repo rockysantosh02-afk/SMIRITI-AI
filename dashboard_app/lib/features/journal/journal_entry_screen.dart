@@ -42,6 +42,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
 
   String? _photoPath;
   String? _generatedStory;
+  String _storySource = 'ai';
   bool _isSaving = false;
   bool _isGeneratingStory = false;
 
@@ -109,6 +110,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
       if (result.success && result.story != null) {
         setState(() {
           _generatedStory = result.story;
+          _storySource = result.source;
           _isGeneratingStory = false;
         });
 
@@ -645,18 +647,20 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Row(
+                      Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.auto_awesome_rounded,
                             color: AppTheme.primaryColor,
                             size: 26,
                           ),
-                          SizedBox(width: 10),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              '✨ আপোনাৰ কাহিনী (Your Story)',
-                              style: TextStyle(
+                              _storySource == 'fallback'
+                                  ? '✨ স্মৃতিৰ এক শান্ত প্ৰতিফলন (A gentle reflection)'
+                                  : '✨ আপোনাৰ কাহিনী (Your Story)',
+                              style: const TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.bold,
                                 color: AppTheme.primaryColor,

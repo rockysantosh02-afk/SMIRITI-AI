@@ -120,9 +120,68 @@ def test_api_generate_story_endpoint():
         assert response.status_code == 200
         data = response.json()
         assert "story" in data
+        assert "source" in data
+        assert data["source"] in {"ai", "fallback"}
         assert len(data["story"]) > 10
     finally:
         app.dependency_overrides.pop(get_current_user, None)
+
+
+def test_api_generate_story_unauthenticated_returns_401():
+    from fastapi.testclient import TestClient
+    from app.main import app
+
+    client = TestClient(app)
+    response = client.post(
+        "/journal/generate-story",
+        json={
+            "title": "Evening Tea",
+            "content": "Drinking chai.",
+            "language": "English",
+        },
+    )
+    assert response.status_code == 401
+
+
+def test_generate_story_returns_source_metadata_ai(monkeypatch):
+    monkeypatch.setattr("app.services.story_generator.settings.GEMINI_API_KEY", "fake-api-key")
+
+    class WorkingModel:
+        def generate_content(self, prompt):
+            class Resp:
+                text = "Sitting on the porch listening to birds filled my heart with peace."
+            return Resp()
+
+    class FakeGenAI:
+        def configure(self, api_key):
+            pass
+        def GenerativeModel(self, name):
+            return WorkingModel()
+
+    import sys
+    monkeypatch.setitem(sys.modules, "google.generativeai", FakeGenAI())
+
+    story, source = generate_story_from_memory(
+        title="Birdsong",
+        content="Birds singing in the morning.",
+        language="English",
+        return_source=True,
+    )
+    assert source == "ai"
+    assert "peace" in story
+
+
+def test_generate_story_returns_source_metadata_fallback(monkeypatch):
+    monkeypatch.setattr("app.services.story_generator.settings.GEMINI_API_KEY", "")
+
+    story, source = generate_story_from_memory(
+        title="Birdsong",
+        content="Birds singing in the morning.",
+        language="English",
+        return_source=True,
+    )
+    assert source == "fallback"
+    assert len(story) > 10
 
 
 def test_journal_story_prompt_fallback_uses_journal_fields(monkeypatch):
