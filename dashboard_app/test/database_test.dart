@@ -1,38 +1,49 @@
+import 'dart:ffi';
+import 'dart:io';
+
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqlite3/open.dart';
 
 import 'package:dashboard_app/core/database/app_database.dart';
 
+// Location of sqlite3.dll downloaded for testing.
+final _sqlite3DllPath = '${Directory.systemTemp.path}/sqlite/sqlite3.dll';
+
 void main() {
-  group('AppDatabase Widget Tests', () {
+  group('AppDatabase Unit Tests', () {
     late AppDatabase database;
 
+    setUpAll(() {
+      // Override sqlite3 DLL location on Windows since it's not in PATH.
+      // The DLL was downloaded to %TEMP%/sqlite/ by a setup step.
+      if (Platform.isWindows) {
+        open.overrideForAll(() => DynamicLibrary.open(_sqlite3DllPath));
+      }
+    });
+
     setUp(() {
-      // Use an in-memory database for testing
-      database = AppDatabase.forTesting(
-        NativeDatabase.memory(),
-      );
+      database = AppDatabase.forTesting(NativeDatabase.memory());
     });
 
     tearDown(() async {
       await database.close();
     });
 
-    testWidgets('Database opens successfully', (WidgetTester tester) async {
+    test('Database opens successfully', () async {
       // Verify we can query the database (table exists)
       final sessions = await database.getAllGameSessions();
       expect(sessions, isEmpty);
     });
 
-    testWidgets('Can insert a GameSession and read it back',
-        (WidgetTester tester) async {
+    test('Can insert a GameSession and read it back', () async {
       // Create a game session companion
       const sessionId = 'test-session-123';
       final now = DateTime.now();
 
       final sessionCompanion = GameSessionsCompanion(
-        id: Value(sessionId),
+        id: const Value(sessionId),
         gameId: const Value('memory_match'),
         startedAt: Value(now),
         completedAt: Value(now.add(const Duration(minutes: 5))),
@@ -58,8 +69,7 @@ void main() {
       expect(retrievedSession.synced, isFalse);
     });
 
-    testWidgets('Can insert multiple GameSessions and retrieve all',
-        (WidgetTester tester) async {
+    test('Can insert multiple GameSessions and retrieve all', () async {
       final now = DateTime.now();
 
       // Insert multiple sessions
@@ -82,14 +92,14 @@ void main() {
       expect(sessions.length, equals(3));
     });
 
-    testWidgets('Can update a GameSession', (WidgetTester tester) async {
+    test('Can update a GameSession', () async {
       const sessionId = 'update-test-session';
       final now = DateTime.now();
 
       // Insert a session
       await database.insertGameSession(
         GameSessionsCompanion(
-          id: Value(sessionId),
+          id: const Value(sessionId),
           gameId: const Value('memory_match'),
           startedAt: Value(now),
           difficultyLevel: const Value(1),
@@ -101,7 +111,7 @@ void main() {
       // Update the session
       await database.updateGameSession(
         GameSessionsCompanion(
-          id: Value(sessionId),
+          id: const Value(sessionId),
           gameId: const Value('memory_match'),
           startedAt: Value(now),
           completedAt: Value(now.add(const Duration(minutes: 10))),
@@ -118,14 +128,14 @@ void main() {
       expect(updatedSession.synced, isTrue);
     });
 
-    testWidgets('Can delete a GameSession', (WidgetTester tester) async {
-      final sessionId = 'delete-test-session';
+    test('Can delete a GameSession', () async {
+      const sessionId = 'delete-test-session';
       final now = DateTime.now();
 
       // Insert a session
       await database.insertGameSession(
         GameSessionsCompanion(
-          id: Value(sessionId),
+          id: const Value(sessionId),
           gameId: const Value('memory_match'),
           startedAt: Value(now),
           difficultyLevel: const Value(1),
@@ -146,14 +156,14 @@ void main() {
       expect(sessions, isEmpty);
     });
 
-    testWidgets('Can insert and query Attempts', (WidgetTester tester) async {
-      final sessionId = 'test-session-for-attempts';
+    test('Can insert and query Attempts', () async {
+      const sessionId = 'test-session-for-attempts';
       final now = DateTime.now();
 
       // First insert a session (to satisfy potential FK if needed)
       await database.insertGameSession(
         GameSessionsCompanion(
-          id: Value(sessionId),
+          id: const Value(sessionId),
           gameId: const Value('reaction_time'),
           startedAt: Value(now),
           difficultyLevel: const Value(1),
@@ -166,7 +176,7 @@ void main() {
       await database.insertAttempt(
         AttemptsCompanion(
           id: const Value('attempt-1'),
-          sessionId: Value(sessionId),
+          sessionId: const Value(sessionId),
           gameId: const Value('reaction_time'),
           roundNumber: const Value(1),
           correct: const Value(true),
@@ -183,8 +193,7 @@ void main() {
       expect(attempts.first.responseTimeMs, equals(1500));
     });
 
-    testWidgets('Can insert and query CognitiveScores',
-        (WidgetTester tester) async {
+    test('Can insert and query CognitiveScores', () async {
       final now = DateTime.now();
 
       // Insert a cognitive score
@@ -205,8 +214,7 @@ void main() {
       expect(score.score, equals(85.5));
     });
 
-    testWidgets('Can insert and query JournalEntries',
-        (WidgetTester tester) async {
+    test('Can insert and query JournalEntries', () async {
       final now = DateTime.now();
 
       // Insert a journal entry
@@ -227,7 +235,7 @@ void main() {
       expect(entries.first.title, equals('My First Entry'));
     });
 
-    testWidgets('Can soft-delete a JournalEntry', (WidgetTester tester) async {
+    test('Can soft-delete a JournalEntry', () async {
       final now = DateTime.now();
 
       // Insert a journal entry
@@ -249,7 +257,7 @@ void main() {
       expect(entries, isEmpty);
     });
 
-    testWidgets('Can insert and query Reminders', (WidgetTester tester) async {
+    test('Can insert and query Reminders', () async {
       final now = DateTime.now();
 
       // Insert a reminder
@@ -270,7 +278,7 @@ void main() {
       expect(reminders.first.title, equals('Take medication'));
     });
 
-    testWidgets('Can insert and query Outbox items', (WidgetTester tester) async {
+    test('Can insert and query Outbox items', () async {
       final now = DateTime.now();
 
       // Insert an outbox item
@@ -291,7 +299,7 @@ void main() {
       expect(items.first.operation, equals('create'));
     });
 
-    testWidgets('Outbox count works correctly', (WidgetTester tester) async {
+    test('Outbox count works correctly', () async {
       final now = DateTime.now();
 
       // Insert multiple outbox items
@@ -312,14 +320,14 @@ void main() {
       expect(count, equals(5));
     });
 
-    testWidgets('Can mark GameSession as synced', (WidgetTester tester) async {
-      final sessionId = 'sync-test-session';
+    test('Can mark GameSession as synced', () async {
+      const sessionId = 'sync-test-session';
       final now = DateTime.now();
 
       // Insert unsynced session
       await database.insertGameSession(
         GameSessionsCompanion(
-          id: Value(sessionId),
+          id: const Value(sessionId),
           gameId: const Value('memory_match'),
           startedAt: Value(now),
           difficultyLevel: const Value(1),
@@ -336,7 +344,7 @@ void main() {
       // Mark as synced
       await database.updateGameSession(
         GameSessionsCompanion(
-          id: Value(sessionId),
+          id: const Value(sessionId),
           gameId: const Value('memory_match'),
           startedAt: Value(now),
           completedAt: Value(now),
@@ -352,7 +360,7 @@ void main() {
       expect(unsynced, isEmpty);
     });
 
-    testWidgets('DatabaseProvider singleton works', (WidgetTester tester) async {
+    test('DatabaseProvider singleton works', () {
       // Reset the singleton first
       DatabaseProvider.resetInstance();
 

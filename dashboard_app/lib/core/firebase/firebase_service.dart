@@ -12,6 +12,10 @@ import 'package:flutter/foundation.dart';
 /// - No sharing or invite functionality
 /// - One person uses the app independently
 class FirebaseService {
+  static final FirebaseService instance = FirebaseService._();
+
+  FirebaseService._();
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     clientId: kIsWeb 

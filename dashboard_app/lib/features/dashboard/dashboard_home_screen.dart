@@ -1,9 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/firebase/firebase_service.dart';
+import '../../core/database/app_database.dart';
+import '../../core/sync/sync_service.dart';
+import '../../core/sync/connectivity_watcher.dart';
+import '../../core/sync/sync_debug_indicator.dart';
 import '../auth/login_screen.dart';
+import '../games/games_hub_screen.dart';
+import '../memory/family_member_screen.dart';
 
 /// Dashboard Home Screen for Smriti AI
 /// 
@@ -19,19 +28,40 @@ class DashboardHomeScreen extends StatefulWidget {
   State<DashboardHomeScreen> createState() => _DashboardHomeScreenState();
 }
 
-class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
-  final FirebaseService _firebaseService = FirebaseService();
-  
+class _DashboardHomeScreenState extends State<DashboardHomeScreen>
+    with WidgetsBindingObserver {
+  final FirebaseService _firebaseService = FirebaseService.instance;
+  late final SyncService _syncService;
+  late final ConnectivityWatcher _connectivityWatcher;
+  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+
   String _userName = 'Friend';
   double _textScale = 1.0;
   bool _reducedMotion = false;
+  int _pendingCount = 0;
+  bool _isOnline = true;
+  DateTime? _lastSyncTime;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _syncService = SyncService(db: _db, getIdToken: _firebaseService.getIdToken);
+    _connectivityWatcher = ConnectivityWatcher(onSync: _syncService.syncNow);
+    _connectivityWatcher.start();
+    _syncService.startPeriodicSync();
+    _syncService.syncNow(); // immediate first sync
     _loadSettings();
     _loadUserName();
+    _refreshPendingCount();
+    _connectivitySubscription = Connectivity().onConnectivityChanged.listen((result) {
+      setState(() {
+        _isOnline = result != ConnectivityResult.none;
+      });
+    });
   }
+
+  AppDatabase get _db => DatabaseProvider.instance;
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
@@ -109,6 +139,8 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
         },
         onSignOut: () async {
           Navigator.pop(context); // Close settings
+          _syncService.stopPeriodicSync();
+          _connectivityWatcher.stop();
           await _firebaseService.signOut();
           if (context.mounted) {
             Navigator.of(context).pushReplacement(
@@ -120,6 +152,32 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
     );
   }
 
+  Future<void> _refreshPendingCount() async {
+    final count = await _syncService.pendingCount;
+    if (mounted) {
+      setState(() {
+        _pendingCount = count;
+        _lastSyncTime = _syncService.lastSyncTime;
+      });
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _syncService.syncNow().then((_) => _refreshPendingCount());
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _connectivitySubscription?.cancel();
+    _syncService.dispose();
+    _connectivityWatcher.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,6 +185,12 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
         title: const Text('Smriti AI'),
         automaticallyImplyLeading: false,
         actions: [
+          SyncDebugIndicator(
+            pendingCount: _pendingCount,
+            isOnline: _isOnline,
+            lastSyncTime: _lastSyncTime,
+          ),
+          const SizedBox(width: 12),
           IconButton(
             icon: const Icon(Icons.settings_rounded),
             iconSize: 28,
@@ -252,7 +316,9 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
                 icon: Icons.games_rounded,
                 label: 'Games',
                 color: const Color(0xFF6B8E23), // Olive green
-                onTap: () => _showComingSoon('Games'),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const GamesHubScreen()),
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -292,13 +358,29 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen> {
         ),
         const SizedBox(height: 16),
         
-        // Row 3: My Progress (full width)
-        _FeatureTile(
-          icon: Icons.trending_up_rounded,
-          label: 'My Progress',
-          color: AppTheme.primaryColor,
-          onTap: () => _showComingSoon('My Progress'),
-          fullWidth: true,
+        // Row 3: My Memories, My Progress
+        Row(
+          children: [
+            Expanded(
+              child: _FeatureTile(
+                icon: Icons.family_restroom_rounded,
+                label: 'My Memories',
+                color: const Color(0xFF9C27B0), // Warm Purple
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const FamilyMemberScreen()),
+                ),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _FeatureTile(
+                icon: Icons.trending_up_rounded,
+                label: 'My Progress',
+                color: AppTheme.primaryColor,
+                onTap: () => _showComingSoon('My Progress'),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -311,14 +393,12 @@ class _FeatureTile extends StatelessWidget {
   final String label;
   final Color color;
   final VoidCallback onTap;
-  final bool fullWidth;
 
   const _FeatureTile({
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
-    this.fullWidth = false,
   });
 
   @override
@@ -334,9 +414,7 @@ class _FeatureTile extends StatelessWidget {
           height: 120,
           padding: const EdgeInsets.all(16),
           child: Row(
-            mainAxisAlignment: fullWidth 
-                ? MainAxisAlignment.start 
-                : MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 width: 64,
@@ -351,34 +429,16 @@ class _FeatureTile extends StatelessWidget {
                   color: color,
                 ),
               ),
-              if (fullWidth) ...[
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: color,
-                      fontWeight: FontWeight.w600,
-                    ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: color,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: color.withValues(alpha: 0.5),
-                  size: 20,
-                ),
-              ] else ...[
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    label,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: color,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ],
           ),
         ),

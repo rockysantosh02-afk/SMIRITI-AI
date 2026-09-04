@@ -91,6 +91,20 @@ class Outbox extends Table {
   TextColumn get lastError => text().nullable()();
 }
 
+/// FamilyMembers table - stores family member memories
+class FamilyMembers extends Table {
+  TextColumn get id => text()();
+  TextColumn get name => text()();
+  TextColumn get relation => text()();
+  TextColumn get photoPath => text().nullable()();
+  TextColumn get notes => text().nullable()();
+  DateTimeColumn get createdAt => dateTime()();
+  BoolColumn get synced => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column> get primaryKey => {id};
+}
+
 @DriftDatabase(tables: [
   GameSessions,
   Attempts,
@@ -98,6 +112,7 @@ class Outbox extends Table {
   JournalEntries,
   Reminders,
   Outbox,
+  FamilyMembers,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
@@ -268,6 +283,32 @@ class AppDatabase extends _$AppDatabase {
     final result = await query.getSingle();
     return result.read(count) ?? 0;
   }
+
+  // ============ FamilyMembers CRUD ============
+
+  Future<List<FamilyMember>> getAllFamilyMembers() => select(familyMembers).get();
+
+  Stream<List<FamilyMember>> watchAllFamilyMembers() => select(familyMembers).watch();
+
+  Future<FamilyMember?> getFamilyMemberById(String id) =>
+      (select(familyMembers)..where((t) => t.id.equals(id))).getSingleOrNull();
+
+  Future<int> insertFamilyMember(FamilyMembersCompanion member) =>
+      into(familyMembers).insert(member);
+
+  Future<bool> updateFamilyMember(FamilyMembersCompanion member) =>
+      update(familyMembers).replace(FamilyMember(
+        id: member.id.value,
+        name: member.name.value,
+        relation: member.relation.value,
+        photoPath: member.photoPath.value,
+        notes: member.notes.value,
+        createdAt: member.createdAt.value,
+        synced: member.synced.value,
+      ));
+
+  Future<int> deleteFamilyMember(String id) =>
+      (delete(familyMembers)..where((t) => t.id.equals(id))).go();
 }
 
 /// The database provider singleton

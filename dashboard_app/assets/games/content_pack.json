@@ -1,0 +1,5399 @@
+{
+  "version": 1,
+  "games": {
+    "matching_image": {
+      "tiers": {
+        "1": [
+          {
+            "id": "match_1_1",
+            "image": "xorai",
+            "prompt": "মিলোৱা ছবিটো বাছক: শৰাই (Xorai) (Find the matching xorai)",
+            "options": [
+              "xorai",
+              "japi",
+              "gamosa"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "match_1_2",
+            "image": "king_chili",
+            "prompt": "মিলোৱা ছবিটো বাছক: ভোট জলকীয়া (King Chili) (Find the matching king chili)",
+            "options": [
+              "gamosa",
+              "king_chili",
+              "dhol"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "match_1_3",
+            "image": "bamboo_shoot",
+            "prompt": "মিলোৱা ছবিটো বাছক: বাঁহৰ খৰিচা (Bamboo Shoot) (Find the matching bamboo shoot)",
+            "options": [
+              "dhol",
+              "pepa",
+              "bamboo_shoot"
+            ],
+            "correctIndex": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "match_1_4",
+            "image": "assam_tea",
+            "prompt": "মিলোৱা ছবিটো বাছক: অসম চাহ (Assam Tea) (Find the matching assam tea)",
+            "options": [
+              "assam_tea",
+              "pepa",
+              "xorai"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "match_1_5",
+            "image": "muga_silk",
+            "prompt": "মিলোৱা ছবিটো বাছক: মুগা ৰেচম (Muga Silk) (Find the matching muga silk)",
+            "options": [
+              "xorai",
+              "muga_silk",
+              "king_chili"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "match_1_6",
+            "image": "malbhog_kol",
+            "prompt": "মিলোৱা ছবিটো বাছক: মালভোগ কল (Banana) (Find the matching malbhog kol)",
+            "options": [
+              "king_chili",
+              "bamboo_shoot",
+              "malbhog_kol"
+            ],
+            "correctIndex": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "match_1_7",
+            "image": "tamul_paan",
+            "prompt": "মিলোৱা ছবিটো বাছক: তামোল-পাণ (Areca Nut & Betel) (Find the matching tamul paan)",
+            "options": [
+              "tamul_paan",
+              "bamboo_shoot",
+              "assam_tea"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "match_1_8",
+            "image": "masor_tenga",
+            "prompt": "মিলোৱা ছবিটো বাছক: মাছৰ টেঙা (Fish Curry) (Find the matching masor tenga)",
+            "options": [
+              "assam_tea",
+              "masor_tenga",
+              "muga_silk"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          }
+        ],
+        "2": [
+          {
+            "id": "match_2_1",
+            "image": "muga_silk",
+            "prompt": "মিলোৱা ছবিটো বাছক: মুগা ৰেচম (Muga Silk) (Find the matching muga silk)",
+            "options": [
+              "muga_silk",
+              "japi",
+              "gamosa"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "match_2_2",
+            "image": "malbhog_kol",
+            "prompt": "মিলোৱা ছবিটো বাছক: মালভোগ কল (Banana) (Find the matching malbhog kol)",
+            "options": [
+              "gamosa",
+              "malbhog_kol",
+              "dhol"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "match_2_3",
+            "image": "tamul_paan",
+            "prompt": "মিলোৱা ছবিটো বাছক: তামোল-পাণ (Areca Nut & Betel) (Find the matching tamul paan)",
+            "options": [
+              "dhol",
+              "pepa",
+              "tamul_paan"
+            ],
+            "correctIndex": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "match_2_4",
+            "image": "masor_tenga",
+            "prompt": "মিলোৱা ছবিটো বাছক: মাছৰ টেঙা (Fish Curry) (Find the matching masor tenga)",
+            "options": [
+              "masor_tenga",
+              "pepa",
+              "xorai"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "match_2_5",
+            "image": "joha_rice",
+            "prompt": "মিলোৱা ছবিটো বাছক: জোহা চাউল (Joha Rice) (Find the matching joha rice)",
+            "options": [
+              "xorai",
+              "joha_rice",
+              "king_chili"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "match_2_6",
+            "image": "bihu_dance",
+            "prompt": "মিলোৱা ছবিটো বাছক: বিহু নৃত্য (Bihu Dance) (Find the matching bihu dance)",
+            "options": [
+              "king_chili",
+              "bamboo_shoot",
+              "bihu_dance"
+            ],
+            "correctIndex": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "match_2_7",
+            "image": "brahmaputra",
+            "prompt": "মিলোৱা ছবিটো বাছক: ব্ৰহ্মপুত্ৰ নদী (Brahmaputra) (Find the matching brahmaputra)",
+            "options": [
+              "brahmaputra",
+              "bamboo_shoot",
+              "assam_tea"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "match_2_8",
+            "image": "rhino",
+            "prompt": "মিলোৱা ছবিটো বাছক: এশিঙীয়া গঁড় (Rhino) (Find the matching rhino)",
+            "options": [
+              "assam_tea",
+              "rhino",
+              "muga_silk"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          }
+        ],
+        "3": [
+          {
+            "id": "match_3_1",
+            "image": "joha_rice",
+            "prompt": "মিলোৱা ছবিটো বাছক: জোহা চাউল (Joha Rice) (Find the matching joha rice)",
+            "options": [
+              "joha_rice",
+              "japi",
+              "gamosa",
+              "dhol"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "match_3_2",
+            "image": "bihu_dance",
+            "prompt": "মিলোৱা ছবিটো বাছক: বিহু নৃত্য (Bihu Dance) (Find the matching bihu dance)",
+            "options": [
+              "gamosa",
+              "bihu_dance",
+              "dhol",
+              "pepa"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "match_3_3",
+            "image": "brahmaputra",
+            "prompt": "মিলোৱা ছবিটো বাছক: ব্ৰহ্মপুত্ৰ নদী (Brahmaputra) (Find the matching brahmaputra)",
+            "options": [
+              "dhol",
+              "pepa",
+              "brahmaputra",
+              "xorai"
+            ],
+            "correctIndex": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "match_3_4",
+            "image": "rhino",
+            "prompt": "মিলোৱা ছবিটো বাছক: এশিঙীয়া গঁড় (Rhino) (Find the matching rhino)",
+            "options": [
+              "pepa",
+              "xorai",
+              "king_chili",
+              "rhino"
+            ],
+            "correctIndex": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "match_3_5",
+            "image": "kopou_phool",
+            "prompt": "মিলোৱা ছবিটো বাছক: কপৌ ফুল (Foxtail Orchid) (Find the matching kopou phool)",
+            "options": [
+              "kopou_phool",
+              "xorai",
+              "king_chili",
+              "bamboo_shoot"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "match_3_6",
+            "image": "gogona",
+            "prompt": "মিলোৱা ছবিটো বাছক: গগনা (Gogona) (Find the matching gogona)",
+            "options": [
+              "king_chili",
+              "gogona",
+              "bamboo_shoot",
+              "assam_tea"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "match_3_7",
+            "image": "tokari",
+            "prompt": "মিলোৱা ছবিটো বাছক: টকাৰী (Tokari) (Find the matching tokari)",
+            "options": [
+              "bamboo_shoot",
+              "assam_tea",
+              "tokari",
+              "muga_silk"
+            ],
+            "correctIndex": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "match_3_8",
+            "image": "pitha",
+            "prompt": "মিলোৱা ছবিটো বাছক: তিল পিঠা (Til Pitha) (Find the matching pitha)",
+            "options": [
+              "assam_tea",
+              "muga_silk",
+              "malbhog_kol",
+              "pitha"
+            ],
+            "correctIndex": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          }
+        ],
+        "4": [
+          {
+            "id": "match_4_1",
+            "image": "kopou_phool",
+            "prompt": "মিলোৱা ছবিটো বাছক: কপৌ ফুল (Foxtail Orchid) (Find the matching kopou phool)",
+            "options": [
+              "kopou_phool",
+              "japi",
+              "gamosa",
+              "dhol"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "match_4_2",
+            "image": "gogona",
+            "prompt": "মিলোৱা ছবিটো বাছক: গগনা (Gogona) (Find the matching gogona)",
+            "options": [
+              "gamosa",
+              "gogona",
+              "dhol",
+              "pepa"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "match_4_3",
+            "image": "tokari",
+            "prompt": "মিলোৱা ছবিটো বাছক: টকাৰী (Tokari) (Find the matching tokari)",
+            "options": [
+              "dhol",
+              "pepa",
+              "tokari",
+              "xorai"
+            ],
+            "correctIndex": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "match_4_4",
+            "image": "pitha",
+            "prompt": "মিলোৱা ছবিটো বাছক: তিল পিঠা (Til Pitha) (Find the matching pitha)",
+            "options": [
+              "pepa",
+              "xorai",
+              "king_chili",
+              "pitha"
+            ],
+            "correctIndex": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "match_4_5",
+            "image": "taat_xaal",
+            "prompt": "মিলোৱা ছবিটো বাছক: তাঁত শাল (Handloom) (Find the matching taat xaal)",
+            "options": [
+              "taat_xaal",
+              "xorai",
+              "king_chili",
+              "bamboo_shoot"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "match_4_6",
+            "image": "majuli",
+            "prompt": "মিলোৱা ছবিটো বাছক: মাজুলী দ্বীপ (Majuli Island) (Find the matching majuli)",
+            "options": [
+              "king_chili",
+              "majuli",
+              "bamboo_shoot",
+              "assam_tea"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "match_4_7",
+            "image": "kamakhya",
+            "prompt": "মিলোৱা ছবিটো বাছক: কামাখ্যা মন্দিৰ (Kamakhya) (Find the matching kamakhya)",
+            "options": [
+              "bamboo_shoot",
+              "assam_tea",
+              "kamakhya",
+              "muga_silk"
+            ],
+            "correctIndex": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "match_4_8",
+            "image": "rang_ghar",
+            "prompt": "মিলোৱা ছবিটো বাছক: ৰংঘৰ (Rang Ghar) (Find the matching rang ghar)",
+            "options": [
+              "assam_tea",
+              "muga_silk",
+              "malbhog_kol",
+              "rang_ghar"
+            ],
+            "correctIndex": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          }
+        ],
+        "5": [
+          {
+            "id": "match_5_1",
+            "image": "taat_xaal",
+            "prompt": "মিলোৱা ছবিটো বাছক: তাঁত শাল (Handloom) (Find the matching taat xaal)",
+            "options": [
+              "taat_xaal",
+              "japi",
+              "gamosa",
+              "dhol"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "match_5_2",
+            "image": "majuli",
+            "prompt": "মিলোৱা ছবিটো বাছক: মাজুলী দ্বীপ (Majuli Island) (Find the matching majuli)",
+            "options": [
+              "gamosa",
+              "majuli",
+              "dhol",
+              "pepa"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "match_5_3",
+            "image": "kamakhya",
+            "prompt": "মিলোৱা ছবিটো বাছক: কামাখ্যা মন্দিৰ (Kamakhya) (Find the matching kamakhya)",
+            "options": [
+              "dhol",
+              "pepa",
+              "kamakhya",
+              "xorai"
+            ],
+            "correctIndex": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "match_5_4",
+            "image": "rang_ghar",
+            "prompt": "মিলোৱা ছবিটো বাছক: ৰংঘৰ (Rang Ghar) (Find the matching rang ghar)",
+            "options": [
+              "pepa",
+              "xorai",
+              "king_chili",
+              "rang_ghar"
+            ],
+            "correctIndex": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "match_5_5",
+            "image": "japi",
+            "prompt": "মিলোৱা ছবিটো বাছক: জাপি (Japi) (Find the matching japi)",
+            "options": [
+              "japi",
+              "king_chili",
+              "bamboo_shoot",
+              "assam_tea"
+            ],
+            "correctIndex": 0,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "match_5_6",
+            "image": "gamosa",
+            "prompt": "মিলোৱা ছবিটো বাছক: গামোচা (Gamosa) (Find the matching gamosa)",
+            "options": [
+              "bamboo_shoot",
+              "gamosa",
+              "assam_tea",
+              "muga_silk"
+            ],
+            "correctIndex": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "match_5_7",
+            "image": "dhol",
+            "prompt": "মিলোৱা ছবিটো বাছক: ঢোল (Dhol) (Find the matching dhol)",
+            "options": [
+              "assam_tea",
+              "muga_silk",
+              "dhol",
+              "malbhog_kol"
+            ],
+            "correctIndex": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "match_5_8",
+            "image": "pepa",
+            "prompt": "মিলোৱা ছবিটো বাছক: পেঁপা (Pepa) (Find the matching pepa)",
+            "options": [
+              "muga_silk",
+              "malbhog_kol",
+              "tamul_paan",
+              "pepa"
+            ],
+            "correctIndex": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          }
+        ]
+      }
+    },
+    "pick_correct": {
+      "tiers": {
+        "1": [
+          {
+            "id": "pick_1_1",
+            "image": "dhol",
+            "prompt": "বাদ্যযন্ত্ৰটো বাছক (Pick the musical instrument)",
+            "options": [
+              "japi",
+              "dhol",
+              "gamosa",
+              "xorai"
+            ],
+            "correctIndex": 1,
+            "domain": "RECALL",
+            "tier": 1
+          },
+          {
+            "id": "pick_1_2",
+            "image": "muga_silk",
+            "prompt": "কাপোৰ বা হস্তশিল্পটো বাছক (Pick the handloom or attire)",
+            "options": [
+              "dhol",
+              "pepa",
+              "muga_silk",
+              "xorai"
+            ],
+            "correctIndex": 2,
+            "domain": "RECALL",
+            "tier": 1
+          },
+          {
+            "id": "pick_1_3",
+            "image": "kamakhya",
+            "prompt": "ঐতিহাসিক বা প্ৰাকৃতিক ঠাইখন বাছক (Pick the landmark or natural place)",
+            "options": [
+              "dhol",
+              "pepa",
+              "xorai",
+              "kamakhya"
+            ],
+            "correctIndex": 3,
+            "domain": "RECALL",
+            "tier": 1
+          },
+          {
+            "id": "pick_1_4",
+            "image": "masor_tenga",
+            "prompt": "খাদ্য বা ফলটো বাছক (Pick the traditional food or fruit)",
+            "options": [
+              "masor_tenga",
+              "pepa",
+              "xorai",
+              "assam_tea"
+            ],
+            "correctIndex": 0,
+            "domain": "RECALL",
+            "tier": 1
+          },
+          {
+            "id": "pick_1_5",
+            "image": "dhol",
+            "prompt": "বাদ্যযন্ত্ৰটো বাছক (Pick the musical instrument)",
+            "options": [
+              "bamboo_shoot",
+              "dhol",
+              "assam_tea",
+              "muga_silk"
+            ],
+            "correctIndex": 1,
+            "domain": "RECALL",
+            "tier": 1
+          },
+          {
+            "id": "pick_1_6",
+            "image": "muga_silk",
+            "prompt": "কাপোৰ বা হস্তশিল্পটো বাছক (Pick the handloom or attire)",
+            "options": [
+              "bamboo_shoot",
+              "assam_tea",
+              "muga_silk",
+              "malbhog_kol"
+            ],
+            "correctIndex": 2,
+            "domain": "RECALL",
+            "tier": 1
+          },
+          {
+            "id": "pick_1_7",
+            "image": "kamakhya",
+            "prompt": "ঐতিহাসিক বা প্ৰাকৃতিক ঠাইখন বাছক (Pick the landmark or natural place)",
+            "options": [
+              "bamboo_shoot",
+              "assam_tea",
+              "muga_silk",
+              "kamakhya"
+            ],
+            "correctIndex": 3,
+            "domain": "RECALL",
+            "tier": 1
+          },
+          {
+            "id": "pick_1_8",
+            "image": "bamboo_shoot",
+            "prompt": "খাদ্য বা ফলটো বাছক (Pick the traditional food or fruit)",
+            "options": [
+              "bamboo_shoot",
+              "tamul_paan",
+              "bihu_dance",
+              "brahmaputra"
+            ],
+            "correctIndex": 0,
+            "domain": "RECALL",
+            "tier": 1
+          }
+        ],
+        "2": [
+          {
+            "id": "pick_2_1",
+            "image": "gamosa",
+            "prompt": "কাপোৰ বা হস্তশিল্পটো বাছক (Pick the handloom or attire)",
+            "options": [
+              "japi",
+              "gamosa",
+              "dhol",
+              "pepa"
+            ],
+            "correctIndex": 1,
+            "domain": "RECALL",
+            "tier": 2
+          },
+          {
+            "id": "pick_2_2",
+            "image": "majuli",
+            "prompt": "ঐতিহাসিক বা প্ৰাকৃতিক ঠাইখন বাছক (Pick the landmark or natural place)",
+            "options": [
+              "gamosa",
+              "dhol",
+              "majuli",
+              "pepa"
+            ],
+            "correctIndex": 2,
+            "domain": "RECALL",
+            "tier": 2
+          },
+          {
+            "id": "pick_2_3",
+            "image": "malbhog_kol",
+            "prompt": "খাদ্য বা ফলটো বাছক (Pick the traditional food or fruit)",
+            "options": [
+              "dhol",
+              "pepa",
+              "xorai",
+              "malbhog_kol"
+            ],
+            "correctIndex": 3,
+            "domain": "RECALL",
+            "tier": 2
+          },
+          {
+            "id": "pick_2_4",
+            "image": "tokari",
+            "prompt": "বাদ্যযন্ত্ৰটো বাছক (Pick the musical instrument)",
+            "options": [
+              "tokari",
+              "king_chili",
+              "bamboo_shoot",
+              "assam_tea"
+            ],
+            "correctIndex": 0,
+            "domain": "RECALL",
+            "tier": 2
+          },
+          {
+            "id": "pick_2_5",
+            "image": "gamosa",
+            "prompt": "কাপোৰ বা হস্তশিল্পটো বাছক (Pick the handloom or attire)",
+            "options": [
+              "king_chili",
+              "gamosa",
+              "bamboo_shoot",
+              "assam_tea"
+            ],
+            "correctIndex": 1,
+            "domain": "RECALL",
+            "tier": 2
+          },
+          {
+            "id": "pick_2_6",
+            "image": "majuli",
+            "prompt": "ঐতিহাসিক বা প্ৰাকৃতিক ঠাইখন বাছক (Pick the landmark or natural place)",
+            "options": [
+              "king_chili",
+              "bamboo_shoot",
+              "majuli",
+              "assam_tea"
+            ],
+            "correctIndex": 2,
+            "domain": "RECALL",
+            "tier": 2
+          },
+          {
+            "id": "pick_2_7",
+            "image": "king_chili",
+            "prompt": "খাদ্য বা ফলটো বাছক (Pick the traditional food or fruit)",
+            "options": [
+              "muga_silk",
+              "tamul_paan",
+              "bihu_dance",
+              "king_chili"
+            ],
+            "correctIndex": 3,
+            "domain": "RECALL",
+            "tier": 2
+          },
+          {
+            "id": "pick_2_8",
+            "image": "tokari",
+            "prompt": "বাদ্যযন্ত্ৰটো বাছক (Pick the musical instrument)",
+            "options": [
+              "tokari",
+              "malbhog_kol",
+              "tamul_paan",
+              "masor_tenga"
+            ],
+            "correctIndex": 0,
+            "domain": "RECALL",
+            "tier": 2
+          }
+        ],
+        "3": [
+          {
+            "id": "pick_3_1",
+            "image": "brahmaputra",
+            "prompt": "ঐতিহাসিক বা প্ৰাকৃতিক ঠাইখন বাছক (Pick the landmark or natural place)",
+            "options": [
+              "japi",
+              "brahmaputra",
+              "gamosa",
+              "dhol"
+            ],
+            "correctIndex": 1,
+            "domain": "RECALL",
+            "tier": 3
+          },
+          {
+            "id": "pick_3_2",
+            "image": "bamboo_shoot",
+            "prompt": "খাদ্য বা ফলটো বাছক (Pick the traditional food or fruit)",
+            "options": [
+              "gamosa",
+              "dhol",
+              "bamboo_shoot",
+              "pepa"
+            ],
+            "correctIndex": 2,
+            "domain": "RECALL",
+            "tier": 3
+          },
+          {
+            "id": "pick_3_3",
+            "image": "gogona",
+            "prompt": "বাদ্যযন্ত্ৰটো বাছক (Pick the musical instrument)",
+            "options": [
+              "xorai",
+              "king_chili",
+              "bamboo_shoot",
+              "gogona"
+            ],
+            "correctIndex": 3,
+            "domain": "RECALL",
+            "tier": 3
+          },
+          {
+            "id": "pick_3_4",
+            "image": "muga_silk",
+            "prompt": "কাপোৰ বা হস্তশিল্পটো বাছক (Pick the handloom or attire)",
+            "options": [
+              "muga_silk",
+              "xorai",
+              "king_chili",
+              "bamboo_shoot"
+            ],
+            "correctIndex": 0,
+            "domain": "RECALL",
+            "tier": 3
+          },
+          {
+            "id": "pick_3_5",
+            "image": "brahmaputra",
+            "prompt": "ঐতিহাসিক বা প্ৰাকৃতিক ঠাইখন বাছক (Pick the landmark or natural place)",
+            "options": [
+              "xorai",
+              "brahmaputra",
+              "king_chili",
+              "bamboo_shoot"
+            ],
+            "correctIndex": 1,
+            "domain": "RECALL",
+            "tier": 3
+          },
+          {
+            "id": "pick_3_6",
+            "image": "pitha",
+            "prompt": "খাদ্য বা ফলটো বাছক (Pick the traditional food or fruit)",
+            "options": [
+              "assam_tea",
+              "muga_silk",
+              "pitha",
+              "tamul_paan"
+            ],
+            "correctIndex": 2,
+            "domain": "RECALL",
+            "tier": 3
+          },
+          {
+            "id": "pick_3_7",
+            "image": "gogona",
+            "prompt": "বাদ্যযন্ত্ৰটো বাছক (Pick the musical instrument)",
+            "options": [
+              "muga_silk",
+              "malbhog_kol",
+              "tamul_paan",
+              "gogona"
+            ],
+            "correctIndex": 3,
+            "domain": "RECALL",
+            "tier": 3
+          },
+          {
+            "id": "pick_3_8",
+            "image": "muga_silk",
+            "prompt": "কাপোৰ বা হস্তশিল্পটো বাছক (Pick the handloom or attire)",
+            "options": [
+              "muga_silk",
+              "malbhog_kol",
+              "tamul_paan",
+              "masor_tenga"
+            ],
+            "correctIndex": 0,
+            "domain": "RECALL",
+            "tier": 3
+          }
+        ],
+        "4": [
+          {
+            "id": "pick_4_1",
+            "image": "king_chili",
+            "prompt": "খাদ্য বা ফলটো বাছক (Pick the traditional food or fruit)",
+            "options": [
+              "japi",
+              "king_chili",
+              "gamosa",
+              "dhol"
+            ],
+            "correctIndex": 1,
+            "domain": "RECALL",
+            "tier": 4
+          },
+          {
+            "id": "pick_4_2",
+            "image": "pepa",
+            "prompt": "বাদ্যযন্ত্ৰটো বাছক (Pick the musical instrument)",
+            "options": [
+              "gamosa",
+              "xorai",
+              "pepa",
+              "king_chili"
+            ],
+            "correctIndex": 2,
+            "domain": "RECALL",
+            "tier": 4
+          },
+          {
+            "id": "pick_4_3",
+            "image": "gamosa",
+            "prompt": "কাপোৰ বা হস্তশিল্পটো বাছক (Pick the handloom or attire)",
+            "options": [
+              "pepa",
+              "xorai",
+              "king_chili",
+              "gamosa"
+            ],
+            "correctIndex": 3,
+            "domain": "RECALL",
+            "tier": 4
+          },
+          {
+            "id": "pick_4_4",
+            "image": "rang_ghar",
+            "prompt": "ঐতিহাসিক বা প্ৰাকৃতিক ঠাইখন বাছক (Pick the landmark or natural place)",
+            "options": [
+              "rang_ghar",
+              "pepa",
+              "xorai",
+              "king_chili"
+            ],
+            "correctIndex": 0,
+            "domain": "RECALL",
+            "tier": 4
+          },
+          {
+            "id": "pick_4_5",
+            "image": "joha_rice",
+            "prompt": "খাদ্য বা ফলটো বাছক (Pick the traditional food or fruit)",
+            "options": [
+              "xorai",
+              "joha_rice",
+              "assam_tea",
+              "muga_silk"
+            ],
+            "correctIndex": 1,
+            "domain": "RECALL",
+            "tier": 4
+          },
+          {
+            "id": "pick_4_6",
+            "image": "pepa",
+            "prompt": "বাদ্যযন্ত্ৰটো বাছক (Pick the musical instrument)",
+            "options": [
+              "assam_tea",
+              "muga_silk",
+              "pepa",
+              "malbhog_kol"
+            ],
+            "correctIndex": 2,
+            "domain": "RECALL",
+            "tier": 4
+          },
+          {
+            "id": "pick_4_7",
+            "image": "gamosa",
+            "prompt": "কাপোৰ বা হস্তশিল্পটো বাছক (Pick the handloom or attire)",
+            "options": [
+              "assam_tea",
+              "malbhog_kol",
+              "tamul_paan",
+              "gamosa"
+            ],
+            "correctIndex": 3,
+            "domain": "RECALL",
+            "tier": 4
+          },
+          {
+            "id": "pick_4_8",
+            "image": "rang_ghar",
+            "prompt": "ঐতিহাসিক বা প্ৰাকৃতিক ঠাইখন বাছক (Pick the landmark or natural place)",
+            "options": [
+              "rang_ghar",
+              "assam_tea",
+              "muga_silk",
+              "malbhog_kol"
+            ],
+            "correctIndex": 0,
+            "domain": "RECALL",
+            "tier": 4
+          }
+        ],
+        "5": [
+          {
+            "id": "pick_5_1",
+            "image": "dhol",
+            "prompt": "বাদ্যযন্ত্ৰটো বাছক (Pick the musical instrument)",
+            "options": [
+              "japi",
+              "dhol",
+              "gamosa",
+              "xorai"
+            ],
+            "correctIndex": 1,
+            "domain": "RECALL",
+            "tier": 5
+          },
+          {
+            "id": "pick_5_2",
+            "image": "muga_silk",
+            "prompt": "কাপোৰ বা হস্তশিল্পটো বাছক (Pick the handloom or attire)",
+            "options": [
+              "dhol",
+              "pepa",
+              "muga_silk",
+              "xorai"
+            ],
+            "correctIndex": 2,
+            "domain": "RECALL",
+            "tier": 5
+          },
+          {
+            "id": "pick_5_3",
+            "image": "kamakhya",
+            "prompt": "ঐতিহাসিক বা প্ৰাকৃতিক ঠাইখন বাছক (Pick the landmark or natural place)",
+            "options": [
+              "dhol",
+              "pepa",
+              "xorai",
+              "kamakhya"
+            ],
+            "correctIndex": 3,
+            "domain": "RECALL",
+            "tier": 5
+          },
+          {
+            "id": "pick_5_4",
+            "image": "masor_tenga",
+            "prompt": "খাদ্য বা ফলটো বাছক (Pick the traditional food or fruit)",
+            "options": [
+              "masor_tenga",
+              "pepa",
+              "xorai",
+              "assam_tea"
+            ],
+            "correctIndex": 0,
+            "domain": "RECALL",
+            "tier": 5
+          },
+          {
+            "id": "pick_5_5",
+            "image": "dhol",
+            "prompt": "বাদ্যযন্ত্ৰটো বাছক (Pick the musical instrument)",
+            "options": [
+              "bamboo_shoot",
+              "dhol",
+              "assam_tea",
+              "muga_silk"
+            ],
+            "correctIndex": 1,
+            "domain": "RECALL",
+            "tier": 5
+          },
+          {
+            "id": "pick_5_6",
+            "image": "muga_silk",
+            "prompt": "কাপোৰ বা হস্তশিল্পটো বাছক (Pick the handloom or attire)",
+            "options": [
+              "bamboo_shoot",
+              "assam_tea",
+              "muga_silk",
+              "malbhog_kol"
+            ],
+            "correctIndex": 2,
+            "domain": "RECALL",
+            "tier": 5
+          },
+          {
+            "id": "pick_5_7",
+            "image": "kamakhya",
+            "prompt": "ঐতিহাসিক বা প্ৰাকৃতিক ঠাইখন বাছক (Pick the landmark or natural place)",
+            "options": [
+              "bamboo_shoot",
+              "assam_tea",
+              "muga_silk",
+              "kamakhya"
+            ],
+            "correctIndex": 3,
+            "domain": "RECALL",
+            "tier": 5
+          },
+          {
+            "id": "pick_5_8",
+            "image": "bamboo_shoot",
+            "prompt": "খাদ্য বা ফলটো বাছক (Pick the traditional food or fruit)",
+            "options": [
+              "bamboo_shoot",
+              "tamul_paan",
+              "bihu_dance",
+              "brahmaputra"
+            ],
+            "correctIndex": 0,
+            "domain": "RECALL",
+            "tier": 5
+          }
+        ]
+      }
+    },
+    "number_game": {
+      "tiers": {
+        "1": [
+          {
+            "id": "num_1_1",
+            "image": "japi",
+            "prompt": "ছবিখনত কেইটা জাপি (Japi) আছে? (Count the japi)",
+            "options": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "correctIndex": 1,
+            "count": 2,
+            "mode": "count",
+            "domain": "NUMERACY",
+            "tier": 1
+          },
+          {
+            "id": "num_1_2",
+            "image": "gamosa",
+            "prompt": "ছবিখনত কেইটা গামোচা (Gamosa) আছে? (Count the gamosa)",
+            "options": [
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "correctIndex": 1,
+            "count": 3,
+            "mode": "count",
+            "domain": "NUMERACY",
+            "tier": 1
+          },
+          {
+            "id": "num_1_3",
+            "image": "dhol",
+            "prompt": "ছবিখনত কেইটা ঢোল (Dhol) আছে? (Count the dhol)",
+            "options": [
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            "correctIndex": 1,
+            "count": 4,
+            "mode": "count",
+            "domain": "NUMERACY",
+            "tier": 1
+          },
+          {
+            "id": "num_1_4",
+            "image": "pepa",
+            "prompt": "ছবিখনত কেইটা পেঁপা (Pepa) আছে? (Count the pepa)",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "count": 5,
+            "mode": "count",
+            "domain": "NUMERACY",
+            "tier": 1
+          },
+          {
+            "id": "num_1_5",
+            "image": "xorai",
+            "prompt": "ছবিখনত কেইটা শৰাই (Xorai) আছে? (Count the xorai)",
+            "options": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ],
+            "correctIndex": 1,
+            "count": 2,
+            "mode": "count",
+            "domain": "NUMERACY",
+            "tier": 1
+          },
+          {
+            "id": "num_1_6",
+            "image": "king_chili",
+            "prompt": "ছবিখনত কেইটা ভোট জলকীয়া (King Chili) আছে? (Count the king chili)",
+            "options": [
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "correctIndex": 1,
+            "count": 3,
+            "mode": "count",
+            "domain": "NUMERACY",
+            "tier": 1
+          },
+          {
+            "id": "num_1_7",
+            "image": "bamboo_shoot",
+            "prompt": "ছবিখনত কেইটা বাঁহৰ খৰিচা (Bamboo Shoot) আছে? (Count the bamboo shoot)",
+            "options": [
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            "correctIndex": 1,
+            "count": 4,
+            "mode": "count",
+            "domain": "NUMERACY",
+            "tier": 1
+          },
+          {
+            "id": "num_1_8",
+            "image": "assam_tea",
+            "prompt": "ছবিখনত কেইটা অসম চাহ (Assam Tea) আছে? (Count the assam tea)",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "count": 5,
+            "mode": "count",
+            "domain": "NUMERACY",
+            "tier": 1
+          }
+        ],
+        "2": [
+          {
+            "id": "num_2_1",
+            "image": "numbers",
+            "prompt": "পৰৱৰ্তী সংখ্যাটো কি? 1, 2, 3, ___ (What comes next?)",
+            "options": [
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            "correctIndex": 1,
+            "sequence": [
+              1,
+              2,
+              3
+            ],
+            "mode": "sequence",
+            "domain": "NUMERACY",
+            "tier": 2
+          },
+          {
+            "id": "num_2_2",
+            "image": "numbers",
+            "prompt": "পৰৱৰ্তী সংখ্যাটো কি? 2, 3, 4, ___ (What comes next?)",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "sequence": [
+              2,
+              3,
+              4
+            ],
+            "mode": "sequence",
+            "domain": "NUMERACY",
+            "tier": 2
+          },
+          {
+            "id": "num_2_3",
+            "image": "numbers",
+            "prompt": "পৰৱৰ্তী সংখ্যাটো কি? 3, 4, 5, ___ (What comes next?)",
+            "options": [
+              "5",
+              "6",
+              "7",
+              "8"
+            ],
+            "correctIndex": 1,
+            "sequence": [
+              3,
+              4,
+              5
+            ],
+            "mode": "sequence",
+            "domain": "NUMERACY",
+            "tier": 2
+          },
+          {
+            "id": "num_2_4",
+            "image": "numbers",
+            "prompt": "পৰৱৰ্তী সংখ্যাটো কি? 4, 5, 6, ___ (What comes next?)",
+            "options": [
+              "6",
+              "7",
+              "8",
+              "9"
+            ],
+            "correctIndex": 1,
+            "sequence": [
+              4,
+              5,
+              6
+            ],
+            "mode": "sequence",
+            "domain": "NUMERACY",
+            "tier": 2
+          },
+          {
+            "id": "num_2_5",
+            "image": "numbers",
+            "prompt": "পৰৱৰ্তী সংখ্যাটো কি? 5, 6, 7, ___ (What comes next?)",
+            "options": [
+              "7",
+              "8",
+              "9",
+              "10"
+            ],
+            "correctIndex": 1,
+            "sequence": [
+              5,
+              6,
+              7
+            ],
+            "mode": "sequence",
+            "domain": "NUMERACY",
+            "tier": 2
+          },
+          {
+            "id": "num_2_6",
+            "image": "numbers",
+            "prompt": "পৰৱৰ্তী সংখ্যাটো কি? 1, 2, 3, ___ (What comes next?)",
+            "options": [
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            "correctIndex": 1,
+            "sequence": [
+              1,
+              2,
+              3
+            ],
+            "mode": "sequence",
+            "domain": "NUMERACY",
+            "tier": 2
+          },
+          {
+            "id": "num_2_7",
+            "image": "numbers",
+            "prompt": "পৰৱৰ্তী সংখ্যাটো কি? 2, 3, 4, ___ (What comes next?)",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "sequence": [
+              2,
+              3,
+              4
+            ],
+            "mode": "sequence",
+            "domain": "NUMERACY",
+            "tier": 2
+          },
+          {
+            "id": "num_2_8",
+            "image": "numbers",
+            "prompt": "পৰৱৰ্তী সংখ্যাটো কি? 3, 4, 5, ___ (What comes next?)",
+            "options": [
+              "5",
+              "6",
+              "7",
+              "8"
+            ],
+            "correctIndex": 1,
+            "sequence": [
+              3,
+              4,
+              5
+            ],
+            "mode": "sequence",
+            "domain": "NUMERACY",
+            "tier": 2
+          }
+        ],
+        "3": [
+          {
+            "id": "num_3_1",
+            "image": "pepa",
+            "prompt": "1 + 2 = কিমান? (1 + 2 পেঁপা (Pepa))",
+            "options": [
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              1,
+              2
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 3
+          },
+          {
+            "id": "num_3_2",
+            "image": "xorai",
+            "prompt": "2 + 3 = কিমান? (2 + 3 শৰাই (Xorai))",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              2,
+              3
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 3
+          },
+          {
+            "id": "num_3_3",
+            "image": "king_chili",
+            "prompt": "3 + 1 = কিমান? (3 + 1 ভোট জলকীয়া (King Chili))",
+            "options": [
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              3,
+              1
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 3
+          },
+          {
+            "id": "num_3_4",
+            "image": "bamboo_shoot",
+            "prompt": "1 + 2 = কিমান? (1 + 2 বাঁহৰ খৰিচা (Bamboo Shoot))",
+            "options": [
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              1,
+              2
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 3
+          },
+          {
+            "id": "num_3_5",
+            "image": "assam_tea",
+            "prompt": "2 + 3 = কিমান? (2 + 3 অসম চাহ (Assam Tea))",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              2,
+              3
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 3
+          },
+          {
+            "id": "num_3_6",
+            "image": "muga_silk",
+            "prompt": "3 + 1 = কিমান? (3 + 1 মুগা ৰেচম (Muga Silk))",
+            "options": [
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              3,
+              1
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 3
+          },
+          {
+            "id": "num_3_7",
+            "image": "malbhog_kol",
+            "prompt": "1 + 2 = কিমান? (1 + 2 মালভোগ কল (Banana))",
+            "options": [
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              1,
+              2
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 3
+          },
+          {
+            "id": "num_3_8",
+            "image": "tamul_paan",
+            "prompt": "2 + 3 = কিমান? (2 + 3 তামোল-পাণ (Areca Nut & Betel))",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              2,
+              3
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 3
+          }
+        ],
+        "4": [
+          {
+            "id": "num_4_1",
+            "image": "pepa",
+            "prompt": "1 + 2 = কিমান? (1 + 2 পেঁপা (Pepa))",
+            "options": [
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              1,
+              2
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 4
+          },
+          {
+            "id": "num_4_2",
+            "image": "xorai",
+            "prompt": "2 + 3 = কিমান? (2 + 3 শৰাই (Xorai))",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              2,
+              3
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 4
+          },
+          {
+            "id": "num_4_3",
+            "image": "king_chili",
+            "prompt": "3 + 1 = কিমান? (3 + 1 ভোট জলকীয়া (King Chili))",
+            "options": [
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              3,
+              1
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 4
+          },
+          {
+            "id": "num_4_4",
+            "image": "bamboo_shoot",
+            "prompt": "1 + 2 = কিমান? (1 + 2 বাঁহৰ খৰিচা (Bamboo Shoot))",
+            "options": [
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              1,
+              2
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 4
+          },
+          {
+            "id": "num_4_5",
+            "image": "assam_tea",
+            "prompt": "2 + 3 = কিমান? (2 + 3 অসম চাহ (Assam Tea))",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              2,
+              3
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 4
+          },
+          {
+            "id": "num_4_6",
+            "image": "muga_silk",
+            "prompt": "3 + 1 = কিমান? (3 + 1 মুগা ৰেচম (Muga Silk))",
+            "options": [
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              3,
+              1
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 4
+          },
+          {
+            "id": "num_4_7",
+            "image": "malbhog_kol",
+            "prompt": "1 + 2 = কিমান? (1 + 2 মালভোগ কল (Banana))",
+            "options": [
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              1,
+              2
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 4
+          },
+          {
+            "id": "num_4_8",
+            "image": "tamul_paan",
+            "prompt": "2 + 3 = কিমান? (2 + 3 তামোল-পাণ (Areca Nut & Betel))",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              2,
+              3
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 4
+          }
+        ],
+        "5": [
+          {
+            "id": "num_5_1",
+            "image": "pepa",
+            "prompt": "1 + 2 = কিমান? (1 + 2 পেঁপা (Pepa))",
+            "options": [
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              1,
+              2
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 5
+          },
+          {
+            "id": "num_5_2",
+            "image": "xorai",
+            "prompt": "2 + 3 = কিমান? (2 + 3 শৰাই (Xorai))",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              2,
+              3
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 5
+          },
+          {
+            "id": "num_5_3",
+            "image": "king_chili",
+            "prompt": "3 + 1 = কিমান? (3 + 1 ভোট জলকীয়া (King Chili))",
+            "options": [
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              3,
+              1
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 5
+          },
+          {
+            "id": "num_5_4",
+            "image": "bamboo_shoot",
+            "prompt": "1 + 2 = কিমান? (1 + 2 বাঁহৰ খৰিচা (Bamboo Shoot))",
+            "options": [
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              1,
+              2
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 5
+          },
+          {
+            "id": "num_5_5",
+            "image": "assam_tea",
+            "prompt": "2 + 3 = কিমান? (2 + 3 অসম চাহ (Assam Tea))",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              2,
+              3
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 5
+          },
+          {
+            "id": "num_5_6",
+            "image": "muga_silk",
+            "prompt": "3 + 1 = কিমান? (3 + 1 মুগা ৰেচম (Muga Silk))",
+            "options": [
+              "3",
+              "4",
+              "5",
+              "6"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              3,
+              1
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 5
+          },
+          {
+            "id": "num_5_7",
+            "image": "malbhog_kol",
+            "prompt": "1 + 2 = কিমান? (1 + 2 মালভোগ কল (Banana))",
+            "options": [
+              "2",
+              "3",
+              "4",
+              "5"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              1,
+              2
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 5
+          },
+          {
+            "id": "num_5_8",
+            "image": "tamul_paan",
+            "prompt": "2 + 3 = কিমান? (2 + 3 তামোল-পাণ (Areca Nut & Betel))",
+            "options": [
+              "4",
+              "5",
+              "6",
+              "7"
+            ],
+            "correctIndex": 1,
+            "operands": [
+              2,
+              3
+            ],
+            "mode": "addition",
+            "domain": "NUMERACY",
+            "tier": 5
+          }
+        ]
+      }
+    },
+    "place_correctly": {
+      "tiers": {
+        "1": [
+          {
+            "id": "place_1_1",
+            "image": "japi",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "japi",
+              "gamosa"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "japi",
+              "gamosa"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 1
+          },
+          {
+            "id": "place_1_2",
+            "image": "pepa",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "pepa",
+              "xorai"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "pepa",
+              "xorai"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 1
+          },
+          {
+            "id": "place_1_3",
+            "image": "bamboo_shoot",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "bamboo_shoot",
+              "assam_tea"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "bamboo_shoot",
+              "assam_tea"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 1
+          },
+          {
+            "id": "place_1_4",
+            "image": "malbhog_kol",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "malbhog_kol",
+              "tamul_paan"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "malbhog_kol",
+              "tamul_paan"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 1
+          },
+          {
+            "id": "place_1_5",
+            "image": "joha_rice",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "joha_rice",
+              "bihu_dance"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "joha_rice",
+              "bihu_dance"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 1
+          },
+          {
+            "id": "place_1_6",
+            "image": "rhino",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "rhino",
+              "kopou_phool"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "rhino",
+              "kopou_phool"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 1
+          },
+          {
+            "id": "place_1_7",
+            "image": "tokari",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "tokari",
+              "pitha"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "tokari",
+              "pitha"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 1
+          },
+          {
+            "id": "place_1_8",
+            "image": "majuli",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "majuli",
+              "kamakhya"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "majuli",
+              "kamakhya"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 1
+          }
+        ],
+        "2": [
+          {
+            "id": "place_2_1",
+            "image": "japi",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "japi",
+              "gamosa"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "japi",
+              "gamosa"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 2
+          },
+          {
+            "id": "place_2_2",
+            "image": "pepa",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "pepa",
+              "xorai"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "pepa",
+              "xorai"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 2
+          },
+          {
+            "id": "place_2_3",
+            "image": "bamboo_shoot",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "bamboo_shoot",
+              "assam_tea"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "bamboo_shoot",
+              "assam_tea"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 2
+          },
+          {
+            "id": "place_2_4",
+            "image": "malbhog_kol",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "malbhog_kol",
+              "tamul_paan"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "malbhog_kol",
+              "tamul_paan"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 2
+          },
+          {
+            "id": "place_2_5",
+            "image": "joha_rice",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "joha_rice",
+              "bihu_dance"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "joha_rice",
+              "bihu_dance"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 2
+          },
+          {
+            "id": "place_2_6",
+            "image": "rhino",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "rhino",
+              "kopou_phool"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "rhino",
+              "kopou_phool"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 2
+          },
+          {
+            "id": "place_2_7",
+            "image": "tokari",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "tokari",
+              "pitha"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "tokari",
+              "pitha"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 2
+          },
+          {
+            "id": "place_2_8",
+            "image": "majuli",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "majuli",
+              "kamakhya"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "majuli",
+              "kamakhya"
+            ],
+            "slotCount": 2,
+            "domain": "SPATIAL",
+            "tier": 2
+          }
+        ],
+        "3": [
+          {
+            "id": "place_3_1",
+            "image": "japi",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "japi",
+              "gamosa",
+              "dhol"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "japi",
+              "gamosa",
+              "dhol"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 3
+          },
+          {
+            "id": "place_3_2",
+            "image": "pepa",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "pepa",
+              "xorai",
+              "king_chili"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "pepa",
+              "xorai",
+              "king_chili"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 3
+          },
+          {
+            "id": "place_3_3",
+            "image": "bamboo_shoot",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "bamboo_shoot",
+              "assam_tea",
+              "muga_silk"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "bamboo_shoot",
+              "assam_tea",
+              "muga_silk"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 3
+          },
+          {
+            "id": "place_3_4",
+            "image": "malbhog_kol",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "malbhog_kol",
+              "tamul_paan",
+              "masor_tenga"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "malbhog_kol",
+              "tamul_paan",
+              "masor_tenga"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 3
+          },
+          {
+            "id": "place_3_5",
+            "image": "joha_rice",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "joha_rice",
+              "bihu_dance",
+              "brahmaputra"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "joha_rice",
+              "bihu_dance",
+              "brahmaputra"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 3
+          },
+          {
+            "id": "place_3_6",
+            "image": "rhino",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "rhino",
+              "kopou_phool",
+              "gogona"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "rhino",
+              "kopou_phool",
+              "gogona"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 3
+          },
+          {
+            "id": "place_3_7",
+            "image": "tokari",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "tokari",
+              "pitha",
+              "taat_xaal"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "tokari",
+              "pitha",
+              "taat_xaal"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 3
+          },
+          {
+            "id": "place_3_8",
+            "image": "majuli",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "majuli",
+              "kamakhya",
+              "rang_ghar"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "majuli",
+              "kamakhya",
+              "rang_ghar"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 3
+          }
+        ],
+        "4": [
+          {
+            "id": "place_4_1",
+            "image": "japi",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "japi",
+              "gamosa",
+              "dhol"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "japi",
+              "gamosa",
+              "dhol"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 4
+          },
+          {
+            "id": "place_4_2",
+            "image": "pepa",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "pepa",
+              "xorai",
+              "king_chili"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "pepa",
+              "xorai",
+              "king_chili"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 4
+          },
+          {
+            "id": "place_4_3",
+            "image": "bamboo_shoot",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "bamboo_shoot",
+              "assam_tea",
+              "muga_silk"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "bamboo_shoot",
+              "assam_tea",
+              "muga_silk"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 4
+          },
+          {
+            "id": "place_4_4",
+            "image": "malbhog_kol",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "malbhog_kol",
+              "tamul_paan",
+              "masor_tenga"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "malbhog_kol",
+              "tamul_paan",
+              "masor_tenga"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 4
+          },
+          {
+            "id": "place_4_5",
+            "image": "joha_rice",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "joha_rice",
+              "bihu_dance",
+              "brahmaputra"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "joha_rice",
+              "bihu_dance",
+              "brahmaputra"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 4
+          },
+          {
+            "id": "place_4_6",
+            "image": "rhino",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "rhino",
+              "kopou_phool",
+              "gogona"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "rhino",
+              "kopou_phool",
+              "gogona"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 4
+          },
+          {
+            "id": "place_4_7",
+            "image": "tokari",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "tokari",
+              "pitha",
+              "taat_xaal"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "tokari",
+              "pitha",
+              "taat_xaal"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 4
+          },
+          {
+            "id": "place_4_8",
+            "image": "majuli",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "majuli",
+              "kamakhya",
+              "rang_ghar"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "majuli",
+              "kamakhya",
+              "rang_ghar"
+            ],
+            "slotCount": 3,
+            "domain": "SPATIAL",
+            "tier": 4
+          }
+        ],
+        "5": [
+          {
+            "id": "place_5_1",
+            "image": "japi",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "japi",
+              "gamosa",
+              "dhol",
+              "pepa"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "japi",
+              "gamosa",
+              "dhol",
+              "pepa"
+            ],
+            "slotCount": 4,
+            "domain": "SPATIAL",
+            "tier": 5
+          },
+          {
+            "id": "place_5_2",
+            "image": "pepa",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "pepa",
+              "xorai",
+              "king_chili",
+              "bamboo_shoot"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "pepa",
+              "xorai",
+              "king_chili",
+              "bamboo_shoot"
+            ],
+            "slotCount": 4,
+            "domain": "SPATIAL",
+            "tier": 5
+          },
+          {
+            "id": "place_5_3",
+            "image": "bamboo_shoot",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "bamboo_shoot",
+              "assam_tea",
+              "muga_silk",
+              "malbhog_kol"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "bamboo_shoot",
+              "assam_tea",
+              "muga_silk",
+              "malbhog_kol"
+            ],
+            "slotCount": 4,
+            "domain": "SPATIAL",
+            "tier": 5
+          },
+          {
+            "id": "place_5_4",
+            "image": "malbhog_kol",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "malbhog_kol",
+              "tamul_paan",
+              "masor_tenga",
+              "joha_rice"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "malbhog_kol",
+              "tamul_paan",
+              "masor_tenga",
+              "joha_rice"
+            ],
+            "slotCount": 4,
+            "domain": "SPATIAL",
+            "tier": 5
+          },
+          {
+            "id": "place_5_5",
+            "image": "joha_rice",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "joha_rice",
+              "bihu_dance",
+              "brahmaputra",
+              "rhino"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "joha_rice",
+              "bihu_dance",
+              "brahmaputra",
+              "rhino"
+            ],
+            "slotCount": 4,
+            "domain": "SPATIAL",
+            "tier": 5
+          },
+          {
+            "id": "place_5_6",
+            "image": "rhino",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "rhino",
+              "kopou_phool",
+              "gogona",
+              "tokari"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "rhino",
+              "kopou_phool",
+              "gogona",
+              "tokari"
+            ],
+            "slotCount": 4,
+            "domain": "SPATIAL",
+            "tier": 5
+          },
+          {
+            "id": "place_5_7",
+            "image": "tokari",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "tokari",
+              "pitha",
+              "taat_xaal",
+              "majuli"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "tokari",
+              "pitha",
+              "taat_xaal",
+              "majuli"
+            ],
+            "slotCount": 4,
+            "domain": "SPATIAL",
+            "tier": 5
+          },
+          {
+            "id": "place_5_8",
+            "image": "majuli",
+            "prompt": "বস্তুটো নিজৰ নিৰ্দিষ্ট স্থানত বহুৱাওক (Place each item in its matching slot)",
+            "options": [
+              "majuli",
+              "kamakhya",
+              "rang_ghar",
+              "japi"
+            ],
+            "correctIndex": 0,
+            "slots": [
+              "majuli",
+              "kamakhya",
+              "rang_ghar",
+              "japi"
+            ],
+            "slotCount": 4,
+            "domain": "SPATIAL",
+            "tier": 5
+          }
+        ]
+      }
+    },
+    "find_difference": {
+      "tiers": {
+        "1": [
+          {
+            "id": "diff_1_1",
+            "image": "bihu_dance",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 1
+          },
+          {
+            "id": "diff_1_2",
+            "image": "assam_tea",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 1
+          },
+          {
+            "id": "diff_1_3",
+            "image": "xorai",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 1
+          },
+          {
+            "id": "diff_1_4",
+            "image": "brahmaputra",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 1
+          },
+          {
+            "id": "diff_1_5",
+            "image": "taat_xaal",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 1
+          },
+          {
+            "id": "diff_1_6",
+            "image": "rhino",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 1
+          },
+          {
+            "id": "diff_1_7",
+            "image": "pitha",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 1
+          },
+          {
+            "id": "diff_1_8",
+            "image": "majuli",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 1
+          }
+        ],
+        "2": [
+          {
+            "id": "diff_2_1",
+            "image": "bihu_dance",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 2
+          },
+          {
+            "id": "diff_2_2",
+            "image": "assam_tea",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 2
+          },
+          {
+            "id": "diff_2_3",
+            "image": "xorai",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 2
+          },
+          {
+            "id": "diff_2_4",
+            "image": "brahmaputra",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 2
+          },
+          {
+            "id": "diff_2_5",
+            "image": "taat_xaal",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 2
+          },
+          {
+            "id": "diff_2_6",
+            "image": "rhino",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 2
+          },
+          {
+            "id": "diff_2_7",
+            "image": "pitha",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 2
+          },
+          {
+            "id": "diff_2_8",
+            "image": "majuli",
+            "prompt": "ছবি দুখনৰ মাজত 3 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 3 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              }
+            ],
+            "diffCount": 3,
+            "domain": "ATTENTION",
+            "tier": 2
+          }
+        ],
+        "3": [
+          {
+            "id": "diff_3_1",
+            "image": "bihu_dance",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 3
+          },
+          {
+            "id": "diff_3_2",
+            "image": "assam_tea",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 3
+          },
+          {
+            "id": "diff_3_3",
+            "image": "xorai",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 3
+          },
+          {
+            "id": "diff_3_4",
+            "image": "brahmaputra",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 3
+          },
+          {
+            "id": "diff_3_5",
+            "image": "taat_xaal",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 3
+          },
+          {
+            "id": "diff_3_6",
+            "image": "rhino",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 3
+          },
+          {
+            "id": "diff_3_7",
+            "image": "pitha",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 3
+          },
+          {
+            "id": "diff_3_8",
+            "image": "majuli",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 3
+          }
+        ],
+        "4": [
+          {
+            "id": "diff_4_1",
+            "image": "bihu_dance",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 4
+          },
+          {
+            "id": "diff_4_2",
+            "image": "assam_tea",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 4
+          },
+          {
+            "id": "diff_4_3",
+            "image": "xorai",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 4
+          },
+          {
+            "id": "diff_4_4",
+            "image": "brahmaputra",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 4
+          },
+          {
+            "id": "diff_4_5",
+            "image": "taat_xaal",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 4
+          },
+          {
+            "id": "diff_4_6",
+            "image": "rhino",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 4
+          },
+          {
+            "id": "diff_4_7",
+            "image": "pitha",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 4
+          },
+          {
+            "id": "diff_4_8",
+            "image": "majuli",
+            "prompt": "ছবি দুখনৰ মাজত 4 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 4 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              }
+            ],
+            "diffCount": 4,
+            "domain": "ATTENTION",
+            "tier": 4
+          }
+        ],
+        "5": [
+          {
+            "id": "diff_5_1",
+            "image": "bihu_dance",
+            "prompt": "ছবি দুখনৰ মাজত 5 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 5 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4",
+              "Diff 5"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              },
+              {
+                "x": 0.97,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 5"
+              }
+            ],
+            "diffCount": 5,
+            "domain": "ATTENTION",
+            "tier": 5
+          },
+          {
+            "id": "diff_5_2",
+            "image": "assam_tea",
+            "prompt": "ছবি দুখনৰ মাজত 5 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 5 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4",
+              "Diff 5"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              },
+              {
+                "x": 0.97,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 5"
+              }
+            ],
+            "diffCount": 5,
+            "domain": "ATTENTION",
+            "tier": 5
+          },
+          {
+            "id": "diff_5_3",
+            "image": "xorai",
+            "prompt": "ছবি দুখনৰ মাজত 5 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 5 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4",
+              "Diff 5"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              },
+              {
+                "x": 0.97,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 5"
+              }
+            ],
+            "diffCount": 5,
+            "domain": "ATTENTION",
+            "tier": 5
+          },
+          {
+            "id": "diff_5_4",
+            "image": "brahmaputra",
+            "prompt": "ছবি দুখনৰ মাজত 5 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 5 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4",
+              "Diff 5"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              },
+              {
+                "x": 0.97,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 5"
+              }
+            ],
+            "diffCount": 5,
+            "domain": "ATTENTION",
+            "tier": 5
+          },
+          {
+            "id": "diff_5_5",
+            "image": "taat_xaal",
+            "prompt": "ছবি দুখনৰ মাজত 5 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 5 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4",
+              "Diff 5"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              },
+              {
+                "x": 0.97,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 5"
+              }
+            ],
+            "diffCount": 5,
+            "domain": "ATTENTION",
+            "tier": 5
+          },
+          {
+            "id": "diff_5_6",
+            "image": "rhino",
+            "prompt": "ছবি দুখনৰ মাজত 5 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 5 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4",
+              "Diff 5"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              },
+              {
+                "x": 0.97,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 5"
+              }
+            ],
+            "diffCount": 5,
+            "domain": "ATTENTION",
+            "tier": 5
+          },
+          {
+            "id": "diff_5_7",
+            "image": "pitha",
+            "prompt": "ছবি দুখনৰ মাজত 5 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 5 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4",
+              "Diff 5"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              },
+              {
+                "x": 0.97,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 5"
+              }
+            ],
+            "diffCount": 5,
+            "domain": "ATTENTION",
+            "tier": 5
+          },
+          {
+            "id": "diff_5_8",
+            "image": "majuli",
+            "prompt": "ছবি দুখনৰ মাজত 5 টা পাৰ্থক্য বিচাৰি স্পৰ্শ কৰক (Find 5 differences)",
+            "options": [
+              "Diff 1",
+              "Diff 2",
+              "Diff 3",
+              "Diff 4",
+              "Diff 5"
+            ],
+            "correctIndex": 0,
+            "differences": [
+              {
+                "x": 0.25,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 1"
+              },
+              {
+                "x": 0.43,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 2"
+              },
+              {
+                "x": 0.61,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 3"
+              },
+              {
+                "x": 0.79,
+                "y": 0.55,
+                "radius": 60.0,
+                "desc": "Difference 4"
+              },
+              {
+                "x": 0.97,
+                "y": 0.3,
+                "radius": 60.0,
+                "desc": "Difference 5"
+              }
+            ],
+            "diffCount": 5,
+            "domain": "ATTENTION",
+            "tier": 5
+          }
+        ]
+      }
+    },
+    "draw_shape": {
+      "tiers": {
+        "1": [
+          {
+            "id": "draw_1_1",
+            "image": "circle",
+            "prompt": "মনত ৰাখি আঁকক: বৃত্ত (Circle) (Draw the circle)",
+            "options": [
+              "circle"
+            ],
+            "correctIndex": 0,
+            "shape": "circle",
+            "shapeName": "বৃত্ত (Circle)",
+            "expectedStrokes": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "draw_1_2",
+            "image": "triangle",
+            "prompt": "মনত ৰাখি আঁকক: ত্ৰিভুজ (Triangle) (Draw the triangle)",
+            "options": [
+              "triangle"
+            ],
+            "correctIndex": 0,
+            "shape": "triangle",
+            "shapeName": "ত্ৰিভুজ (Triangle)",
+            "expectedStrokes": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "draw_1_3",
+            "image": "square",
+            "prompt": "মনত ৰাখি আঁকক: চৌকোনা (Square) (Draw the square)",
+            "options": [
+              "square"
+            ],
+            "correctIndex": 0,
+            "shape": "square",
+            "shapeName": "চৌকোনা (Square)",
+            "expectedStrokes": 4,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "draw_1_4",
+            "image": "cone",
+            "prompt": "মনত ৰাখি আঁকক: জাপিৰ আকৃতি (Cone / Japi) (Draw the cone)",
+            "options": [
+              "cone"
+            ],
+            "correctIndex": 0,
+            "shape": "cone",
+            "shapeName": "জাপিৰ আকৃতি (Cone / Japi)",
+            "expectedStrokes": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "draw_1_5",
+            "image": "barrel",
+            "prompt": "মনত ৰাখি আঁকক: ঢোলৰ আকৃতি (Barrel / Dhol) (Draw the barrel)",
+            "options": [
+              "barrel"
+            ],
+            "correctIndex": 0,
+            "shape": "barrel",
+            "shapeName": "ঢোলৰ আকৃতি (Barrel / Dhol)",
+            "expectedStrokes": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "draw_1_6",
+            "image": "star",
+            "prompt": "মনত ৰাখি আঁকক: তৰা (Star) (Draw the star)",
+            "options": [
+              "star"
+            ],
+            "correctIndex": 0,
+            "shape": "star",
+            "shapeName": "তৰা (Star)",
+            "expectedStrokes": 5,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "draw_1_7",
+            "image": "diamond",
+            "prompt": "মনত ৰাখি আঁকক: হীৰা (Diamond) (Draw the diamond)",
+            "options": [
+              "diamond"
+            ],
+            "correctIndex": 0,
+            "shape": "diamond",
+            "shapeName": "হীৰা (Diamond)",
+            "expectedStrokes": 4,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          },
+          {
+            "id": "draw_1_8",
+            "image": "semicircle",
+            "prompt": "মনত ৰাখি আঁকক: অৰ্ধবৃত্ত (Semi-circle) (Draw the semicircle)",
+            "options": [
+              "semicircle"
+            ],
+            "correctIndex": 0,
+            "shape": "semicircle",
+            "shapeName": "অৰ্ধবৃত্ত (Semi-circle)",
+            "expectedStrokes": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 1
+          }
+        ],
+        "2": [
+          {
+            "id": "draw_2_1",
+            "image": "triangle",
+            "prompt": "মনত ৰাখি আঁকক: ত্ৰিভুজ (Triangle) (Draw the triangle)",
+            "options": [
+              "triangle"
+            ],
+            "correctIndex": 0,
+            "shape": "triangle",
+            "shapeName": "ত্ৰিভুজ (Triangle)",
+            "expectedStrokes": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "draw_2_2",
+            "image": "square",
+            "prompt": "মনত ৰাখি আঁকক: চৌকোনা (Square) (Draw the square)",
+            "options": [
+              "square"
+            ],
+            "correctIndex": 0,
+            "shape": "square",
+            "shapeName": "চৌকোনা (Square)",
+            "expectedStrokes": 4,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "draw_2_3",
+            "image": "cone",
+            "prompt": "মনত ৰাখি আঁকক: জাপিৰ আকৃতি (Cone / Japi) (Draw the cone)",
+            "options": [
+              "cone"
+            ],
+            "correctIndex": 0,
+            "shape": "cone",
+            "shapeName": "জাপিৰ আকৃতি (Cone / Japi)",
+            "expectedStrokes": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "draw_2_4",
+            "image": "barrel",
+            "prompt": "মনত ৰাখি আঁকক: ঢোলৰ আকৃতি (Barrel / Dhol) (Draw the barrel)",
+            "options": [
+              "barrel"
+            ],
+            "correctIndex": 0,
+            "shape": "barrel",
+            "shapeName": "ঢোলৰ আকৃতি (Barrel / Dhol)",
+            "expectedStrokes": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "draw_2_5",
+            "image": "star",
+            "prompt": "মনত ৰাখি আঁকক: তৰা (Star) (Draw the star)",
+            "options": [
+              "star"
+            ],
+            "correctIndex": 0,
+            "shape": "star",
+            "shapeName": "তৰা (Star)",
+            "expectedStrokes": 5,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "draw_2_6",
+            "image": "diamond",
+            "prompt": "মনত ৰাখি আঁকক: হীৰা (Diamond) (Draw the diamond)",
+            "options": [
+              "diamond"
+            ],
+            "correctIndex": 0,
+            "shape": "diamond",
+            "shapeName": "হীৰা (Diamond)",
+            "expectedStrokes": 4,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "draw_2_7",
+            "image": "semicircle",
+            "prompt": "মনত ৰাখি আঁকক: অৰ্ধবৃত্ত (Semi-circle) (Draw the semicircle)",
+            "options": [
+              "semicircle"
+            ],
+            "correctIndex": 0,
+            "shape": "semicircle",
+            "shapeName": "অৰ্ধবৃত্ত (Semi-circle)",
+            "expectedStrokes": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          },
+          {
+            "id": "draw_2_8",
+            "image": "circle",
+            "prompt": "মনত ৰাখি আঁকক: বৃত্ত (Circle) (Draw the circle)",
+            "options": [
+              "circle"
+            ],
+            "correctIndex": 0,
+            "shape": "circle",
+            "shapeName": "বৃত্ত (Circle)",
+            "expectedStrokes": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 2
+          }
+        ],
+        "3": [
+          {
+            "id": "draw_3_1",
+            "image": "square",
+            "prompt": "মনত ৰাখি আঁকক: চৌকোনা (Square) (Draw the square)",
+            "options": [
+              "square"
+            ],
+            "correctIndex": 0,
+            "shape": "square",
+            "shapeName": "চৌকোনা (Square)",
+            "expectedStrokes": 4,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "draw_3_2",
+            "image": "cone",
+            "prompt": "মনত ৰাখি আঁকক: জাপিৰ আকৃতি (Cone / Japi) (Draw the cone)",
+            "options": [
+              "cone"
+            ],
+            "correctIndex": 0,
+            "shape": "cone",
+            "shapeName": "জাপিৰ আকৃতি (Cone / Japi)",
+            "expectedStrokes": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "draw_3_3",
+            "image": "barrel",
+            "prompt": "মনত ৰাখি আঁকক: ঢোলৰ আকৃতি (Barrel / Dhol) (Draw the barrel)",
+            "options": [
+              "barrel"
+            ],
+            "correctIndex": 0,
+            "shape": "barrel",
+            "shapeName": "ঢোলৰ আকৃতি (Barrel / Dhol)",
+            "expectedStrokes": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "draw_3_4",
+            "image": "star",
+            "prompt": "মনত ৰাখি আঁকক: তৰা (Star) (Draw the star)",
+            "options": [
+              "star"
+            ],
+            "correctIndex": 0,
+            "shape": "star",
+            "shapeName": "তৰা (Star)",
+            "expectedStrokes": 5,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "draw_3_5",
+            "image": "diamond",
+            "prompt": "মনত ৰাখি আঁকক: হীৰা (Diamond) (Draw the diamond)",
+            "options": [
+              "diamond"
+            ],
+            "correctIndex": 0,
+            "shape": "diamond",
+            "shapeName": "হীৰা (Diamond)",
+            "expectedStrokes": 4,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "draw_3_6",
+            "image": "semicircle",
+            "prompt": "মনত ৰাখি আঁকক: অৰ্ধবৃত্ত (Semi-circle) (Draw the semicircle)",
+            "options": [
+              "semicircle"
+            ],
+            "correctIndex": 0,
+            "shape": "semicircle",
+            "shapeName": "অৰ্ধবৃত্ত (Semi-circle)",
+            "expectedStrokes": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "draw_3_7",
+            "image": "circle",
+            "prompt": "মনত ৰাখি আঁকক: বৃত্ত (Circle) (Draw the circle)",
+            "options": [
+              "circle"
+            ],
+            "correctIndex": 0,
+            "shape": "circle",
+            "shapeName": "বৃত্ত (Circle)",
+            "expectedStrokes": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          },
+          {
+            "id": "draw_3_8",
+            "image": "triangle",
+            "prompt": "মনত ৰাখি আঁকক: ত্ৰিভুজ (Triangle) (Draw the triangle)",
+            "options": [
+              "triangle"
+            ],
+            "correctIndex": 0,
+            "shape": "triangle",
+            "shapeName": "ত্ৰিভুজ (Triangle)",
+            "expectedStrokes": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 3
+          }
+        ],
+        "4": [
+          {
+            "id": "draw_4_1",
+            "image": "cone",
+            "prompt": "মনত ৰাখি আঁকক: জাপিৰ আকৃতি (Cone / Japi) (Draw the cone)",
+            "options": [
+              "cone"
+            ],
+            "correctIndex": 0,
+            "shape": "cone",
+            "shapeName": "জাপিৰ আকৃতি (Cone / Japi)",
+            "expectedStrokes": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "draw_4_2",
+            "image": "barrel",
+            "prompt": "মনত ৰাখি আঁকক: ঢোলৰ আকৃতি (Barrel / Dhol) (Draw the barrel)",
+            "options": [
+              "barrel"
+            ],
+            "correctIndex": 0,
+            "shape": "barrel",
+            "shapeName": "ঢোলৰ আকৃতি (Barrel / Dhol)",
+            "expectedStrokes": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "draw_4_3",
+            "image": "star",
+            "prompt": "মনত ৰাখি আঁকক: তৰা (Star) (Draw the star)",
+            "options": [
+              "star"
+            ],
+            "correctIndex": 0,
+            "shape": "star",
+            "shapeName": "তৰা (Star)",
+            "expectedStrokes": 5,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "draw_4_4",
+            "image": "diamond",
+            "prompt": "মনত ৰাখি আঁকক: হীৰা (Diamond) (Draw the diamond)",
+            "options": [
+              "diamond"
+            ],
+            "correctIndex": 0,
+            "shape": "diamond",
+            "shapeName": "হীৰা (Diamond)",
+            "expectedStrokes": 4,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "draw_4_5",
+            "image": "semicircle",
+            "prompt": "মনত ৰাখি আঁকক: অৰ্ধবৃত্ত (Semi-circle) (Draw the semicircle)",
+            "options": [
+              "semicircle"
+            ],
+            "correctIndex": 0,
+            "shape": "semicircle",
+            "shapeName": "অৰ্ধবৃত্ত (Semi-circle)",
+            "expectedStrokes": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "draw_4_6",
+            "image": "circle",
+            "prompt": "মনত ৰাখি আঁকক: বৃত্ত (Circle) (Draw the circle)",
+            "options": [
+              "circle"
+            ],
+            "correctIndex": 0,
+            "shape": "circle",
+            "shapeName": "বৃত্ত (Circle)",
+            "expectedStrokes": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "draw_4_7",
+            "image": "triangle",
+            "prompt": "মনত ৰাখি আঁকক: ত্ৰিভুজ (Triangle) (Draw the triangle)",
+            "options": [
+              "triangle"
+            ],
+            "correctIndex": 0,
+            "shape": "triangle",
+            "shapeName": "ত্ৰিভুজ (Triangle)",
+            "expectedStrokes": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          },
+          {
+            "id": "draw_4_8",
+            "image": "square",
+            "prompt": "মনত ৰাখি আঁকক: চৌকোনা (Square) (Draw the square)",
+            "options": [
+              "square"
+            ],
+            "correctIndex": 0,
+            "shape": "square",
+            "shapeName": "চৌকোনা (Square)",
+            "expectedStrokes": 4,
+            "domain": "VISUAL_MEMORY",
+            "tier": 4
+          }
+        ],
+        "5": [
+          {
+            "id": "draw_5_1",
+            "image": "barrel",
+            "prompt": "মনত ৰাখি আঁকক: ঢোলৰ আকৃতি (Barrel / Dhol) (Draw the barrel)",
+            "options": [
+              "barrel"
+            ],
+            "correctIndex": 0,
+            "shape": "barrel",
+            "shapeName": "ঢোলৰ আকৃতি (Barrel / Dhol)",
+            "expectedStrokes": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "draw_5_2",
+            "image": "star",
+            "prompt": "মনত ৰাখি আঁকক: তৰা (Star) (Draw the star)",
+            "options": [
+              "star"
+            ],
+            "correctIndex": 0,
+            "shape": "star",
+            "shapeName": "তৰা (Star)",
+            "expectedStrokes": 5,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "draw_5_3",
+            "image": "diamond",
+            "prompt": "মনত ৰাখি আঁকক: হীৰা (Diamond) (Draw the diamond)",
+            "options": [
+              "diamond"
+            ],
+            "correctIndex": 0,
+            "shape": "diamond",
+            "shapeName": "হীৰা (Diamond)",
+            "expectedStrokes": 4,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "draw_5_4",
+            "image": "semicircle",
+            "prompt": "মনত ৰাখি আঁকক: অৰ্ধবৃত্ত (Semi-circle) (Draw the semicircle)",
+            "options": [
+              "semicircle"
+            ],
+            "correctIndex": 0,
+            "shape": "semicircle",
+            "shapeName": "অৰ্ধবৃত্ত (Semi-circle)",
+            "expectedStrokes": 2,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "draw_5_5",
+            "image": "circle",
+            "prompt": "মনত ৰাখি আঁকক: বৃত্ত (Circle) (Draw the circle)",
+            "options": [
+              "circle"
+            ],
+            "correctIndex": 0,
+            "shape": "circle",
+            "shapeName": "বৃত্ত (Circle)",
+            "expectedStrokes": 1,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "draw_5_6",
+            "image": "triangle",
+            "prompt": "মনত ৰাখি আঁকক: ত্ৰিভুজ (Triangle) (Draw the triangle)",
+            "options": [
+              "triangle"
+            ],
+            "correctIndex": 0,
+            "shape": "triangle",
+            "shapeName": "ত্ৰিভুজ (Triangle)",
+            "expectedStrokes": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "draw_5_7",
+            "image": "square",
+            "prompt": "মনত ৰাখি আঁকক: চৌকোনা (Square) (Draw the square)",
+            "options": [
+              "square"
+            ],
+            "correctIndex": 0,
+            "shape": "square",
+            "shapeName": "চৌকোনা (Square)",
+            "expectedStrokes": 4,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          },
+          {
+            "id": "draw_5_8",
+            "image": "cone",
+            "prompt": "মনত ৰাখি আঁকক: জাপিৰ আকৃতি (Cone / Japi) (Draw the cone)",
+            "options": [
+              "cone"
+            ],
+            "correctIndex": 0,
+            "shape": "cone",
+            "shapeName": "জাপিৰ আকৃতি (Cone / Japi)",
+            "expectedStrokes": 3,
+            "domain": "VISUAL_MEMORY",
+            "tier": 5
+          }
+        ]
+      }
+    },
+    "situation_match": {
+      "tiers": {
+        "1": [
+          {
+            "id": "sit_1_1",
+            "image": "japi",
+            "prompt": "বাহিৰত বৰষুণ দিছে, কি লৈ যাব? (It is raining outside. What would you take?)",
+            "options": [
+              "dhol",
+              "japi",
+              "bamboo_shoot",
+              "pepa"
+            ],
+            "correctIndex": 1,
+            "domain": "REASONING",
+            "tier": 1
+          },
+          {
+            "id": "sit_1_2",
+            "image": "gamosa",
+            "prompt": "অতিথিক সন্মান জনাবলৈ কি আগবঢ়াব? (To welcome and honor a guest, what do you offer?)",
+            "options": [
+              "king_chili",
+              "dhol",
+              "gamosa",
+              "rhino"
+            ],
+            "correctIndex": 2,
+            "domain": "REASONING",
+            "tier": 1
+          },
+          {
+            "id": "sit_1_3",
+            "image": "dhol",
+            "prompt": "বিহুৰ দিনা আনন্দ কৰি কি বজাব? (On Bihu festival day, what instrument do you play?)",
+            "options": [
+              "malbhog_kol",
+              "joha_rice",
+              "taat_xaal",
+              "dhol"
+            ],
+            "correctIndex": 3,
+            "domain": "REASONING",
+            "tier": 1
+          },
+          {
+            "id": "sit_1_4",
+            "image": "assam_tea",
+            "prompt": "পুৱা গৰমে গৰমে কি খাব ভাল পায়? (What warm beverage is lovely to drink in the morning?)",
+            "options": [
+              "assam_tea",
+              "gamosa",
+              "pepa",
+              "xorai"
+            ],
+            "correctIndex": 0,
+            "domain": "REASONING",
+            "tier": 1
+          },
+          {
+            "id": "sit_1_5",
+            "image": "xorai",
+            "prompt": "পূজা বা নামঘৰত নৈবেদ্য কিহত সজাব? (In the prayer hall/namghar, in what tray do you offer prasad?)",
+            "options": [
+              "king_chili",
+              "xorai",
+              "dhol",
+              "rhino"
+            ],
+            "correctIndex": 1,
+            "domain": "REASONING",
+            "tier": 1
+          },
+          {
+            "id": "sit_1_6",
+            "image": "masor_tenga",
+            "prompt": "মাছৰ আঞ্জা টেঙা কৰিবলৈ কি ব্যৱহাৰ কৰিব? (For preparing authentic sour fish curry, what is cooked?)",
+            "options": [
+              "gamosa",
+              "pepa",
+              "masor_tenga",
+              "muga_silk"
+            ],
+            "correctIndex": 2,
+            "domain": "REASONING",
+            "tier": 1
+          },
+          {
+            "id": "sit_1_7",
+            "image": "japi",
+            "prompt": "বতাহ বৰষুণত মূৰত কি পিন্ধিব? (What traditional woven hat protects from sun and rain?)",
+            "options": [
+              "malbhog_kol",
+              "assam_tea",
+              "tokari",
+              "japi"
+            ],
+            "correctIndex": 3,
+            "domain": "REASONING",
+            "tier": 1
+          },
+          {
+            "id": "sit_1_8",
+            "image": "kopou_phool",
+            "prompt": "বিহু নাচোনিয়ে মূৰৰ খোপাত কি ফুল গুজি লয়? (What beautiful purple orchid do Bihu dancers wear in their hair?)",
+            "options": [
+              "kopou_phool",
+              "king_chili",
+              "dhol",
+              "bamboo_shoot"
+            ],
+            "correctIndex": 0,
+            "domain": "REASONING",
+            "tier": 1
+          }
+        ],
+        "2": [
+          {
+            "id": "sit_2_1",
+            "image": "japi",
+            "prompt": "বাহিৰত বৰষুণ দিছে, কি লৈ যাব? (It is raining outside. What would you take?)",
+            "options": [
+              "dhol",
+              "bamboo_shoot",
+              "japi",
+              "pepa"
+            ],
+            "correctIndex": 2,
+            "domain": "REASONING",
+            "tier": 2
+          },
+          {
+            "id": "sit_2_2",
+            "image": "gamosa",
+            "prompt": "অতিথিক সন্মান জনাবলৈ কি আগবঢ়াব? (To welcome and honor a guest, what do you offer?)",
+            "options": [
+              "king_chili",
+              "dhol",
+              "rhino",
+              "gamosa"
+            ],
+            "correctIndex": 3,
+            "domain": "REASONING",
+            "tier": 2
+          },
+          {
+            "id": "sit_2_3",
+            "image": "dhol",
+            "prompt": "বিহুৰ দিনা আনন্দ কৰি কি বজাব? (On Bihu festival day, what instrument do you play?)",
+            "options": [
+              "dhol",
+              "malbhog_kol",
+              "joha_rice",
+              "taat_xaal"
+            ],
+            "correctIndex": 0,
+            "domain": "REASONING",
+            "tier": 2
+          },
+          {
+            "id": "sit_2_4",
+            "image": "assam_tea",
+            "prompt": "পুৱা গৰমে গৰমে কি খাব ভাল পায়? (What warm beverage is lovely to drink in the morning?)",
+            "options": [
+              "gamosa",
+              "assam_tea",
+              "pepa",
+              "xorai"
+            ],
+            "correctIndex": 1,
+            "domain": "REASONING",
+            "tier": 2
+          },
+          {
+            "id": "sit_2_5",
+            "image": "xorai",
+            "prompt": "পূজা বা নামঘৰত নৈবেদ্য কিহত সজাব? (In the prayer hall/namghar, in what tray do you offer prasad?)",
+            "options": [
+              "king_chili",
+              "dhol",
+              "xorai",
+              "rhino"
+            ],
+            "correctIndex": 2,
+            "domain": "REASONING",
+            "tier": 2
+          },
+          {
+            "id": "sit_2_6",
+            "image": "masor_tenga",
+            "prompt": "মাছৰ আঞ্জা টেঙা কৰিবলৈ কি ব্যৱহাৰ কৰিব? (For preparing authentic sour fish curry, what is cooked?)",
+            "options": [
+              "gamosa",
+              "pepa",
+              "muga_silk",
+              "masor_tenga"
+            ],
+            "correctIndex": 3,
+            "domain": "REASONING",
+            "tier": 2
+          },
+          {
+            "id": "sit_2_7",
+            "image": "japi",
+            "prompt": "বতাহ বৰষুণত মূৰত কি পিন্ধিব? (What traditional woven hat protects from sun and rain?)",
+            "options": [
+              "japi",
+              "malbhog_kol",
+              "assam_tea",
+              "tokari"
+            ],
+            "correctIndex": 0,
+            "domain": "REASONING",
+            "tier": 2
+          },
+          {
+            "id": "sit_2_8",
+            "image": "kopou_phool",
+            "prompt": "বিহু নাচোনিয়ে মূৰৰ খোপাত কি ফুল গুজি লয়? (What beautiful purple orchid do Bihu dancers wear in their hair?)",
+            "options": [
+              "king_chili",
+              "kopou_phool",
+              "dhol",
+              "bamboo_shoot"
+            ],
+            "correctIndex": 1,
+            "domain": "REASONING",
+            "tier": 2
+          }
+        ],
+        "3": [
+          {
+            "id": "sit_3_1",
+            "image": "japi",
+            "prompt": "বাহিৰত বৰষুণ দিছে, কি লৈ যাব? (It is raining outside. What would you take?)",
+            "options": [
+              "dhol",
+              "bamboo_shoot",
+              "pepa",
+              "japi"
+            ],
+            "correctIndex": 3,
+            "domain": "REASONING",
+            "tier": 3
+          },
+          {
+            "id": "sit_3_2",
+            "image": "gamosa",
+            "prompt": "অতিথিক সন্মান জনাবলৈ কি আগবঢ়াব? (To welcome and honor a guest, what do you offer?)",
+            "options": [
+              "gamosa",
+              "king_chili",
+              "dhol",
+              "rhino"
+            ],
+            "correctIndex": 0,
+            "domain": "REASONING",
+            "tier": 3
+          },
+          {
+            "id": "sit_3_3",
+            "image": "dhol",
+            "prompt": "বিহুৰ দিনা আনন্দ কৰি কি বজাব? (On Bihu festival day, what instrument do you play?)",
+            "options": [
+              "malbhog_kol",
+              "dhol",
+              "joha_rice",
+              "taat_xaal"
+            ],
+            "correctIndex": 1,
+            "domain": "REASONING",
+            "tier": 3
+          },
+          {
+            "id": "sit_3_4",
+            "image": "assam_tea",
+            "prompt": "পুৱা গৰমে গৰমে কি খাব ভাল পায়? (What warm beverage is lovely to drink in the morning?)",
+            "options": [
+              "gamosa",
+              "pepa",
+              "assam_tea",
+              "xorai"
+            ],
+            "correctIndex": 2,
+            "domain": "REASONING",
+            "tier": 3
+          },
+          {
+            "id": "sit_3_5",
+            "image": "xorai",
+            "prompt": "পূজা বা নামঘৰত নৈবেদ্য কিহত সজাব? (In the prayer hall/namghar, in what tray do you offer prasad?)",
+            "options": [
+              "king_chili",
+              "dhol",
+              "rhino",
+              "xorai"
+            ],
+            "correctIndex": 3,
+            "domain": "REASONING",
+            "tier": 3
+          },
+          {
+            "id": "sit_3_6",
+            "image": "masor_tenga",
+            "prompt": "মাছৰ আঞ্জা টেঙা কৰিবলৈ কি ব্যৱহাৰ কৰিব? (For preparing authentic sour fish curry, what is cooked?)",
+            "options": [
+              "masor_tenga",
+              "gamosa",
+              "pepa",
+              "muga_silk"
+            ],
+            "correctIndex": 0,
+            "domain": "REASONING",
+            "tier": 3
+          },
+          {
+            "id": "sit_3_7",
+            "image": "japi",
+            "prompt": "বতাহ বৰষুণত মূৰত কি পিন্ধিব? (What traditional woven hat protects from sun and rain?)",
+            "options": [
+              "malbhog_kol",
+              "japi",
+              "assam_tea",
+              "tokari"
+            ],
+            "correctIndex": 1,
+            "domain": "REASONING",
+            "tier": 3
+          },
+          {
+            "id": "sit_3_8",
+            "image": "kopou_phool",
+            "prompt": "বিহু নাচোনিয়ে মূৰৰ খোপাত কি ফুল গুজি লয়? (What beautiful purple orchid do Bihu dancers wear in their hair?)",
+            "options": [
+              "king_chili",
+              "dhol",
+              "kopou_phool",
+              "bamboo_shoot"
+            ],
+            "correctIndex": 2,
+            "domain": "REASONING",
+            "tier": 3
+          }
+        ],
+        "4": [
+          {
+            "id": "sit_4_1",
+            "image": "japi",
+            "prompt": "বাহিৰত বৰষুণ দিছে, কি লৈ যাব? (It is raining outside. What would you take?)",
+            "options": [
+              "japi",
+              "dhol",
+              "bamboo_shoot",
+              "pepa"
+            ],
+            "correctIndex": 0,
+            "domain": "REASONING",
+            "tier": 4
+          },
+          {
+            "id": "sit_4_2",
+            "image": "gamosa",
+            "prompt": "অতিথিক সন্মান জনাবলৈ কি আগবঢ়াব? (To welcome and honor a guest, what do you offer?)",
+            "options": [
+              "king_chili",
+              "gamosa",
+              "dhol",
+              "rhino"
+            ],
+            "correctIndex": 1,
+            "domain": "REASONING",
+            "tier": 4
+          },
+          {
+            "id": "sit_4_3",
+            "image": "dhol",
+            "prompt": "বিহুৰ দিনা আনন্দ কৰি কি বজাব? (On Bihu festival day, what instrument do you play?)",
+            "options": [
+              "malbhog_kol",
+              "joha_rice",
+              "dhol",
+              "taat_xaal"
+            ],
+            "correctIndex": 2,
+            "domain": "REASONING",
+            "tier": 4
+          },
+          {
+            "id": "sit_4_4",
+            "image": "assam_tea",
+            "prompt": "পুৱা গৰমে গৰমে কি খাব ভাল পায়? (What warm beverage is lovely to drink in the morning?)",
+            "options": [
+              "gamosa",
+              "pepa",
+              "xorai",
+              "assam_tea"
+            ],
+            "correctIndex": 3,
+            "domain": "REASONING",
+            "tier": 4
+          },
+          {
+            "id": "sit_4_5",
+            "image": "xorai",
+            "prompt": "পূজা বা নামঘৰত নৈবেদ্য কিহত সজাব? (In the prayer hall/namghar, in what tray do you offer prasad?)",
+            "options": [
+              "xorai",
+              "king_chili",
+              "dhol",
+              "rhino"
+            ],
+            "correctIndex": 0,
+            "domain": "REASONING",
+            "tier": 4
+          },
+          {
+            "id": "sit_4_6",
+            "image": "masor_tenga",
+            "prompt": "মাছৰ আঞ্জা টেঙা কৰিবলৈ কি ব্যৱহাৰ কৰিব? (For preparing authentic sour fish curry, what is cooked?)",
+            "options": [
+              "gamosa",
+              "masor_tenga",
+              "pepa",
+              "muga_silk"
+            ],
+            "correctIndex": 1,
+            "domain": "REASONING",
+            "tier": 4
+          },
+          {
+            "id": "sit_4_7",
+            "image": "japi",
+            "prompt": "বতাহ বৰষুণত মূৰত কি পিন্ধিব? (What traditional woven hat protects from sun and rain?)",
+            "options": [
+              "malbhog_kol",
+              "assam_tea",
+              "japi",
+              "tokari"
+            ],
+            "correctIndex": 2,
+            "domain": "REASONING",
+            "tier": 4
+          },
+          {
+            "id": "sit_4_8",
+            "image": "kopou_phool",
+            "prompt": "বিহু নাচোনিয়ে মূৰৰ খোপাত কি ফুল গুজি লয়? (What beautiful purple orchid do Bihu dancers wear in their hair?)",
+            "options": [
+              "king_chili",
+              "dhol",
+              "bamboo_shoot",
+              "kopou_phool"
+            ],
+            "correctIndex": 3,
+            "domain": "REASONING",
+            "tier": 4
+          }
+        ],
+        "5": [
+          {
+            "id": "sit_5_1",
+            "image": "japi",
+            "prompt": "বাহিৰত বৰষুণ দিছে, কি লৈ যাব? (It is raining outside. What would you take?)",
+            "options": [
+              "dhol",
+              "japi",
+              "bamboo_shoot",
+              "pepa"
+            ],
+            "correctIndex": 1,
+            "domain": "REASONING",
+            "tier": 5
+          },
+          {
+            "id": "sit_5_2",
+            "image": "gamosa",
+            "prompt": "অতিথিক সন্মান জনাবলৈ কি আগবঢ়াব? (To welcome and honor a guest, what do you offer?)",
+            "options": [
+              "king_chili",
+              "dhol",
+              "gamosa",
+              "rhino"
+            ],
+            "correctIndex": 2,
+            "domain": "REASONING",
+            "tier": 5
+          },
+          {
+            "id": "sit_5_3",
+            "image": "dhol",
+            "prompt": "বিহুৰ দিনা আনন্দ কৰি কি বজাব? (On Bihu festival day, what instrument do you play?)",
+            "options": [
+              "malbhog_kol",
+              "joha_rice",
+              "taat_xaal",
+              "dhol"
+            ],
+            "correctIndex": 3,
+            "domain": "REASONING",
+            "tier": 5
+          },
+          {
+            "id": "sit_5_4",
+            "image": "assam_tea",
+            "prompt": "পুৱা গৰমে গৰমে কি খাব ভাল পায়? (What warm beverage is lovely to drink in the morning?)",
+            "options": [
+              "assam_tea",
+              "gamosa",
+              "pepa",
+              "xorai"
+            ],
+            "correctIndex": 0,
+            "domain": "REASONING",
+            "tier": 5
+          },
+          {
+            "id": "sit_5_5",
+            "image": "xorai",
+            "prompt": "পূজা বা নামঘৰত নৈবেদ্য কিহত সজাব? (In the prayer hall/namghar, in what tray do you offer prasad?)",
+            "options": [
+              "king_chili",
+              "xorai",
+              "dhol",
+              "rhino"
+            ],
+            "correctIndex": 1,
+            "domain": "REASONING",
+            "tier": 5
+          },
+          {
+            "id": "sit_5_6",
+            "image": "masor_tenga",
+            "prompt": "মাছৰ আঞ্জা টেঙা কৰিবলৈ কি ব্যৱহাৰ কৰিব? (For preparing authentic sour fish curry, what is cooked?)",
+            "options": [
+              "gamosa",
+              "pepa",
+              "masor_tenga",
+              "muga_silk"
+            ],
+            "correctIndex": 2,
+            "domain": "REASONING",
+            "tier": 5
+          },
+          {
+            "id": "sit_5_7",
+            "image": "japi",
+            "prompt": "বতাহ বৰষুণত মূৰত কি পিন্ধিব? (What traditional woven hat protects from sun and rain?)",
+            "options": [
+              "malbhog_kol",
+              "assam_tea",
+              "tokari",
+              "japi"
+            ],
+            "correctIndex": 3,
+            "domain": "REASONING",
+            "tier": 5
+          },
+          {
+            "id": "sit_5_8",
+            "image": "kopou_phool",
+            "prompt": "বিহু নাচোনিয়ে মূৰৰ খোপাত কি ফুল গুজি লয়? (What beautiful purple orchid do Bihu dancers wear in their hair?)",
+            "options": [
+              "kopou_phool",
+              "king_chili",
+              "dhol",
+              "bamboo_shoot"
+            ],
+            "correctIndex": 0,
+            "domain": "REASONING",
+            "tier": 5
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,13 +1,27 @@
+import 'dart:ffi';
+import 'dart:io';
+
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqlite3/open.dart';
 
 import 'package:dashboard_app/core/database/app_database.dart';
 import 'package:dashboard_app/core/database/repositories/outbox_repository.dart';
+
+// Location of sqlite3.dll downloaded for testing.
+final _sqlite3DllPath = '${Directory.systemTemp.path}/sqlite/sqlite3.dll';
 
 void main() {
   group('OutboxRepository Tests', () {
     late AppDatabase database;
     late OutboxRepository repository;
+
+    setUpAll(() {
+      // Override sqlite3 DLL location on Windows since it's not in PATH.
+      if (Platform.isWindows) {
+        open.overrideForAll(() => DynamicLibrary.open(_sqlite3DllPath));
+      }
+    });
 
     setUp(() {
       database = AppDatabase.forTesting(NativeDatabase.memory());

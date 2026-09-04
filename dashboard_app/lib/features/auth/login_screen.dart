@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../core/firebase/firebase_service.dart';
+import '../../core/database/app_database.dart';
+import '../../core/sync/sync_service.dart';
 import '../dashboard/dashboard_home_screen.dart';
 
 /// Login Screen for Smriti AI Dashboard
@@ -16,7 +18,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final FirebaseService _firebaseService = FirebaseService();
+  final FirebaseService _firebaseService = FirebaseService.instance;
   
   // Form state
   final _emailController = TextEditingController();
@@ -48,6 +50,8 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text,
         password: _passwordController.text,
       );
+      // Kick off first sync immediately after sign-in
+      _triggerSync();
       _navigateToDashboard();
     } on AuthException catch (e) {
       setState(() {
@@ -80,6 +84,8 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text,
         password: _passwordController.text,
       );
+      // Kick off first sync immediately after account creation
+      _triggerSync();
       _navigateToDashboard();
     } on AuthException catch (e) {
       setState(() {
@@ -107,6 +113,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       await _firebaseService.signInWithGoogle();
+      // Kick off first sync immediately after sign-in
+      _triggerSync();
       _navigateToDashboard();
     } on AuthException catch (e) {
       setState(() {
@@ -149,6 +157,17 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const DashboardHomeScreen()),
     );
+  }
+
+  /// Triggers a background sync after successful authentication.
+  /// Errors are silently logged — sync runs fire-and-forget.
+  void _triggerSync() {
+    final db = DatabaseProvider.instance;
+    final syncService = SyncService(
+      db: db,
+      getIdToken: FirebaseService.instance.getIdToken,
+    );
+    syncService.syncNow(); // fire-and-forget
   }
 
   @override

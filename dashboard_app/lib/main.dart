@@ -12,6 +12,17 @@ import 'core/theme/app_theme.dart';
 import 'core/firebase/firebase_options.dart';
 import 'features/auth/login_screen.dart';
 import 'features/dashboard/dashboard_home_screen.dart';
+import 'features/games/games_hub_screen.dart';
+import 'features/games/screens/matching_image_screen.dart';
+import 'features/games/screens/pick_correct_screen.dart';
+import 'features/games/screens/number_game_screen.dart';
+import 'features/games/screens/place_correctly_screen.dart';
+import 'features/games/screens/find_difference_screen.dart';
+import 'features/games/screens/draw_shape_screen.dart';
+import 'features/games/screens/situation_match_screen.dart';
+import 'features/games/screens/family_quiz_screen.dart';
+import 'features/games/screens/recalling_memories_screen.dart';
+import 'features/memory/family_member_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -76,6 +87,17 @@ class _SmritiAppState extends State<SmritiApp> {
       routes: {
         '/login': (context) => const LoginScreen(),
         '/dashboard': (context) => const DashboardHomeScreen(),
+        '/games': (context) => const GamesHubScreen(),
+        '/games/matching_image': (context) => const MatchingImageScreen(),
+        '/games/pick_correct': (context) => const PickCorrectScreen(),
+        '/games/number_game': (context) => const NumberGameScreen(),
+        '/games/place_correctly': (context) => const PlaceCorrectlyScreen(),
+        '/games/find_difference': (context) => const FindDifferenceScreen(),
+        '/games/draw_shape': (context) => const DrawShapeScreen(),
+        '/games/situation_match': (context) => const SituationMatchScreen(),
+        '/games/family_quiz': (context) => const FamilyQuizScreen(),
+        '/games/recalling_memories': (context) => const RecallingMemoriesScreen(),
+        '/memories': (context) => const FamilyMemberScreen(),
       },
       
       // Handle unknown routes - redirect to login
