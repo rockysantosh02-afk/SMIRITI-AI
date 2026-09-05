@@ -6,6 +6,6 @@ services:
     name: smriti-ai-backend
     runtime: docker
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /
+    healthCheckPath: /health
     envVars:
 
