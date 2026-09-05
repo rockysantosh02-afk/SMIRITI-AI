@@ -10,8 +10,6 @@ pydantic-settings==2.7.1   # Environment-based application settings
 python-multipart==0.0.6            # Form data handling
 
 # AI & LLM
-langchain==0.0.340                 # LLM orchestration
-langchain-google-genai==0.0.5      # Gemini integration
 google-generativeai>=0.8.0         # Google's AI SDK (>=0.8.0 supports protobuf>=5)
 
 # Real-time Communication
