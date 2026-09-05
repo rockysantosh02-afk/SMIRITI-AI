@@ -60,10 +60,10 @@ class _ReminderEntryScreenState extends State<ReminderEntryScreen> {
       }
     } else {
       _titleController = TextEditingController();
-      _selectedDate = DateTime.now();
-      // Default scheduled time: 1 hour in the future rounded to next hour
       final now = DateTime.now();
       final defaultTime = now.add(const Duration(hours: 1));
+      _selectedDate =
+          DateTime(defaultTime.year, defaultTime.month, defaultTime.day);
       _selectedTime =
           TimeOfDay(hour: defaultTime.hour, minute: defaultTime.minute);
       _isDaily = false;
@@ -125,7 +125,7 @@ class _ReminderEntryScreenState extends State<ReminderEntryScreen> {
       return;
     }
 
-    final scheduledDateTime = DateTime(
+    var scheduledDateTime = DateTime(
       _selectedDate.year,
       _selectedDate.month,
       _selectedDate.day,
@@ -133,12 +133,15 @@ class _ReminderEntryScreenState extends State<ReminderEntryScreen> {
       _selectedTime.minute,
     );
 
-    // Validate future time for one-time reminders
+    // If one-time reminder was selected for today but time already passed,
+    // advance date to tomorrow for elderly convenience and valid scheduling.
     if (!_isDaily && scheduledDateTime.isBefore(DateTime.now())) {
-      setState(() {
-        _errorMessage = 'Please choose a future time for this reminder.';
-      });
-      return;
+      scheduledDateTime = scheduledDateTime.add(const Duration(days: 1));
+      _selectedDate = DateTime(
+        scheduledDateTime.year,
+        scheduledDateTime.month,
+        scheduledDateTime.day,
+      );
     }
 
     setState(() {
@@ -172,55 +175,78 @@ class _ReminderEntryScreenState extends State<ReminderEntryScreen> {
         );
       }
 
-      // Schedule local notification with collision-safe deterministic integer ID
-      final notificationId = notificationIdFromReminderId(reminderId);
-      final hasPermission = await _notificationService.hasPermission();
+      // Schedule local notification (Isolated in try-catch so failure does NOT block SQLite save)
+      try {
+        final notificationId = notificationIdFromReminderId(reminderId);
+        final hasPermission = await _notificationService.hasPermission();
 
-      if (!hasPermission) {
-        // Calm non-blocking permission request
-        await _notificationService.requestPermission();
+        if (!hasPermission) {
+          await _notificationService.requestPermission();
+        }
+
+        final scheduleSuccess = await _notificationService.scheduleReminder(
+          notificationId: notificationId,
+          title: 'Reminder: $title',
+          body: 'It is time for your reminder: $title',
+          scheduledDate: scheduledDateTime,
+          isDaily: _isDaily,
+        );
+
+        if (mounted) {
+          if (!scheduleSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Your reminder was saved. Notifications are currently turned off.',
+                  style: TextStyle(fontSize: 16),
+                ),
+                duration: Duration(seconds: 4),
+                backgroundColor: Color(0xFFE65100),
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Reminder saved successfully!',
+                  style: TextStyle(fontSize: 16),
+                ),
+                duration: Duration(seconds: 2),
+                backgroundColor: Color(0xFF2E7D32),
+              ),
+            );
+          }
+        }
+      } catch (notifErr) {
+        debugPrint(
+            '[ReminderEntryScreen] Notification scheduling warning: $notifErr');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Reminder saved locally.',
+                style: TextStyle(fontSize: 16),
+              ),
+              duration: Duration(seconds: 2),
+            ),
+          );
+        }
       }
 
-      final scheduleSuccess = await _notificationService.scheduleReminder(
-        notificationId: notificationId,
-        title: 'Reminder: $title',
-        body: 'It is time for your reminder: $title',
-        scheduledDate: scheduledDateTime,
-        isDaily: _isDaily,
-      );
-
-      if (!mounted) return;
-
-      if (!scheduleSuccess) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Your reminder was saved. Notifications are currently turned off.',
-              style: TextStyle(fontSize: 16),
-            ),
-            duration: Duration(seconds: 4),
-            backgroundColor: Color(0xFFE65100),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Reminder saved successfully!',
-              style: TextStyle(fontSize: 16),
-            ),
-            duration: Duration(seconds: 2),
-            backgroundColor: Color(0xFF2E7D32),
-          ),
-        );
+      if (mounted) {
+        Navigator.of(context).pop(true);
       }
-
-      Navigator.of(context).pop(true);
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('[ReminderEntryScreen] Save error: $e');
+      debugPrintStack(stackTrace: stackTrace);
       if (mounted) {
         setState(() {
           _errorMessage = 'Could not save reminder. Please try again.';
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
           _isSaving = false;
         });
       }
@@ -300,6 +326,7 @@ class _ReminderEntryScreenState extends State<ReminderEntryScreen> {
               ),
               const SizedBox(height: 8),
               TextField(
+                key: const Key('reminder_title_field'),
                 controller: _titleController,
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                 decoration: InputDecoration(

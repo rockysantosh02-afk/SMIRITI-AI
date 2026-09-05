@@ -73,3 +73,20 @@ class SyncResult(BaseModel):
 class SyncResponse(BaseModel):
     results: list[SyncResult]
     successful_record_ids: list[str]
+
+
+class VoiceChatMessage(BaseModel):
+    role: str
+    content: str
+    timestamp: str | None = None
+
+
+class VoiceChatRequest(BaseModel):
+    message: str
+    language: str = "en-US"
+    history: list[VoiceChatMessage] = Field(default_factory=list)
+
+
+class VoiceChatResponse(BaseModel):
+    response: str
+

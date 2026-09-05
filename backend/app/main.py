@@ -11,7 +11,7 @@ from app.core.firebase_admin import FirebaseInitializationError, get_firestore
 from app.core.config import settings
 from app.exceptions import ForbiddenException, NotFoundException, ServerException, SmritiException, UnauthorizedException, ValidationException
 from app.logging_config import configure_logging
-from app.routers import auth, games, journal, reminders, sync, test_helpers
+from app.routers import auth, games, journal, reminders, sync, test_helpers, voice
 
 configure_logging()
 import logging
@@ -103,6 +103,7 @@ app.include_router(test_helpers.router)
 app.include_router(journal.router)
 app.include_router(reminders.router)
 app.include_router(sync.router)
+app.include_router(voice.router)
 
 
 def _error_response(status_code: int, detail: str) -> JSONResponse:
