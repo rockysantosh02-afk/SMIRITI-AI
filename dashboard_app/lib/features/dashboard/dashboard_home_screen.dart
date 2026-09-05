@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/localization/app_languages.dart';
+import '../../core/localization/app_localizations.dart';
+import '../../core/localization/language_provider.dart';
 import '../../core/firebase/firebase_service.dart';
 import '../../core/database/app_database.dart';
 import '../../core/sync/sync_service.dart';
@@ -15,7 +19,9 @@ import '../games/games_hub_screen.dart';
 import '../memory/family_member_screen.dart';
 import '../journal/journal_screen.dart';
 import '../voice/screens/voice_assistant_screen.dart';
+import '../voice/services/language_detector.dart';
 import '../reminders/reminders_screen.dart';
+
 
 /// Dashboard Home Screen for Smriti AI
 /// 
@@ -90,14 +96,14 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
     }
   }
 
-  String _getGreeting() {
+  String _getGreeting(AppLocalizations loc) {
     final hour = DateTime.now().hour;
     if (hour < 12) {
-      return 'Good morning';
+      return loc.greetingMorning;
     } else if (hour < 17) {
-      return 'Good afternoon';
+      return loc.greetingAfternoon;
     } else {
-      return 'Good evening';
+      return loc.greetingEvening;
     }
   }
 
@@ -183,6 +189,8 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Smriti AI'),
@@ -198,7 +206,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
             icon: const Icon(Icons.settings_rounded),
             iconSize: 28,
             onPressed: _showSettings,
-            tooltip: 'Settings',
+            tooltip: loc.settings,
           ),
           const SizedBox(width: 8),
         ],
@@ -211,14 +219,14 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
             children: [
               // Greeting
               Text(
-                '${_getGreeting()}, $_userName',
+                '${_getGreeting(loc)}, $_userName',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'What would you like to do today?',
+                loc.howAreYouFeeling,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: AppTheme.subtitleColor,
                 ),
@@ -232,7 +240,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
               const SizedBox(height: 28),
               
               // Feature Tiles
-              _buildFeatureTiles(),
+              _buildFeatureTiles(loc),
             ],
           ),
         ),
@@ -308,7 +316,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
     );
   }
 
-  Widget _buildFeatureTiles() {
+  Widget _buildFeatureTiles(AppLocalizations loc) {
     return Column(
       children: [
         // Row 1: Games, Voice Assistant
@@ -317,7 +325,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
             Expanded(
               child: _FeatureTile(
                 icon: Icons.games_rounded,
-                label: 'Games',
+                label: loc.games,
                 color: const Color(0xFF6B8E23), // Olive green
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const GamesHubScreen()),
@@ -328,7 +336,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
             Expanded(
               child: _FeatureTile(
                 icon: Icons.mic_rounded,
-                label: 'Voice Assistant',
+                label: loc.voiceAssistant,
                 color: const Color(0xFF4682B4), // Steel blue
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const VoiceAssistantScreen()),
@@ -345,7 +353,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
             Expanded(
               child: _FeatureTile(
                 icon: Icons.book_rounded,
-                label: 'My Journal',
+                label: loc.journal,
                 color: const Color(0xFF8B4513), // Saddle brown
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const JournalScreen()),
@@ -356,7 +364,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
             Expanded(
               child: _FeatureTile(
                 icon: Icons.alarm_rounded,
-                label: 'Reminders',
+                label: loc.reminders,
                 color: const Color(0xFFCD853F), // Peru/tan
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const RemindersScreen()),
@@ -373,7 +381,7 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
             Expanded(
               child: _FeatureTile(
                 icon: Icons.family_restroom_rounded,
-                label: 'My Memories',
+                label: loc.familyMemories,
                 color: const Color(0xFF9C27B0), // Warm Purple
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const FamilyMemberScreen()),
@@ -472,12 +480,124 @@ class _SettingsSheet extends StatelessWidget {
     required this.onSignOut,
   });
 
+  void _showLanguageSelectionDialog(
+    BuildContext context,
+    LanguageProvider langProvider,
+  ) {
+    final loc = AppLocalizations.of(context);
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          title: Text(
+            loc.selectLanguage,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          content: RadioGroup<AppLanguage>(
+            groupValue: langProvider.currentLanguage,
+            onChanged: (val) {
+              if (val != null) {
+                langProvider.setLanguage(val);
+                Navigator.of(dialogCtx).pop();
+              }
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: AppLanguages.supportedLanguages.map((lang) {
+                final isSelected = langProvider.currentLanguage == lang;
+                final label = lang == AppLanguage.english
+                    ? 'English'
+                    : '${lang.nativeName} (${lang.displayName})';
+
+                return RadioListTile<AppLanguage>(
+                  title: Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? AppTheme.primaryColor : AppTheme.textColor,
+                    ),
+                  ),
+                  value: lang,
+                  activeColor: AppTheme.primaryColor,
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              child: Text(loc.cancel, style: const TextStyle(fontSize: 16)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showVoiceResponseModeDialog(
+    BuildContext context,
+    LanguageProvider langProvider,
+  ) {
+    final loc = AppLocalizations.of(context);
+
+    showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        return AlertDialog(
+          title: const Text(
+            'Voice Response Language',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          content: RadioGroup<VoiceResponseLanguageMode>(
+            groupValue: langProvider.voiceResponseLanguageMode,
+            onChanged: (val) {
+              if (val != null) {
+                langProvider.setVoiceResponseLanguageMode(val);
+                Navigator.of(dialogCtx).pop();
+              }
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: VoiceResponseLanguageMode.values.map((mode) {
+                final isSelected = langProvider.voiceResponseLanguageMode == mode;
+                return RadioListTile<VoiceResponseLanguageMode>(
+                  title: Text(
+                    mode.displayName,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? AppTheme.primaryColor : AppTheme.textColor,
+                    ),
+                  ),
+                  value: mode,
+                  activeColor: AppTheme.primaryColor,
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogCtx).pop(),
+              child: Text(loc.cancel, style: const TextStyle(fontSize: 16)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return DraggableScrollableSheet(
-      initialChildSize: 0.6,
+      initialChildSize: 0.75,
       minChildSize: 0.4,
-      maxChildSize: 0.9,
+      maxChildSize: 0.95,
       expand: false,
       builder: (context, scrollController) {
         return SingleChildScrollView(
@@ -500,14 +620,119 @@ class _SettingsSheet extends StatelessWidget {
               const SizedBox(height: 24),
               
               Text(
-                'Settings',
+                loc.settings,
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
               const SizedBox(height: 24),
+
+              // Language Selection Tile
+              Consumer<LanguageProvider>(
+                builder: (context, langProvider, _) {
+                  final current = langProvider.currentLanguage;
+                  final currentLabel = switch (current) {
+                    AppLanguage.english => 'English >',
+                    AppLanguage.telugu => 'తెలుగు >',
+                    AppLanguage.hindi => 'हिन्दी >',
+                  };
+
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () => _showLanguageSelectionDialog(context, langProvider),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.language_rounded, size: 28, color: AppTheme.primaryColor),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  loc.language,
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  currentLabel,
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppTheme.primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right_rounded, color: AppTheme.subtitleColor),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+              
+              const SizedBox(height: 16),
+
+              // Voice Response Language Mode Tile
+              Consumer<LanguageProvider>(
+                builder: (context, langProvider, _) {
+                  final currentMode = langProvider.voiceResponseLanguageMode;
+
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: () => _showVoiceResponseModeDialog(context, langProvider),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: AppTheme.surfaceColor,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey.shade300),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.record_voice_over_rounded, size: 28, color: AppTheme.primaryColor),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Voice Response Language',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  '${currentMode.displayName} >',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppTheme.primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right_rounded, color: AppTheme.subtitleColor),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              const SizedBox(height: 24),
+
               
               // Text Size Slider
               Text(
-                'Text Size',
+                loc.textSize,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 8),
@@ -528,7 +753,7 @@ class _SettingsSheet extends StatelessWidget {
                 ],
               ),
               Text(
-                'Adjust text size for better readability',
+                loc.textSizeDesc,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppTheme.subtitleColor,
                 ),
@@ -544,12 +769,12 @@ class _SettingsSheet extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Reduced Motion',
+                          loc.reducedMotion,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Use simple fade animations',
+                          loc.reducedMotionDesc,
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: AppTheme.subtitleColor,
                           ),
@@ -574,7 +799,7 @@ class _SettingsSheet extends StatelessWidget {
                 child: OutlinedButton.icon(
                   onPressed: onSignOut,
                   icon: const Icon(Icons.logout_rounded),
-                  label: const Text('Sign Out'),
+                  label: Text(loc.signOut),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red.shade700,
                     side: BorderSide(color: Colors.red.shade700),

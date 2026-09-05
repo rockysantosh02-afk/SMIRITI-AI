@@ -122,7 +122,8 @@ class FirebaseService {
       throw _handleAuthException(e);
     } catch (e) {
       if (e is AuthException) rethrow;
-      throw AuthException('Failed to sign in with Google: $e');
+      debugPrint('[FirebaseService] Google sign-in technical exception: $e');
+      throw AuthException('Could not sign in with Google. Please try again.');
     }
   }
 

@@ -27,17 +27,17 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
   void _showAddMemberDialog() {
     final nameController = TextEditingController();
     final notesController = TextEditingController();
-    String selectedRelation = 'Daughter (কন্যা)';
+    String selectedRelation = 'Daughter';
     String? pickedImagePath;
 
     final relations = [
-      'Daughter (কন্যা)',
-      'Son (পুত্ৰ)',
-      'Granddaughter (নাতিনী)',
-      'Grandson (নাতি)',
-      'Spouse (জীৱনসংগী)',
-      'Sibling (ভাই/ভনী)',
-      'Friend (বন্ধু)',
+      'Daughter',
+      'Son',
+      'Granddaughter',
+      'Grandson',
+      'Spouse',
+      'Sibling',
+      'Friend',
     ];
 
     showModalBottomSheet(
@@ -65,7 +65,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'আপোনজনৰ চিনাকি যোগ কৰক',
+                      'Add Family Member',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -73,6 +73,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                       ),
                     ),
                     IconButton(
+
                       icon: const Icon(Icons.close_rounded, size: 28),
                       onPressed: () => Navigator.pop(ctx),
                     ),
@@ -127,9 +128,9 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                                 Icon(Icons.add_a_photo_rounded, size: 40, color: AppTheme.primaryColor),
                                 SizedBox(height: 6),
                                 Text(
-                                  'ফটো বাছক\n(Pick photo)',
+                                  'Pick photo',
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 13, color: AppTheme.subtitleColor),
+                                  style: TextStyle(fontSize: 14, color: AppTheme.subtitleColor),
                                 ),
                               ],
                             ),
@@ -143,7 +144,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                   controller: nameController,
                   style: const TextStyle(fontSize: 22, color: AppTheme.textColor),
                   decoration: InputDecoration(
-                    labelText: 'নাম (Full Name)',
+                    labelText: 'Full Name',
                     labelStyle: const TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
                     filled: true,
                     fillColor: AppTheme.surfaceColor,
@@ -157,7 +158,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                   initialValue: selectedRelation,
                   style: const TextStyle(fontSize: 18, color: AppTheme.textColor),
                   decoration: InputDecoration(
-                    labelText: 'সম্পৰ্ক (Relation)',
+                    labelText: 'Relation',
                     labelStyle: const TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
                     filled: true,
                     fillColor: AppTheme.surfaceColor,
@@ -177,7 +178,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                   controller: notesController,
                   style: const TextStyle(fontSize: 18, color: AppTheme.textColor),
                   decoration: InputDecoration(
-                    labelText: 'মনত থকা কথা (Notes - optional)',
+                    labelText: 'Notes (optional)',
                     labelStyle: const TextStyle(fontSize: 16, color: AppTheme.subtitleColor),
                     filled: true,
                     fillColor: AppTheme.surfaceColor,
@@ -198,7 +199,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                     ),
                     icon: const Icon(Icons.check_circle_rounded, size: 32),
                     label: const Text(
-                      'সংৰক্ষণ কৰক (Save Member)',
+                      'Save Member',
                       style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     onPressed: () async {
@@ -210,7 +211,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
 
                       await _repository.addMember(
                         name: name,
-                        relation: selectedRelation.split(' ').first,
+                        relation: selectedRelation,
                         photoPath: pickedImagePath,
                         notes: notesController.text.trim(),
                       );
@@ -219,7 +220,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                         navigator.pop();
                         messenger.showSnackBar(
                           const SnackBar(
-                            content: Text('আপোনজনক সফলতাৰে যোগ কৰা হ\'ল (Family member added)'),
+                            content: Text('Family member added successfully'),
                           ),
                         );
                       }
@@ -238,7 +239,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('মোৰ আপোনজন (My Family Memories)'),
+        title: const Text('Family Memories'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, size: 32),
           tooltip: 'Back',
@@ -264,7 +265,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                   SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Add family photos only if you are comfortable. They stay private on this device and your account.\n(আপোনাৰ সুবিধা অনুসৰিহে ফটো যোগ কৰক। এইবোৰ আপোনাৰ ডিভাইচতে সম্পূৰ্ণ গোপনীয় হৈ থাকিব।)',
+                      'Add family photos only if you are comfortable. They stay private on this device and your account.',
                       style: TextStyle(
                         fontSize: 15,
                         color: Color(0xFF4A148C),
@@ -297,7 +298,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                             ),
                             const SizedBox(height: 16),
                             const Text(
-                              'এতিয়ালৈকে কোনো সদস্য যোগ কৰা হোৱা নাই',
+                              'No family members added yet',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 20,
@@ -307,7 +308,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                             ),
                             const SizedBox(height: 8),
                             const Text(
-                              'Family quiz আৰু স্মৃতিকথা খেলিবলৈ আপোনজনৰ ফটো আৰু নাম যোগ কৰক।',
+                              'Add photos and names of loved ones to use in memories and quizzes.',
                               textAlign: TextAlign.center,
                               style: TextStyle(fontSize: 16, color: AppTheme.subtitleColor),
                             ),
@@ -316,6 +317,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                       ),
                     );
                   }
+
 
                   return ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -399,7 +401,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                   ),
                   icon: const Icon(Icons.add_rounded, size: 36),
                   label: const Text(
-                    'নতুন সদস্য যোগ কৰক (Add Family Member)',
+                    'Add Family Member',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   onPressed: _showAddMemberDialog,

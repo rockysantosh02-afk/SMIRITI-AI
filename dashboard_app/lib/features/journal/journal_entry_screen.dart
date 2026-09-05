@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/localization/app_localizations.dart';
+import '../../core/localization/language_provider.dart';
 import '../../core/database/app_database.dart';
 import '../../core/database/repositories/journal_repository.dart';
 import 'journal_story_service.dart';
@@ -59,18 +62,17 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
 
   String? _photoPath;
   String? _generatedStory;
-  String _storySource = 'ai';
   bool _isSaving = false;
   bool _isGeneratingStory = false;
   bool _isDictating = false;
   String _dictationLivePreview = '';
 
-  final List<String> _reminiscencePrompts = [
-    'Tell me about a happy memory (এটা সুখৰ স্মৃতি কওক)',
-    'Tell me about this special day (এই বিশেষ দিনটোৰ কথা মনত আছেনে?)',
-    'What do you remember about this place? (এই ঠাইখনৰ কি মনত পৰে?)',
-    'A memory of family or friends (পৰিয়াল বা বন্ধুৰ সৈতে এটা স্মৃতি)',
-  ];
+  List<String> _getReminiscencePrompts(AppLocalizations loc) => [
+        loc.memoryPrompt1,
+        loc.memoryPrompt2,
+        loc.memoryPrompt3,
+        loc.memoryPrompt4,
+      ];
 
   @override
   void initState() {
@@ -110,7 +112,13 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
       _dictationLivePreview = '';
     });
 
+    String? langCode;
+    try {
+      langCode = Provider.of<LanguageProvider>(context, listen: false).languageCode;
+    } catch (_) {}
+
     _voiceService.startListening(
+      languageCode: langCode ?? 'en',
       onResult: (words) {
         if (mounted) {
           setState(() {
@@ -148,82 +156,73 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
   Future<void> _handleGenerateStory() async {
     if (_isGeneratingStory) return;
 
-    final title = _titleController.text.trim();
-    final body = _bodyController.text.trim();
-
-    if (title.isEmpty && body.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          backgroundColor: AppTheme.secondaryColor,
-          content: Text(
-            'অনুগ্ৰহ কৰি কাহিনী তৈয়াৰ কৰাৰ আগতে অলপ স্মৃতি লিখক।\n(Please write a little memory before creating a story.)',
-            style: TextStyle(
-              fontSize: 16,
-              color: AppTheme.textColor,
-              fontWeight: FontWeight.bold,
+    final memoryText = _bodyController.text.trim();
+    if (memoryText.isEmpty) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: AppTheme.secondaryColor,
+            content: Text(
+              'Please write a little memory before creating a story.',
+              style: TextStyle(fontSize: 16, color: AppTheme.textColor),
             ),
+            duration: Duration(seconds: 2),
           ),
-          duration: Duration(seconds: 3),
-        ),
-      );
+        );
+      }
       return;
     }
 
-    setState(() => _isGeneratingStory = true);
+    setState(() {
+      _isGeneratingStory = true;
+    });
 
     try {
-      final result = await _storyService.generateStory(
-        title: title,
-        content: body,
+      final storyResult = await _storyService.generateStory(
+        title: _titleController.text.trim(),
+        content: memoryText,
       );
 
-      if (!mounted) return;
-
-      if (result.success && result.story != null) {
-        setState(() {
-          _generatedStory = result.story;
-          _storySource = result.source;
-          _isGeneratingStory = false;
-        });
+      if (storyResult.success && storyResult.story != null) {
+        if (mounted) {
+          setState(() {
+            _generatedStory = storyResult.story;
+            _isGeneratingStory = false;
+          });
+        }
 
         // If this entry is already saved in SQLite, persist the story immediately
         if (widget.existingEntry != null) {
           await _repository.saveGeneratedStory(
             id: widget.existingEntry!.id,
-            story: result.story!,
+            story: storyResult.story!,
           );
         }
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              backgroundColor: Color(0xFF2E8B57), // Sea green
-              content: Row(
-                children: [
-                  Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 26),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'আপোনাৰ সুন্দৰ কাহিনী প্ৰস্তুত হ\'ল!\n(Your story is ready!)',
-                      style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
+              backgroundColor: AppTheme.primaryColor,
+              content: Text(
+                'Your story is ready!',
+                style: TextStyle(fontSize: 16, color: Colors.white),
               ),
               duration: Duration(seconds: 2),
             ),
           );
         }
       } else {
-        setState(() => _isGeneratingStory = false);
         if (mounted) {
+          setState(() {
+            _isGeneratingStory = false;
+          });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              backgroundColor: AppTheme.surfaceColor,
+              backgroundColor: AppTheme.primaryColor,
               content: Text(
-                result.errorMessage ??
-                    'আমি এই মুহূৰ্তত কাহিনী সৃষ্টি কৰিব নোৱাৰিলোঁ। আপোনাৰ স্মৃতি সুৰক্ষিত হৈ আছে।\n(We could not create a story right now. Your memory is safely saved.)',
-                style: const TextStyle(fontSize: 16, color: AppTheme.textColor, fontWeight: FontWeight.w600),
+                storyResult.errorMessage ??
+                    'Your memory is safely saved. We can create a story when you are connected.',
+                style: const TextStyle(fontSize: 16, color: Colors.white),
               ),
               duration: const Duration(seconds: 3),
             ),
@@ -231,14 +230,18 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
         }
       }
     } catch (e) {
+      debugPrint('[JournalEntryScreen] Story generation exception: $e');
       if (mounted) {
-        setState(() => _isGeneratingStory = false);
+        setState(() {
+          _isGeneratingStory = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            backgroundColor: AppTheme.surfaceColor,
+            backgroundColor: AppTheme.primaryColor,
             content: Text(
-              'আমি এই মুহূৰ্তত কাহিনী সৃষ্টি কৰিব নোৱাৰিলোঁ। আপোনাৰ স্মৃতি সুৰক্ষিত হৈ আছে।\n(We could not create a story right now. Your memory is safely saved.)',
-              style: TextStyle(fontSize: 16, color: AppTheme.textColor, fontWeight: FontWeight.w600),
+              'Your memory is safely saved. We can create a story when you are connected.',
+              style: TextStyle(fontSize: 16, color: Colors.white),
             ),
             duration: Duration(seconds: 3),
           ),
@@ -249,15 +252,16 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
 
   Future<void> _pickImage(ImageSource source) async {
     try {
-      final XFile? image = await _picker.pickImage(
+      final picked = await _picker.pickImage(
         source: source,
-        maxWidth: 1200,
-        maxHeight: 1200,
+        maxWidth: 1600,
+        maxHeight: 1600,
         imageQuality: 85,
       );
-      if (image != null && mounted) {
+
+      if (picked != null && mounted) {
         setState(() {
-          _photoPath = image.path;
+          _photoPath = picked.path;
         });
       }
     } catch (e) {
@@ -265,10 +269,10 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            backgroundColor: AppTheme.primaryColor,
+            backgroundColor: AppTheme.errorColor,
             content: Text(
-              'ছবি যোগ কৰিব পৰা নগল (Could not attach photo. Please try again.)',
-              style: TextStyle(fontSize: 16),
+              'Could not attach photo. Please try again.',
+              style: TextStyle(fontSize: 16, color: Colors.white),
             ),
           ),
         );
@@ -279,51 +283,47 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
   Future<void> _saveEntry() async {
     if (_isSaving) return;
 
-    final title = _titleController.text.trim();
-    final body = _bodyController.text.trim();
+    final bodyText = _bodyController.text.trim();
+    final titleText = _titleController.text.trim();
 
-    // Validation: Require at least some title, body, or photo
-    if (title.isEmpty && body.isEmpty && _photoPath == null) {
+    if (bodyText.isEmpty && titleText.isEmpty && _photoPath == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           backgroundColor: AppTheme.secondaryColor,
           content: Text(
-            'অনুগ্ৰহ কৰি সংৰক্ষণ কৰাৰ আগতে অলপ স্মৃতি যোগ কৰক।\n(Please add a little memory before saving.)',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              color: AppTheme.textColor,
-            ),
+            'Please add a little memory before saving.',
+            style: TextStyle(fontSize: 16, color: AppTheme.textColor),
           ),
-          duration: Duration(seconds: 3),
+          duration: Duration(seconds: 2),
         ),
       );
       return;
     }
 
-    setState(() => _isSaving = true);
+    setState(() {
+      _isSaving = true;
+    });
+
+    final loc = AppLocalizations.of(context);
+    final effectiveTitle = titleText.isNotEmpty
+        ? titleText
+        : (bodyText.isNotEmpty
+            ? (bodyText.length > 30 ? '${bodyText.substring(0, 30)}...' : bodyText)
+            : loc.newEntry);
 
     try {
-      final effectiveTitle = title.isNotEmpty
-          ? title
-          : (body.isNotEmpty
-              ? (body.length > 30 ? '${body.substring(0, 30)}...' : body)
-              : 'স্মৃতি (Memory)');
-
       if (widget.existingEntry != null) {
-        // Update existing memory
         await _repository.update(
           id: widget.existingEntry!.id,
           title: effectiveTitle,
-          body: body,
+          body: bodyText,
           photoPath: _photoPath,
           generatedStory: _generatedStory,
         );
       } else {
-        // Create new memory
         await _repository.create(
           title: effectiveTitle,
-          body: body,
+          body: bodyText,
           photoPath: _photoPath,
           generatedStory: _generatedStory,
         );
@@ -331,35 +331,29 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Color(0xFF2E8B57), // Sea green
-            content: Row(
-              children: [
-                Icon(Icons.check_circle_rounded, color: Colors.white, size: 28),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'আপোনাৰ স্মৃতি সুৰক্ষিতভাৱে সাঁচি ৰখা হ\'ল।\n(Beautiful memory saved.)',
-                    style: TextStyle(fontSize: 17, color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
+          SnackBar(
+            backgroundColor: AppTheme.primaryColor,
+            content: Text(
+              loc.memorySavedSuccess,
+              style: const TextStyle(fontSize: 16, color: Colors.white),
             ),
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
         Navigator.of(context).pop();
       }
     } catch (e) {
-      debugPrint('[JournalEntryScreen] Error saving journal entry: $e');
+      debugPrint('[JournalEntryScreen] Error saving entry: $e');
       if (mounted) {
-        setState(() => _isSaving = false);
+        setState(() {
+          _isSaving = false;
+        });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: AppTheme.primaryColor,
+          SnackBar(
+            backgroundColor: AppTheme.errorColor,
             content: Text(
-              'বৰ্তমান এই স্মৃতি সাঁচিব পৰা নগল, অনুগ্ৰহ কৰি পুনৰ চেষ্টা কৰক।\n(We could not save this memory right now. Please try again.)',
-              style: TextStyle(fontSize: 16, color: Colors.white),
+              loc.memorySaveError,
+              style: const TextStyle(fontSize: 16, color: Colors.white),
             ),
           ),
         );
@@ -369,18 +363,20 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     final isEditing = widget.existingEntry != null;
+    final prompts = _getReminiscencePrompts(loc);
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         title: Text(
-          isEditing ? 'স্মৃতি সম্পাদনা (Edit Memory)' : 'নতুন স্মৃতি (New Memory)',
+          isEditing ? loc.editEntry : loc.newEntry,
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, size: 30),
-          tooltip: 'Back',
+          tooltip: loc.back,
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -391,9 +387,9 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // 1. Reminiscence inspiration prompts
-              const Text(
-                'প্ৰেৰণাদায়ক প্ৰশ্ন (Inspiration Prompts):',
-                style: TextStyle(
+              Text(
+                loc.inspirationPrompts,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.primaryColor,
@@ -403,7 +399,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  children: _reminiscencePrompts.map((prompt) {
+                  children: prompts.map((prompt) {
                     return Padding(
                       padding: const EdgeInsets.only(right: 10),
                       child: ActionChip(
@@ -424,7 +420,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                         ),
                         onPressed: () {
                           if (_titleController.text.isEmpty) {
-                            _titleController.text = prompt.split('(').first.trim();
+                            _titleController.text = prompt;
                           } else if (_bodyController.text.isEmpty) {
                             _bodyController.text = prompt;
                           }
@@ -438,9 +434,9 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
               const SizedBox(height: 24),
 
               // 2. Title Input
-              const Text(
-                'স্মৃতিৰ শিৰোনাম (Title):',
-                style: TextStyle(
+              Text(
+                loc.memoryTitle,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textColor,
@@ -452,7 +448,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                 controller: _titleController,
                 style: const TextStyle(fontSize: 20, color: AppTheme.textColor),
                 decoration: InputDecoration(
-                  hintText: 'e.g., বাগিচাত পুৱাৰ চাহ (Morning tea in the garden)',
+                  hintText: loc.memoryTitleHint,
                   hintStyle: TextStyle(fontSize: 17, color: Colors.grey[500]),
                   filled: true,
                   fillColor: AppTheme.surfaceColor,
@@ -471,9 +467,9 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
               const SizedBox(height: 20),
 
               // 3. Memory Content / Story Input
-              const Text(
-                'আপোনাৰ স্মৃতি লিখক (Your Memory):',
-                style: TextStyle(
+              Text(
+                loc.yourMemory,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textColor,
@@ -486,7 +482,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                 maxLines: 6,
                 style: const TextStyle(fontSize: 20, height: 1.4, color: AppTheme.textColor),
                 decoration: InputDecoration(
-                  hintText: 'আপোনাৰ মনত থকা কথাখিনি ইয়াত লিখক...\n(Write what you remember about this time...)',
+                  hintText: loc.yourMemoryHint,
                   hintStyle: TextStyle(fontSize: 17, color: Colors.grey[500]),
                   filled: true,
                   fillColor: AppTheme.surfaceColor,
@@ -505,9 +501,9 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
               const SizedBox(height: 24),
 
               // 4. Photo Section
-              const Text(
-                'ছবি যোগ কৰক (Add Photo):',
-                style: TextStyle(
+              Text(
+                loc.addPhoto,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textColor,
@@ -542,7 +538,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                                       Icon(Icons.broken_image_rounded, size: 28, color: AppTheme.subtitleColor),
                                       SizedBox(width: 8),
                                       Text(
-                                        'ছবি প্ৰদৰ্শন কৰিব পৰা নগ\'ল (Could not display photo)',
+                                        'Could not display photo',
                                         style: TextStyle(fontSize: 15, color: AppTheme.subtitleColor),
                                       ),
                                     ],
@@ -567,7 +563,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                                     Icon(Icons.broken_image_rounded, size: 28, color: AppTheme.subtitleColor),
                                     SizedBox(width: 8),
                                     Text(
-                                      'ছবি উপলব্ধ নহয় (Photo not found on device)',
+                                      'Photo not found on device',
                                       style: TextStyle(fontSize: 15, color: AppTheme.subtitleColor),
                                     ),
                                   ],
@@ -601,9 +597,9 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                         key: const Key('pick_gallery_button'),
                         onPressed: () => _pickImage(ImageSource.gallery),
                         icon: const Icon(Icons.photo_library_rounded, size: 28),
-                        label: const Text(
-                          'গেলেৰী (Gallery)',
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                        label: Text(
+                          loc.gallery,
+                          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                         ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppTheme.primaryColor,
@@ -623,9 +619,9 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                         key: const Key('pick_camera_button'),
                         onPressed: () => _pickImage(ImageSource.camera),
                         icon: const Icon(Icons.camera_alt_rounded, size: 28),
-                        label: const Text(
-                          'কেমেৰা (Camera)',
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                        label: Text(
+                          loc.camera,
+                          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                         ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppTheme.primaryColor,
@@ -642,7 +638,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
 
               const SizedBox(height: 24),
 
-              // 5. Voice Dictation ("Speak Your Memory" / "কণ্ঠৰে স্মৃতি কওক")
+              // 5. Voice Dictation ("Speak Your Memory")
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -671,7 +667,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                             customBorder: const CircleBorder(),
                             onTap: _handleVoiceDictation,
                             child: Padding(
-                              padding: const EdgeInsets.all(16), // Comfortable touch target
+                              padding: const EdgeInsets.all(16),
                               child: Icon(
                                 _isDictating ? Icons.stop_rounded : Icons.mic_rounded,
                                 color: Colors.white,
@@ -687,8 +683,8 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                             children: [
                               Text(
                                 _isDictating
-                                    ? 'শুনি থকা হৈছে... (Listening...)'
-                                    : 'কণ্ঠৰে স্মৃতি কওক (Speak Your Memory)',
+                                    ? loc.listeningDictation
+                                    : loc.speakYourMemory,
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -700,8 +696,8 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                               const SizedBox(height: 4),
                               Text(
                                 _isDictating
-                                    ? 'থামিবলৈ বুটামটো টিপক (Tap button to stop)'
-                                    : 'ক\'লে আপোনাৰ কথা তলৰ ডায়ৰীত যোগ হ\'ব (Dictate directly into memory)',
+                                    ? loc.stopDictation
+                                    : loc.dictateHint,
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: AppTheme.subtitleColor,
@@ -741,9 +737,9 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
               const SizedBox(height: 24),
 
               // 6. AI Story Generator Section (Phase 3.2)
-              const Text(
-                'স্মৃতিৰ কাহিনী (AI Story):',
-                style: TextStyle(
+              Text(
+                loc.aiStory,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: AppTheme.textColor,
@@ -775,9 +771,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              _storySource == 'fallback'
-                                  ? '✨ স্মৃতিৰ এক শান্ত প্ৰতিফলন (A gentle reflection)'
-                                  : '✨ আপোনাৰ কাহিনী (Your Story)',
+                              loc.storyReflection,
                               style: const TextStyle(
                                 fontSize: 19,
                                 fontWeight: FontWeight.bold,
@@ -812,7 +806,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                                 )
                               : const Icon(Icons.refresh_rounded, size: 22, color: AppTheme.primaryColor),
                           label: Text(
-                            _isGeneratingStory ? 'কাহিনী তৈয়াৰ কৰা হৈছে... (Creating...)' : 'নতুন গল্প বনাওক (Create a New Story)',
+                            _isGeneratingStory ? loc.creatingStory : loc.createAiStory,
                             style: const TextStyle(fontSize: 16, color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -840,8 +834,8 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                         : const Icon(Icons.auto_awesome_rounded, size: 30),
                     label: Text(
                       _isGeneratingStory
-                          ? 'কাহিনী তৈয়াৰ কৰা হৈছে...\n(Creating your story...)'
-                          : 'গল্প বনাওক\n(✨ Create a Story)',
+                          ? loc.creatingStory
+                          : loc.createAiStory,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 18,
@@ -878,7 +872,7 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
                         )
                       : const Icon(Icons.check_circle_rounded, size: 36),
                   label: Text(
-                    _isSaving ? 'সাঁচি থকা হৈছে... (Saving...)' : 'স্মৃতি সাঁচি ৰাখক\n(Save Memory)',
+                    _isSaving ? loc.savingEntry : loc.saveEntry,
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 20,

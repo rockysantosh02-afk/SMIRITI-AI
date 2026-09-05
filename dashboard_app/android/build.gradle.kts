@@ -37,6 +37,14 @@ subprojects {
     }
 }
 
+subprojects {
+    tasks.configureEach {
+        if (name.contains("CMake", ignoreCase = true)) {
+            doNotTrackState("Avoid Gradle 9 cmake timing metadata tracking issue")
+        }
+    }
+}
+
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }

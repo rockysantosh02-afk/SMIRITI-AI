@@ -12,8 +12,14 @@ enum VoiceIntent {
   /// Navigate to games hub
   openGames,
 
-  /// Inquire about reminders (Phase 3.4 coming soon notice)
+  /// Navigate to reminders screen
   openReminders,
+
+  /// Create or schedule a new reminder
+  setReminder,
+
+  /// Cancel current ongoing multi-turn conversation
+  cancel,
 
   /// Spoken text was empty or not matched to any deterministic intent
   unknown,
@@ -33,16 +39,28 @@ class VoiceIntentResult {
   /// The destination route to navigate to (if any)
   final String? targetRoute;
 
+  /// Parsed reminder title (if any)
+  final String? reminderTitle;
+
+  /// Parsed reminder date and time (if any)
+  final DateTime? reminderDateTime;
+
+  /// Time of day formatted as "HH:mm" (if any)
+  final String? reminderTimeOfDay;
+
   const VoiceIntentResult({
     required this.intent,
     required this.rawText,
     required this.feedbackMessage,
     this.targetRoute,
+    this.reminderTitle,
+    this.reminderDateTime,
+    this.reminderTimeOfDay,
   });
 
   @override
   String toString() =>
-      'VoiceIntentResult(intent: $intent, rawText: "$rawText", route: $targetRoute)';
+      'VoiceIntentResult(intent: $intent, rawText: "$rawText", route: $targetRoute, title: "$reminderTitle")';
 
   @override
   bool operator ==(Object other) =>
@@ -52,8 +70,19 @@ class VoiceIntentResult {
           intent == other.intent &&
           rawText == other.rawText &&
           feedbackMessage == other.feedbackMessage &&
-          targetRoute == other.targetRoute;
+          targetRoute == other.targetRoute &&
+          reminderTitle == other.reminderTitle &&
+          reminderDateTime == other.reminderDateTime &&
+          reminderTimeOfDay == other.reminderTimeOfDay;
 
   @override
-  int get hashCode => Object.hash(intent, rawText, feedbackMessage, targetRoute);
+  int get hashCode => Object.hash(
+        intent,
+        rawText,
+        feedbackMessage,
+        targetRoute,
+        reminderTitle,
+        reminderDateTime,
+        reminderTimeOfDay,
+      );
 }

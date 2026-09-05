@@ -104,7 +104,9 @@ class _PickCorrectScreenState extends BaseGameScreenState<PickCorrectScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        meta.nameAs,
+                        meta.getLocalizedName(
+                          Localizations.localeOf(context).languageCode,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(

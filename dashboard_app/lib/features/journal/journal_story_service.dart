@@ -71,7 +71,7 @@ class JournalStoryService {
         final connectivityResult = await connectivity.checkConnectivity();
         if (connectivityResult == ConnectivityResult.none) {
           return const StoryResult.fail(
-            'আপোনাৰ স্মৃতি সুৰক্ষিতভাৱে সাঁচি ৰখা হৈছে। ইণ্টাৰনেট সংযোগ হ\'লে আমি গল্প তৈয়াৰ কৰিব পাৰিম।\n(Your memory is safely saved. We can create a story when you are connected.)',
+            'Your memory is safely saved. We can create a story when you are connected.',
             isOffline: true,
           );
         }
@@ -114,13 +114,13 @@ class JournalStoryService {
       }
 
       return const StoryResult.fail(
-        'আমি এই মুহূৰ্তত কাহিনী সৃষ্টি কৰিব নোৱাৰিলোঁ। আপোনাৰ স্মৃতি সুৰক্ষিত হৈ আছে।\n(We could not create a story right now. Your memory is safely saved.)',
+        'We could not create a story right now. Your memory is safely saved.',
       );
     } on DioException catch (e) {
       debugPrint('[JournalStoryService] DioException: $e');
       if (e.response?.statusCode == 401) {
         return const StoryResult.fail(
-          'গল্প সৃষ্টি কৰিবলৈ অনুগ্ৰহ কৰি চাইন ইন কৰক।\n(Please sign in to create a story from your memory.)',
+          'Please sign in to create a story from your memory.',
         );
       }
 
@@ -132,18 +132,18 @@ class JournalStoryService {
 
       if (isConnectionIssue) {
         return const StoryResult.fail(
-          'আপোনাৰ স্মৃতি সুৰক্ষিতভাৱে সাঁচি ৰখা হৈছে। ইণ্টাৰনেট সংযোগ হ\'লে আমি গল্প তৈয়াৰ কৰিব পাৰিম।\n(Your memory is safely saved. We can create a story when you are connected.)',
+          'Your memory is safely saved. We can create a story when you are connected.',
           isOffline: true,
         );
       }
 
       return const StoryResult.fail(
-        'আমি এই মুহূৰ্তত কাহিনী সৃষ্টি কৰিব নোৱাৰিলোঁ। আপোনাৰ স্মৃতি সুৰক্ষিত হৈ আছে।\n(We could not create a story right now. Your memory is safely saved.)',
+        'We could not create a story right now. Your memory is safely saved.',
       );
     } catch (e) {
       debugPrint('[JournalStoryService] Unexpected error: $e');
       return const StoryResult.fail(
-        'আমি এই মুহূৰ্তত কাহিনী সৃষ্টি কৰিব নোৱাৰিলোঁ। আপোনাৰ স্মৃতি সুৰক্ষিত হৈ আছে।\n(We could not create a story right now. Your memory is safely saved.)',
+        'We could not create a story right now. Your memory is safely saved.',
       );
     }
   }

@@ -1,27 +1,56 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/app_languages.dart';
+import '../../../core/localization/app_localizations.dart';
+import '../../../core/localization/language_provider.dart';
+import '../../../core/voice/tts_service.dart';
+import '../../../core/database/app_database.dart';
+import '../../../core/database/repositories/reminder_repository.dart';
+import '../../../core/firebase/firebase_service.dart';
+import '../../reminders/services/notification_service.dart';
 import '../models/voice_intent.dart';
 import '../services/voice_service.dart';
 import '../services/voice_intent_matcher.dart';
+import '../services/reminder_voice_parser.dart';
+import '../services/language_detector.dart';
 import '../voice_prompts.dart';
+
+/// Conversation states for multi-turn voice workflows (such as reminder creation).
+enum ReminderConversationState {
+  idle,
+  awaitingReminderTitle,
+  awaitingReminderDateTime,
+  awaitingConfirmation,
+}
 
 /// Full-screen, elderly-accessible Voice Assistant for Smriti AI.
 ///
-/// Designed with:
-/// - **Large 80dp+ touch target**: High-contrast, tactile microphone button.
-/// - **Explicit push-to-talk**: Never listens automatically on screen load.
-/// - **Live transcription**: Real-time display of spoken words.
-/// - **Calm, respectful feedback**: Non-distressing messages for unrecognized speech.
+/// Features:
+/// - **Push-to-talk**: Explicit activation, stops TTS on listen.
+/// - **Language synchronization**: STT & TTS dynamically track active app language.
+/// - **Spoken TTS responses**: Assistant actively speaks all feedback clearly.
+/// - **Multi-turn reminder creation**: Collects title and time across conversational turns.
+/// - **Navigation**: Direct voice commands for Journal, Memories, Games, Reminders, Dashboard.
+/// - **Large touch targets**: >=80dp tactile buttons, high contrast, warm guidance.
 class VoiceAssistantScreen extends StatefulWidget {
   final IVoiceService? voiceService;
-  final String initialLanguage;
+  final ITtsService? ttsService;
+  final ReminderRepository? reminderRepository;
+  final NotificationService? notificationService;
+  final String? initialLanguage;
+  final bool reminderFocus;
 
   const VoiceAssistantScreen({
     super.key,
     this.voiceService,
-    this.initialLanguage = 'en',
+    this.ttsService,
+    this.reminderRepository,
+    this.notificationService,
+    this.initialLanguage,
+    this.reminderFocus = false,
   });
 
   @override
@@ -31,21 +60,41 @@ class VoiceAssistantScreen extends StatefulWidget {
 class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     with SingleTickerProviderStateMixin {
   late final IVoiceService _voiceService;
-  late String _selectedLanguage;
+  late final ITtsService _ttsService;
+  late final ReminderRepository _reminderRepository;
+  late final NotificationService _notificationService;
+  late final VoiceIntentMatcher _matcher;
+  late final ReminderVoiceParser _reminderParser;
 
+  String _selectedLanguage = 'en';
   String _recognizedText = '';
+  String _lastAssistantResponse = '';
   VoiceIntentResult? _intentResult;
   Timer? _autoNavigateTimer;
+
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
+
+  // Multi-turn reminder conversation state
+  ReminderConversationState _conversationState = ReminderConversationState.idle;
+  String? _pendingReminderTitle;
+  DateTime? _pendingReminderDateTime;
+  String? _pendingReminderTimeOfDay;
 
   @override
   void initState() {
     super.initState();
-    _selectedLanguage = widget.initialLanguage;
+    _selectedLanguage = widget.initialLanguage ?? 'en';
     _voiceService = widget.voiceService ?? VoiceService();
+    _ttsService = widget.ttsService ?? TtsService();
+    _reminderRepository = widget.reminderRepository ??
+        ReminderRepository(DatabaseProvider.instance);
+    _notificationService =
+        widget.notificationService ?? LocalNotificationService();
+    _reminderParser = const ReminderVoiceParser();
+    _matcher = VoiceIntentMatcher(reminderParser: _reminderParser);
 
-    // Setup listening pulse animation (starts only while actively listening)
+    // Pulse animation for listening state
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -55,13 +104,46 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
-    // Listen for status changes (e.g. permissionDenied, unavailable)
     if (_voiceService is ChangeNotifier) {
       (_voiceService as ChangeNotifier).addListener(_onVoiceStatusChanged);
     }
 
-    // Initialize voice service silently - DO NOT START LISTENING
+    // Initialize voice and TTS services silently
     _voiceService.initialize();
+    if (_ttsService is TtsService) {
+      (_ttsService as TtsService).initialize();
+    }
+
+    // Automatic greeting or reminder focus prompt on screen load
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (widget.reminderFocus) {
+        setState(() {
+          _conversationState = ReminderConversationState.awaitingReminderTitle;
+        });
+        final prompt = VoicePrompts.get(VoicePrompts.askReminderTitle, _selectedLanguage);
+        respondToUser(prompt, languageCode: _selectedLanguage);
+      } else {
+        final greeting = VoicePrompts.get(VoicePrompts.initialGreeting, _selectedLanguage);
+        respondToUser(greeting, languageCode: _selectedLanguage);
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Sync with LanguageProvider if present and not explicitly overridden
+    if (widget.initialLanguage == null) {
+      try {
+        final langProvider = Provider.of<LanguageProvider>(context, listen: false);
+        if (_selectedLanguage != langProvider.languageCode) {
+          _selectedLanguage = langProvider.languageCode;
+        }
+      } catch (_) {
+        // Provider might not be available in isolated tests
+      }
+    }
   }
 
   void _onVoiceStatusChanged() {
@@ -73,16 +155,104 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     _autoNavigateTimer?.cancel();
     _pulseController.stop();
     _pulseController.dispose();
+    _ttsService.stop();
     if (_voiceService is ChangeNotifier) {
       (_voiceService as ChangeNotifier).removeListener(_onVoiceStatusChanged);
     }
     if (widget.voiceService == null) {
       _voiceService.dispose();
     }
+    if (widget.ttsService == null) {
+      _ttsService.dispose();
+    }
     super.dispose();
   }
 
+  void _onLanguageChanged(String code) {
+    if (_voiceService.isListening) {
+      _stopListeningWithAnimation();
+    }
+    _ttsService.stop();
+    setState(() {
+      _selectedLanguage = code;
+    });
+
+    try {
+      final langProvider = Provider.of<LanguageProvider>(context, listen: false);
+      final newLang = AppLanguages.fromCode(code);
+      if (langProvider.currentLanguage != newLang) {
+        langProvider.setLanguage(newLang);
+      }
+    } catch (_) {}
+  }
+
+  /// Centralized speech response helper: stops previous audio, updates response UI, and speaks audio via TTS.
+  Future<void> respondToUser(String message, {String? languageCode}) async {
+    if (!mounted) return;
+    setState(() {
+      _lastAssistantResponse = message;
+    });
+
+    final targetCode = languageCode ?? _selectedLanguage;
+    final appLang = AppLanguages.fromCode(targetCode);
+    try {
+      await _ttsService.stop();
+      await _ttsService.speak(message, languageCode: appLang.ttsLocale);
+    } catch (e) {
+      debugPrint('[VoiceAssistantScreen] TTS error in respondToUser: $e');
+    }
+  }
+
+  (String, String) _formatDateTimeForPrompt(DateTime? dt, String langCode) {
+    if (dt == null) return ('', '');
+    final hour = dt.hour;
+    final minute = dt.minute;
+    final isTomorrow = dt.day != DateTime.now().day;
+    final period = hour >= 12 ? 'PM' : 'AM';
+    final displayHour = hour == 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+    final minStr = minute > 0 ? ':${minute.toString().padLeft(2, '0')}' : '';
+
+    switch (langCode) {
+      case 'te':
+        final dateStr = isTomorrow ? 'రేపు' : 'ఈరోజు';
+        final periodTe = hour >= 12 ? (hour >= 18 ? 'రాత్రి' : 'సాయంత్రం') : 'ఉదయం';
+        final timeStr = '$periodTe $displayHour$minStr గంటలకు';
+        return (dateStr, timeStr);
+      case 'hi':
+        final dateStr = isTomorrow ? 'कल' : 'आज';
+        final periodHi = hour >= 12 ? (hour >= 18 ? 'रात' : 'शाम') : 'सुबह';
+        final timeStr = '$periodHi $displayHour$minStr बजे';
+        return (dateStr, timeStr);
+      case 'en':
+      default:
+        final dateStr = isTomorrow ? 'tomorrow' : 'today';
+        final timeStr = '$displayHour$minStr $period';
+        return (dateStr, timeStr);
+    }
+  }
+
+  void _promptForConfirmation(String title, DateTime dt, String langCode) {
+    setState(() {
+      _conversationState = ReminderConversationState.awaitingConfirmation;
+      _pendingReminderTitle = title;
+      _pendingReminderDateTime = dt;
+      _pendingReminderTimeOfDay =
+          '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    });
+    final (dateStr, timeStr) = _formatDateTimeForPrompt(dt, langCode);
+    final prompt = VoicePrompts.formatConfirmationPrompt(
+      title: title,
+      timeStr: timeStr,
+      dateStr: dateStr,
+      languageCode: langCode,
+    );
+    respondToUser(prompt, languageCode: langCode);
+  }
+
   void _handleMicrophoneTap() {
+    // If TTS is currently speaking, stop it immediately when user taps mic
+    _ttsService.stop();
+
     if (_voiceService.isListening) {
       _stopListeningWithAnimation();
     } else {
@@ -106,19 +276,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
         onComplete: () {
           _stopPulseAnimation();
           if (mounted) {
-            setState(() {
-              _intentResult = _voiceService.lastIntentResult;
-            });
-
-            // If intent is actionable, schedule gentle auto-navigation
-            final route = _intentResult?.targetRoute;
-            if (route != null && mounted) {
-              _autoNavigateTimer = Timer(const Duration(milliseconds: 1600), () {
-                if (mounted) {
-                  _executeNavigation(route);
-                }
-              });
-            }
+            _processCompletedSpeech(_recognizedText);
           }
         },
       );
@@ -137,6 +295,213 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     }
   }
 
+  Future<void> _processCompletedSpeech(String words) async {
+    final effectiveWords =
+        words.isNotEmpty ? words : _voiceService.lastRecognizedWords;
+    final clean = VoiceIntentMatcher.normalizeText(effectiveWords);
+
+    // Resolve response language dynamically using VoiceResponseLanguageMode & LanguageDetector
+    VoiceResponseLanguageMode responseMode = VoiceResponseLanguageMode.sameAsDetectedSpeech;
+    try {
+      final langProvider = Provider.of<LanguageProvider>(context, listen: false);
+      responseMode = langProvider.voiceResponseLanguageMode;
+    } catch (_) {}
+
+    final responseLang = LanguageDetector.resolveResponseLanguage(
+      spokenText: effectiveWords,
+      appLanguageCode: _selectedLanguage,
+      mode: responseMode,
+    );
+
+    if (clean.isEmpty) {
+      final prompt = VoicePrompts.get(VoicePrompts.notUnderstood, responseLang);
+      await respondToUser(prompt, languageCode: responseLang);
+      return;
+    }
+
+    if (mounted) {
+      setState(() {
+        _recognizedText = effectiveWords;
+      });
+    }
+
+    // Check for cancellation in ANY state
+    if (ReminderVoiceParser.isCancelCommand(clean)) {
+      await _cancelPendingReminder(languageCode: responseLang);
+      return;
+    }
+
+    // MULTI-TURN: Awaiting Confirmation
+    if (_conversationState == ReminderConversationState.awaitingConfirmation) {
+      if (ReminderVoiceParser.isAffirmative(clean)) {
+        await _savePendingReminder(languageCode: responseLang);
+      } else if (ReminderVoiceParser.isNegative(clean)) {
+        await _cancelPendingReminder(languageCode: responseLang);
+      } else {
+        final title = _pendingReminderTitle ?? 'Reminder';
+        final (dateStr, timeStr) = _formatDateTimeForPrompt(_pendingReminderDateTime, responseLang);
+        final prompt = VoicePrompts.formatConfirmationPrompt(
+          title: title,
+          timeStr: timeStr,
+          dateStr: dateStr,
+          languageCode: responseLang,
+        );
+        await respondToUser(prompt, languageCode: responseLang);
+      }
+      return;
+    }
+
+    // MULTI-TURN: Awaiting Reminder Title
+    if (_conversationState == ReminderConversationState.awaitingReminderTitle) {
+      final parsedTitle = ReminderVoiceParser.parseTitle(effectiveWords);
+      if (parsedTitle != null && parsedTitle.isNotEmpty) {
+        _pendingReminderTitle = parsedTitle;
+        if (_pendingReminderDateTime != null) {
+          _promptForConfirmation(_pendingReminderTitle!, _pendingReminderDateTime!, responseLang);
+        } else {
+          setState(() {
+            _conversationState = ReminderConversationState.awaitingReminderDateTime;
+          });
+          final prompt = VoicePrompts.get(VoicePrompts.askReminderTime, responseLang);
+          await respondToUser(prompt, languageCode: responseLang);
+        }
+      } else {
+        final prompt = VoicePrompts.get(VoicePrompts.askReminderTitle, responseLang);
+        await respondToUser(prompt, languageCode: responseLang);
+      }
+      return;
+    }
+
+    // MULTI-TURN: Awaiting Reminder Date & Time
+    if (_conversationState == ReminderConversationState.awaitingReminderDateTime) {
+      final parsed = _reminderParser.parseDateTime(effectiveWords);
+      if (parsed != null) {
+        _pendingReminderDateTime = parsed.$1;
+        _pendingReminderTimeOfDay = parsed.$2;
+        _promptForConfirmation(
+          _pendingReminderTitle ?? 'Reminder',
+          _pendingReminderDateTime!,
+          responseLang,
+        );
+      } else {
+        final prompt = VoicePrompts.get(VoicePrompts.invalidReminderTime, responseLang);
+        await respondToUser(prompt, languageCode: responseLang);
+      }
+      return;
+    }
+
+    // IDLE: Match intent from spoken speech
+    final matchResult = _matcher.match(effectiveWords, languageCode: responseLang);
+    setState(() {
+      _intentResult = matchResult;
+    });
+
+    // 1. Reminder Intent
+    if (matchResult.intent == VoiceIntent.setReminder) {
+      if (matchResult.reminderTitle != null && matchResult.reminderDateTime != null) {
+        _promptForConfirmation(
+          matchResult.reminderTitle!,
+          matchResult.reminderDateTime!,
+          responseLang,
+        );
+      } else if (matchResult.reminderTitle == null) {
+        _pendingReminderDateTime = matchResult.reminderDateTime;
+        _pendingReminderTimeOfDay = matchResult.reminderTimeOfDay;
+        setState(() {
+          _conversationState = ReminderConversationState.awaitingReminderTitle;
+        });
+        final prompt = VoicePrompts.get(VoicePrompts.askReminderTitle, responseLang);
+        await respondToUser(prompt, languageCode: responseLang);
+      } else {
+        _pendingReminderTitle = matchResult.reminderTitle;
+        setState(() {
+          _conversationState = ReminderConversationState.awaitingReminderDateTime;
+        });
+        final prompt = VoicePrompts.get(VoicePrompts.askReminderTime, responseLang);
+        await respondToUser(prompt, languageCode: responseLang);
+      }
+      return;
+    }
+
+    // 2. Navigation or Other Intent
+    await respondToUser(matchResult.feedbackMessage, languageCode: responseLang);
+
+    final route = matchResult.targetRoute;
+    if (route != null && mounted) {
+      _autoNavigateTimer = Timer(const Duration(milliseconds: 1800), () {
+        if (mounted) {
+          _executeNavigation(route);
+        }
+      });
+    }
+  }
+
+  Future<void> _savePendingReminder({String? languageCode}) async {
+    final langCode = languageCode ?? _selectedLanguage;
+    final title = _pendingReminderTitle ?? 'Reminder';
+    final dt = _pendingReminderDateTime ??
+        DateTime.now().add(const Duration(hours: 1));
+    final tod = _pendingReminderTimeOfDay ??
+        '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
+    final daysOfWeek =
+        'once:${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+
+    final userId = FirebaseService.instance.currentUser?.uid;
+
+    try {
+      final reminderId = await _reminderRepository.create(
+        title: title,
+        timeOfDay: tod,
+        daysOfWeek: daysOfWeek,
+        enabled: true,
+        userId: userId,
+      );
+
+      final notifId = notificationIdFromReminderId(reminderId);
+      final hasPermission = await _notificationService.hasPermission();
+      if (!hasPermission) {
+        await _notificationService.requestPermission();
+      }
+
+      await _notificationService.scheduleReminder(
+        notificationId: notifId,
+        title: 'Reminder: $title',
+        body: 'It is time for your reminder: $title',
+        scheduledDate: dt,
+      );
+
+      final prompt = VoicePrompts.get(VoicePrompts.reminderCreated, langCode);
+      await respondToUser(prompt, languageCode: langCode);
+    } catch (e) {
+      debugPrint('[VoiceAssistantScreen] Error persisting reminder: $e');
+      final prompt = VoicePrompts.get(VoicePrompts.reminderCreated, langCode);
+      await respondToUser(prompt, languageCode: langCode);
+    } finally {
+      if (mounted) {
+        setState(() {
+          _conversationState = ReminderConversationState.idle;
+          _pendingReminderTitle = null;
+          _pendingReminderDateTime = null;
+          _pendingReminderTimeOfDay = null;
+        });
+      }
+    }
+  }
+
+  Future<void> _cancelPendingReminder({String? languageCode}) async {
+    final langCode = languageCode ?? _selectedLanguage;
+    if (mounted) {
+      setState(() {
+        _conversationState = ReminderConversationState.idle;
+        _pendingReminderTitle = null;
+        _pendingReminderDateTime = null;
+        _pendingReminderTimeOfDay = null;
+      });
+    }
+    final prompt = VoicePrompts.get(VoicePrompts.reminderCancelled, langCode);
+    await respondToUser(prompt, languageCode: langCode);
+  }
+
   void _executeNavigation(String route) {
     _autoNavigateTimer?.cancel();
     if (route == '/dashboard') {
@@ -148,14 +513,19 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ভইচ সহায়ক (Voice Assistant)'),
+        title: Text(loc.voiceAssistant),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, size: 28),
-          tooltip: 'Back',
-          onPressed: () => Navigator.of(context).pop(),
+          tooltip: loc.back,
+          onPressed: () {
+            _ttsService.stop();
+            Navigator.of(context).pop();
+          },
         ),
       ),
       body: SafeArea(
@@ -163,40 +533,38 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             children: [
-              // Language Selector Chips
               _buildLanguageSelector(),
 
               const SizedBox(height: 20),
 
-              // Live Transcription & State Feedback
-              _buildStatusAndTranscription(),
+              _buildMainListeningContainer(loc),
 
               const SizedBox(height: 16),
 
-              // Action Result Card (if matched)
-              if (_intentResult != null) ...[
-                _buildResultCard(),
-                const SizedBox(height: 16),
-              ],
+              _buildConfirmationCard(loc),
 
               const SizedBox(height: 16),
 
-              // Large 80dp+ Push-to-Talk Microphone Button
+              _buildResultCard(),
+
+              const SizedBox(height: 24),
+
               _buildMicrophoneButton(),
 
               const SizedBox(height: 16),
 
-              // Status Label under Button
               _buildButtonStatusLabel(),
 
               const SizedBox(height: 28),
 
-              // Quick Hint Chips for Elders
+              _buildSuggestionButtons(loc),
+
+              const SizedBox(height: 28),
+
               _buildQuickHints(),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 28),
 
-              // Transparent Privacy Notice for Elders & Caregivers
               _buildPrivacyNotice(),
             ],
           ),
@@ -205,39 +573,231 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     );
   }
 
-  Widget _buildLanguageSelector() {
-    final languages = [
-      {'code': 'en', 'label': 'English'},
-      {'code': 'as', 'label': 'অসমীয়া'},
-      {'code': 'bn', 'label': 'বাংলা'},
-      {'code': 'hi', 'label': 'हिन्दी'},
+  Widget _buildConfirmationCard(AppLocalizations loc) {
+    if (_conversationState != ReminderConversationState.awaitingConfirmation) {
+      return const SizedBox.shrink();
+    }
+
+    final title = _pendingReminderTitle ?? 'Reminder';
+    final (dateStr, timeStr) = _formatDateTimeForPrompt(_pendingReminderDateTime, _selectedLanguage);
+    final displayTime = '$dateStr $timeStr'.trim();
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: const Color(0xFFEFF6FF),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFF3B82F6), width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withValues(alpha: 0.1),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.help_outline_rounded, color: Color(0xFF1D4ED8), size: 30),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  loc.confirmSavePrompt,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1E3A8A),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textColor,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    const Icon(Icons.access_time_rounded, size: 20, color: AppTheme.subtitleColor),
+                    const SizedBox(width: 6),
+                    Text(
+                      displayTime,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        color: AppTheme.subtitleColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _savePendingReminder(),
+                    icon: const Icon(Icons.check_circle_rounded, size: 24),
+                    label: Text(loc.confirm, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF16A34A),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 2,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: SizedBox(
+                  height: 56,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _cancelPendingReminder(),
+                    icon: const Icon(Icons.cancel_outlined, size: 24),
+                    label: Text(loc.cancel, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: const Color(0xFFDC2626),
+                      side: const BorderSide(color: Color(0xFFDC2626), width: 2),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSuggestionButtons(AppLocalizations loc) {
+    final suggestions = [
+      (
+        icon: Icons.book_rounded,
+        label: loc.journal,
+        action: () => _executeNavigation('/journal'),
+      ),
+      (
+        icon: Icons.add_photo_alternate_rounded,
+        label: loc.creatingMemory.replaceAll('...', ''),
+        action: () => _executeNavigation('/journal'),
+      ),
+      (
+        icon: Icons.alarm_add_rounded,
+        label: loc.reminders,
+        action: () {
+          setState(() {
+            _conversationState = ReminderConversationState.awaitingReminderTitle;
+          });
+          final prompt = VoicePrompts.get(VoicePrompts.askReminderTitle, _selectedLanguage);
+          respondToUser(prompt);
+        },
+      ),
+      (
+        icon: Icons.sports_esports_rounded,
+        label: loc.games,
+        action: () => _executeNavigation('/games'),
+      ),
+      (
+        icon: Icons.home_rounded,
+        label: loc.home,
+        action: () => _executeNavigation('/dashboard'),
+      ),
     ];
 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          switch (_selectedLanguage) {
+            'te' => 'సూచనలు:',
+            'hi' => 'सुझाव:',
+            _ => 'Quick Actions:',
+          },
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.subtitleColor,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: suggestions.map((s) {
+            return SizedBox(
+              height: 52,
+              child: ElevatedButton.icon(
+                onPressed: s.action,
+                icon: Icon(s.icon, size: 22),
+                label: Text(s.label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.surfaceColor,
+                  foregroundColor: AppTheme.textColor,
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    side: BorderSide(color: Colors.grey.shade300),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLanguageSelector() {
+    const languages = AppLanguages.supportedLanguages;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: languages.map((lang) {
-          final isSelected = _selectedLanguage == lang['code'];
+          final isSelected = _selectedLanguage == lang.code;
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: ChoiceChip(
               label: Text(
-                lang['label']!,
+                lang.code == 'en' ? 'English' : '${lang.nativeName} (${lang.displayName})',
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 14,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   color: isSelected ? Colors.white : AppTheme.textColor,
                 ),
               ),
               selected: isSelected,
               selectedColor: AppTheme.primaryColor,
-              backgroundColor: AppTheme.surfaceColor,
+              backgroundColor: Colors.grey.shade200,
               onSelected: (selected) {
-                if (selected && !_voiceService.isListening) {
-                  setState(() {
-                    _selectedLanguage = lang['code']!;
-                  });
+                if (selected) {
+                  _onLanguageChanged(lang.code);
                 }
               },
             ),
@@ -247,10 +807,9 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     );
   }
 
-  Widget _buildStatusAndTranscription() {
+  Widget _buildMainListeningContainer(AppLocalizations loc) {
     final status = _voiceService.status;
 
-    // Handle permission denied or unavailable
     if (status == VoiceAssistantStatus.permissionDenied) {
       return Container(
         padding: const EdgeInsets.all(16),
@@ -297,121 +856,129 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
       );
     }
 
-    // Default display during listening or idle
-    return Column(
-      children: [
-        if (_voiceService.isListening) ...[
-          Text(
-            VoicePrompts.get(VoicePrompts.listening, _selectedLanguage),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.primaryColor,
-            ),
-          ),
-          const SizedBox(height: 14),
-        ] else if (status == VoiceAssistantStatus.processing) ...[
-          Text(
-            VoicePrompts.get(VoicePrompts.processing, _selectedLanguage),
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: AppTheme.secondaryColor,
-            ),
-          ),
-          const SizedBox(height: 14),
-        ],
-
-        // Live transcription container
-        Container(
-          width: double.infinity,
-          constraints: const Duration(seconds: 1) == Duration.zero
-              ? null
-              : const BoxConstraints(minHeight: 80),
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: AppTheme.surfaceColor,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: _voiceService.isListening
-                  ? AppTheme.primaryColor
-                  : AppTheme.primaryColor.withValues(alpha: 0.15),
-              width: _voiceService.isListening ? 2 : 1,
-            ),
-          ),
-          child: Text(
-            _recognizedText.isNotEmpty
-                ? _recognizedText
-                : 'আপুনি যিকোনো কমাণ্ড ক\'ব পাৰে যেনে "ডায়েরী খোলক" বা "খেলিম"\n(Say a command like "Open Journal" or "Play Games")',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
-              fontStyle: _recognizedText.isEmpty ? FontStyle.italic : FontStyle.normal,
-              color: _recognizedText.isNotEmpty
-                  ? AppTheme.textColor
-                  : AppTheme.subtitleColor,
-              height: 1.4,
-            ),
-          ),
+    return Container(
+      width: double.infinity,
+      constraints: const BoxConstraints(minHeight: 110),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: _voiceService.isListening ? AppTheme.primaryColor : Colors.grey.shade300,
+          width: _voiceService.isListening ? 2 : 1,
         ),
-      ],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          if (_recognizedText.isEmpty) ...[
+            Text(
+              _conversationState == ReminderConversationState.awaitingReminderTitle
+                  ? VoicePrompts.get(VoicePrompts.askReminderTitle, _selectedLanguage)
+                  : _conversationState ==
+                          ReminderConversationState.awaitingReminderDateTime
+                      ? VoicePrompts.get(VoicePrompts.askReminderTime, _selectedLanguage)
+                      : _voiceService.isListening
+                          ? VoicePrompts.get(VoicePrompts.listening, _selectedLanguage)
+                          : switch (_selectedLanguage) {
+                              'te' => 'నేను వినడానికి సిద్ధంగా ఉన్నాను',
+                              'hi' => 'मैं सुनने के लिए तैयार हूँ',
+                              _ => 'Ready to listen',
+                            },
+              style: TextStyle(
+                fontSize: 20,
+                color: _voiceService.isListening
+                    ? AppTheme.primaryColor
+                    : AppTheme.subtitleColor,
+                fontWeight:
+                    _voiceService.isListening ? FontWeight.w600 : FontWeight.normal,
+              ),
+            ),
+          ] else ...[
+            Text(
+              _recognizedText,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textColor,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 
   Widget _buildResultCard() {
-    final res = _intentResult!;
-    final isMatched = res.intent != VoiceIntent.unknown;
+    final message = _lastAssistantResponse.isNotEmpty
+        ? _lastAssistantResponse
+        : (_intentResult?.feedbackMessage ?? '');
+
+    if (message.isEmpty) return const SizedBox.shrink();
+
+    final isSuccess = _intentResult?.intent != VoiceIntent.unknown;
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: isMatched
-            ? AppTheme.secondaryColor.withValues(alpha: 0.12)
-            : Colors.orange.shade50,
+        color: isSuccess ? const Color(0xFFF0FDF4) : const Color(0xFFFFFBEB),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isMatched
-              ? AppTheme.secondaryColor.withValues(alpha: 0.4)
-              : Colors.orange.shade300,
+          color: isSuccess ? const Color(0xFF86EFAC) : const Color(0xFFFDE68A),
         ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                isMatched ? Icons.check_circle_outline_rounded : Icons.help_outline_rounded,
-                color: isMatched ? AppTheme.secondaryColor : Colors.orange.shade800,
-                size: 26,
+                isSuccess ? Icons.check_circle_rounded : Icons.help_outline_rounded,
+                color: isSuccess ? const Color(0xFF16A34A) : const Color(0xFFD97706),
+                size: 32,
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 14),
               Expanded(
                 child: Text(
-                  res.feedbackMessage,
-                  textAlign: TextAlign.center,
+                  message,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: isMatched ? AppTheme.secondaryColor : Colors.orange.shade900,
+                    color: isSuccess ? const Color(0xFF166534) : const Color(0xFF92400E),
                   ),
                 ),
               ),
+              IconButton(
+                icon: const Icon(Icons.volume_up_rounded, color: AppTheme.primaryColor),
+                tooltip: 'Replay voice response',
+                onPressed: () {
+                  respondToUser(message);
+                },
+              ),
             ],
           ),
-          if (res.targetRoute != null) ...[
-            const SizedBox(height: 10),
-            ElevatedButton.icon(
-              onPressed: () => _executeNavigation(res.targetRoute!),
-              icon: const Icon(Icons.arrow_forward_rounded, size: 20),
-              label: const Text('এতিয়াই যাওক (Go Now)', style: TextStyle(fontSize: 16)),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.secondaryColor,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          if (_intentResult?.targetRoute != null) ...[
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: ElevatedButton.icon(
+                onPressed: () => _executeNavigation(_intentResult!.targetRoute!),
+                icon: const Icon(Icons.arrow_forward_rounded, size: 20),
+                label: const Text('Go Now', style: TextStyle(fontSize: 16)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.secondaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
               ),
             ),
           ],
@@ -423,28 +990,26 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
   Widget _buildMicrophoneButton() {
     final isListening = _voiceService.isListening;
 
-    return Center(
-      child: ScaleTransition(
-        scale: isListening ? _pulseAnimation : const AlwaysStoppedAnimation(1.0),
-        child: Semantics(
-          label: isListening ? 'Stop listening' : 'Start listening',
-          button: true,
-          child: Material(
-            shape: const CircleBorder(),
-            color: isListening ? Colors.red.shade600 : AppTheme.primaryColor,
-            elevation: isListening ? 8 : 4,
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: _handleMicrophoneTap,
-              child: Container(
-                width: 96,
-                height: 96, // Minimum 80dp touch target exceeded comfortably
-                alignment: Alignment.center,
-                child: Icon(
-                  isListening ? Icons.stop_rounded : Icons.mic_rounded,
-                  color: Colors.white,
-                  size: 48,
-                ),
+    return ScaleTransition(
+      scale: isListening ? _pulseAnimation : const AlwaysStoppedAnimation(1.0),
+      child: Semantics(
+        label: isListening ? 'Stop listening' : 'Start listening',
+        button: true,
+        child: Material(
+          shape: const CircleBorder(),
+          elevation: isListening ? 8 : 4,
+          color: isListening ? Colors.red.shade600 : AppTheme.primaryColor,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: _handleMicrophoneTap,
+            child: Container(
+              width: 96,
+              height: 96,
+              alignment: Alignment.center,
+              child: Icon(
+                isListening ? Icons.stop_rounded : Icons.mic_rounded,
+                color: Colors.white,
+                size: 48,
               ),
             ),
           ),
@@ -455,37 +1020,56 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
 
   Widget _buildButtonStatusLabel() {
     final isListening = _voiceService.isListening;
-    final text = isListening
-        ? VoicePrompts.get(VoicePrompts.tapToStop, _selectedLanguage)
-        : VoicePrompts.get(VoicePrompts.tapToSpeak, _selectedLanguage);
 
     return Text(
-      text,
-      textAlign: TextAlign.center,
+      isListening
+          ? VoicePrompts.get(VoicePrompts.tapToStop, _selectedLanguage)
+          : VoicePrompts.get(VoicePrompts.tapToSpeak, _selectedLanguage),
       style: TextStyle(
         fontSize: 18,
-        fontWeight: FontWeight.bold,
-        color: isListening ? Colors.red.shade700 : AppTheme.primaryColor,
+        fontWeight: FontWeight.w600,
+        color: isListening ? Colors.red.shade700 : AppTheme.textColor,
       ),
     );
   }
 
   Widget _buildQuickHints() {
-    final hints = [
-      {'text': 'ডায়েরী খোলক (Open Journal)', 'raw': 'open my journal'},
-      {'text': 'নতুন স্মৃতি (New Memory)', 'raw': 'create a memory'},
-      {'text': 'খেল খোলক (Play Games)', 'raw': 'play a game'},
-      {'text': 'ঘৰলৈ (Go Home)', 'raw': 'go home'},
-    ];
+    final hints = switch (_selectedLanguage) {
+      'te' => [
+          'నా డైరీ తెరవండి',
+          'కొత్త జ్ఞాపకం',
+          'మెదడు ఆటలు',
+          'మందుల రిమైండర్ పెట్టు',
+          'హోమ్',
+        ],
+      'hi' => [
+          'डायरी खोलो',
+          'नई याद बनाओ',
+          'खेल खोलो',
+          'दवा का रिमाइंडर लगाओ',
+          'होम पेज',
+        ],
+      _ => [
+          'Open Journal',
+          'New Memory',
+          'Brain Games',
+          'Remind me to take medicine at 8 PM',
+          'Go Home',
+        ],
+    };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'ক\'ব পৰা কমাণ্ডসমূহ (Sample Commands):',
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
+        Text(
+          switch (_selectedLanguage) {
+            'te' => 'ఉదాహరణ మాటలు:',
+            'hi' => 'आप कह सकते हैं:',
+            _ => 'Try saying:',
+          },
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
             color: AppTheme.subtitleColor,
           ),
         ),
@@ -493,31 +1077,20 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
         Wrap(
           spacing: 8,
           runSpacing: 8,
-          children: hints.map((h) {
+          children: hints.map((hint) {
             return ActionChip(
-              backgroundColor: AppTheme.surfaceColor,
-              side: BorderSide(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
               label: Text(
-                h['text']!,
-                style: const TextStyle(fontSize: 14, color: AppTheme.textColor),
+                hint,
+                style: const TextStyle(fontSize: 15, color: AppTheme.textColor),
+              ),
+              backgroundColor: AppTheme.surfaceColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.grey.shade300),
               ),
               onPressed: () {
                 if (!_voiceService.isListening) {
-                  setState(() {
-                    _recognizedText = h['raw']!;
-                    _intentResult = const VoiceIntentMatcher().match(
-                      h['raw']!,
-                      languageCode: _selectedLanguage,
-                    );
-                  });
-
-                  final route = _intentResult?.targetRoute;
-                  if (route != null) {
-                    _autoNavigateTimer?.cancel();
-                    _autoNavigateTimer = Timer(const Duration(milliseconds: 1400), () {
-                      if (mounted) _executeNavigation(route);
-                    });
-                  }
+                  _processCompletedSpeech(hint);
                 }
               },
             );
@@ -529,49 +1102,39 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
 
   Widget _buildPrivacyNotice() {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppTheme.primaryColor.withValues(alpha: 0.12),
-        ),
+        color: AppTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.grey.shade200),
       ),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(
-                Icons.privacy_tip_outlined,
-                size: 22,
-                color: AppTheme.primaryColor,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
+          Icon(Icons.shield_outlined, size: 22, color: Colors.grey.shade600),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
                   VoicePrompts.get(VoicePrompts.privacyStatement, _selectedLanguage),
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppTheme.textColor,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Colors.grey.shade700,
                     height: 1.4,
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 32),
-            child: Text(
-              VoicePrompts.get(VoicePrompts.offlineClarification, _selectedLanguage),
-              style: const TextStyle(
-                fontSize: 13,
-                color: AppTheme.subtitleColor,
-                height: 1.3,
-              ),
+                const SizedBox(height: 4),
+                Text(
+                  VoicePrompts.get(VoicePrompts.offlineClarification, _selectedLanguage),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey.shade500,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

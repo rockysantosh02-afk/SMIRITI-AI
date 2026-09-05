@@ -206,7 +206,9 @@ class _FindDifferenceScreenState
                       Icon(meta.icon, size: 76, color: meta.primaryColor),
                       const SizedBox(height: 8),
                       Text(
-                        meta.nameAs,
+                        meta.getLocalizedName(
+                          Localizations.localeOf(context).languageCode,
+                        ),
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

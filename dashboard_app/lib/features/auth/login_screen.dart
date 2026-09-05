@@ -120,7 +120,9 @@ class _LoginScreenState extends State<LoginScreen> {
       debugPrint('[LoginScreen] AuthException during Google sign-in: ${e.message}');
       setState(() {
         if (e.message != 'Google sign-in was cancelled') {
-          _errorMessage = e.message;
+          _errorMessage = (e.message.contains('type') || e.message.contains('Pigeon') || e.message.contains('subtype'))
+              ? 'Could not sign in with Google. Please try again.'
+              : e.message;
         }
       });
     } catch (e) {
@@ -313,13 +315,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 24),
                     
                     // Google Sign In Button
-                    OutlinedButton.icon(
-                      onPressed: _isLoading ? null : _signInWithGoogle,
-                      icon: _buildGoogleIcon(),
-                      label: const Text('Sign in with Google'),
-                    ),
-                    
-                    const SizedBox(height: 16),
+                     // Google Sign In Button
+                      OutlinedButton.icon(
+                        onPressed: _isLoading ? null : _signInWithGoogle,
+                        icon: _buildGoogleIcon(),
+                        label: const Text('Sign in with Google'),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      ElevatedButton.icon(
+                        onPressed: _isLoading
+                            ? null
+                            : () {
+                                _navigateToDashboard();
+                              },
+                        icon: const Icon(Icons.play_arrow),
+                        label: const Text('Continue in Demo Mode'),
+                      ),
+
+                      const SizedBox(height: 16),
                     
                     // Simple Code Button (placeholder)
                     TextButton(

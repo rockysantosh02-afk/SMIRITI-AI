@@ -59,6 +59,7 @@ class ReminderRepository {
     required String timeOfDay,
     required String daysOfWeek,
     bool enabled = true,
+    String? userId,
   }) async {
     final now = DateTime.now();
     final id =
@@ -116,6 +117,7 @@ class ReminderRepository {
             'enabled': enabled,
             'scheduled_time': scheduledTime!.toIso8601String(),
             'type': isOnce ? 'one_time' : 'daily',
+            'user_id': userId ?? '',
           })),
           createdAt: Value(now),
         ),

@@ -1,126 +1,218 @@
 /// Pre-authored, elderly-calm multilingual strings for Smriti AI Voice Assistant.
 ///
-/// NOTE FOR TEAM: All non-English strings are culturally reviewed for North-East Indian
-/// elders (Assam, Bengal) and Hindi speakers.
+/// Designed with respect, clarity, and gentle guidance for elders in English, Telugu, and Hindi.
 class VoicePrompts {
   VoicePrompts._();
+
+  // --- Initial Greeting (Phase 6) ---
+  static const Map<String, String> initialGreeting = {
+    'en': 'Hello. What would you like me to help you with?',
+    'te': 'హలో. నేను మీకు ఎలా సహాయం చేయగలను?',
+    'hi': 'नमस्ते। मैं आपकी कैसे मदद कर सकता हूँ?',
+  };
 
   // --- UI States ---
 
   static const Map<String, String> tapToSpeak = {
-    'as': 'কোৱাৰ বাবে টিপক (Tap to Speak)',
-    'bn': 'কথা বলার জন্য চাপুন (Tap to Speak)',
-    'hi': 'बोलने के लिए दबाएं (Tap to Speak)',
     'en': 'Tap to Speak',
+    'te': 'మాట్లాడటానికి నొక్కండి',
+    'hi': 'बोलने के लिए दबाएं',
   };
 
   static const Map<String, String> listening = {
-    'as': 'শুনি থকা হৈছে... কোৱা শেষ হ\'লে থামিব (Listening...)',
-    'bn': 'শুনছি... কথা বলা শেষ হলে থামবে (Listening...)',
-    'hi': 'सुन रहे हैं... बोलना समाप्त होने पर रुकेंगे (Listening...)',
     'en': 'Listening... Speak clearly',
+    'te': 'వింటున్నాము... స్పష్టంగా మాట్లాడండి',
+    'hi': 'सुन रहे हैं... कृपया स्पष्ट बोलें',
   };
 
   static const Map<String, String> processing = {
-    'as': 'বুজিবলৈ চেষ্টা কৰা হৈছে... (Understanding...)',
-    'bn': 'বোঝার চেষ্টা করছি... (Understanding...)',
-    'hi': 'समझने का प्रयास कर रहे हैं... (Understanding...)',
     'en': 'Understanding...',
+    'te': 'అర్థం చేసుకుంటున్నాము...',
+    'hi': 'समझने का प्रयास कर रहे हैं...',
   };
 
   static const Map<String, String> tapToStop = {
-    'as': 'থামিবলৈ টিপক (Tap to Stop)',
-    'bn': 'থামানোর জন্য চাপুন (Tap to Stop)',
-    'hi': 'रोकने के लिए दबाएं (Tap to Stop)',
     'en': 'Tap to Stop',
+    'te': 'ఆపడానికి నొక్కండి',
+    'hi': 'रोकने के लिए दबाएं',
+  };
+
+  static const Map<String, String> readyToListen = {
+    'en': 'Ready to listen',
+    'te': 'నేను వినడానికి సిద్ధంగా ఉన్నాను',
+    'hi': 'मैं सुनने के लिए तैयार हूँ',
+  };
+
+  static const Map<String, String> trySaying = {
+    'en': 'Try saying:',
+    'te': 'ఉదాహరణ మాటలు:',
+    'hi': 'आप कह सकते हैं:',
   };
 
   // --- Feedbacks ---
 
   static const Map<String, String> heardPrefix = {
-    'as': 'মই শুনিলোঁ:',
-    'bn': 'আমি শুনেছি:',
-    'hi': 'मैंने सुना:',
     'en': 'I heard:',
+    'te': 'నేను విన్నది:',
+    'hi': 'मैंने सुना:',
   };
 
   static const Map<String, String> notUnderstood = {
-    'as': 'বুজি নাপালোঁ। অনুগ্ৰহ কৰি পুনৰ কওক।\n(I didn\'t understand that. Please try again.)',
-    'bn': 'বুঝতে পারিনি। দয়া করে আবার বলুন।\n(I didn\'t understand that. Please try again.)',
-    'hi': 'समझ नहीं पाए। कृपया दोबारा बोलें।\n(I didn\'t understand that. Please try again.)',
     'en': 'I didn\'t understand that. Please try speaking again.',
+    'te': 'అర్థం కాలేదు. దయచేసి మళ్ళీ మాట్లాడండి.',
+    'hi': 'समझ नहीं पाए। कृपया दोबारा बोलें।',
   };
 
   static const Map<String, String> openingJournal = {
-    'as': 'আপোনাৰ স্মৃতি ডায়েরী খোলা হৈছে... (Opening your Journal...)',
-    'bn': 'আপনার স্মৃতির ডায়েরি খোলা হচ্ছে... (Opening your Journal...)',
-    'hi': 'आपकी यादों की डायरी खुल रही है... (Opening your Journal...)',
     'en': 'Opening your Journal...',
+    'te': 'మీ డైరీ తెరవబడుతోంది...',
+    'hi': 'आपकी यादों की डायरी खुल रही है...',
+    'as': 'আপোনাৰ স্মৃতিসমূহ খুলి থকা হৈছে...',
+    'bn': 'আপনার স্মৃতিগুলো খোলা হচ্ছে...',
   };
 
   static const Map<String, String> creatingMemory = {
-    'as': 'নতুন স্মৃতি লিখাৰ পৃষ্ঠা খোলা হৈছে... (Opening New Memory...)',
-    'bn': 'নতুন স্মৃতি লেখার পাতা খোলা হচ্ছে... (Opening New Memory...)',
-    'hi': 'नई याद लिखने का पृष्ठ खुल रहा है... (Opening New Memory...)',
     'en': 'Opening New Memory...',
+    'te': 'కొత్త జ్ఞాపకం తెరవబడుతోంది...',
+    'hi': 'नई याद का पृष्ठ खुल रहा है...',
+    'as': 'নতুন স্মৃতি যোগ কৰক...',
+    'bn': 'নতুন স্মৃতি যোগ করুন...',
   };
 
   static const Map<String, String> openingDashboard = {
-    'as': 'মূল পৃষ্ঠালৈ ঘূৰি যোৱা হৈছে... (Going to Home...)',
-    'bn': 'মূল পাতায় ফিরে যাওয়া হচ্ছে... (Going to Home...)',
-    'hi': 'होम पेज पर वापस जा रहे हैं... (Going to Home...)',
     'en': 'Going back Home...',
+    'te': 'హోమ్ పేజీకి వెళ్తున్నాము...',
+    'hi': 'होम पेज पर वापस जा रहे हैं...',
+    'as': 'ঘৰলৈ উভతి যোৱా হৈছে...',
+    'bn': 'হোমে ফিরে যাওয়া হচ্ছে...',
   };
 
   static const Map<String, String> openingGames = {
-    'as': 'খেলৰ পৃষ্ঠালৈ যোৱা হৈছে... (Opening Games...)',
-    'bn': 'খেলার পাতায় যাওয়া হচ্ছে... (Opening Games...)',
-    'hi': 'खेलों के पेज पर जा रहे हैं... (Opening Games...)',
     'en': 'Opening Games...',
+    'te': 'ఆటల పేజీకి వెళ్తున్నాము...',
+    'hi': 'खेलों के पेज पर जा रहे हैं...',
+    'as': 'খেল আৰম্ভ কৰా হৈছে...',
+    'bn': 'খেলা শুরু হচ্ছে...',
   };
 
   static const Map<String, String> openingReminders = {
-    'as': 'ৰিমাইণ্ডাৰ খোলা হৈছে... (Opening Reminders...)',
-    'bn': 'অনুস্মারক খোলা হচ্ছে... (Opening Reminders...)',
-    'hi': 'रिमाइंडर खुल रहे हैं... (Opening Reminders...)',
     'en': 'Opening Reminders...',
-  };
-
-  static const Map<String, String> remindersNotice = {
-    'as': 'ৰিমাইণ্ডাৰ অতি সোনকালে উপলব্ধ হ\'ব।\n(Reminders will be available soon.)',
-    'bn': 'অনুস্মারক খুব শীঘ্রই উপলব্ধ হবে।\n(Reminders will be available soon.)',
-    'hi': 'रिमाइंडर जल्द ही उपलब्ध होंगे।\n(Reminders will be available soon.)',
-    'en': 'Reminders will be available soon in an upcoming update.',
+    'te': 'రిమైండర్లు తెరవబడుతున్నాయి...',
+    'hi': 'रिमाइंडर खुल रहे हैं...',
+    'as': 'ৰিমাইণ্ডাৰ খোলা হৈছে...',
+    'bn': 'রিমাইন্ডার খোলা হচ্ছে...',
   };
 
   static const Map<String, String> permissionDenied = {
-    'as': 'মাইক্ৰ\'ফনৰ অনুমতি প্ৰয়োজন। আপুনি ভইচ কমাণ্ড নোহোৱাকৈও Smriti AI ব্যৱহাৰ কৰিব পাৰে।',
-    'bn': 'মাইক্রোফোনের অনুমতি প্রয়োজন। আপনি ভয়েস কমান্ড ছাড়াও Smriti AI ব্যবহার করতে পারেন।',
-    'hi': 'माइक्रोफ़ोन की अनुमति चाहिए। आप बिना आवाज़ के भी Smriti AI का उपयोग कर सकते हैं।',
     'en': 'Microphone permission is needed for voice commands. You can still use Smriti AI without voice.',
+    'te': 'వాయిస్ కమాండ్ల కోసం మైక్రోఫోన్ అనుమతి అవసరం. మీరు బటన్లను ఉపయోగించవచ్చు.',
+    'hi': 'आवाज़ पहचान के लिए माइक्रोफ़ोन की अनुमति आवश्यक है। आप बटनों का उपयोग कर सकते हैं।',
   };
 
   static const Map<String, String> speechUnavailable = {
-    'as': 'এই ডিভাইচত ভইচ সেৱা উপলব্ধ নহয়। আপুনি বুটামবোৰ ব্যৱহাৰ কৰিব পাৰে।',
-    'bn': 'এই ডিভাইসে ভয়েস সেবা উপলব্ধ নেই। আপনি বোতামগুলো ব্যবহার করতে পারেন।',
-    'hi': 'इस डिवाइस पर आवाज़ सेवा उपलब्ध नहीं है। आप बटनों का उपयोग कर सकते हैं।',
     'en': 'Voice commands are not available right now. You can continue using the buttons.',
+    'te': 'ఈ పరికరంలో వాయిస్ సేవ అందుబాటులో లేదు. మీరు బటన్లను ఉపయోగించవచ్చు.',
+    'hi': 'इस डिवाइस पर आवाज़ सेवा उपलब्ध नहीं है। आप बटनों का उपयोग कर सकते हैं।',
   };
+
+  // --- Reminders Voice Prompts ---
+
+  static const Map<String, String> creatingReminder = {
+    'en': 'Setting your reminder...',
+    'te': 'రిమైండర్ సెట్ చేస్తున్నాము...',
+    'hi': 'रिमाइंडर सेट किया जा रहा है...',
+  };
+
+  static const Map<String, String> reminderCreated = {
+    'en': 'Okay, I have created your reminder.',
+    'te': 'సరే, మీ రిమైండర్ సేవ్ చేయబడింది.',
+    'hi': 'ठीक है, आपका रिमाइंडर सेट कर दिया गया है।',
+  };
+
+  static const Map<String, String> reminderUpdated = {
+    'en': 'Your reminder has been updated.',
+    'te': 'మీ రిమైండర్ నవీకరించబడింది.',
+    'hi': 'आपका रिमाइंडर अपडेट कर दिया गया है।',
+  };
+
+  static const Map<String, String> reminderDeleted = {
+    'en': 'Your reminder has been deleted.',
+    'te': 'రిమైండర్ తొలగించబడింది.',
+    'hi': 'रिमाइंडर हटा दिया गया है।',
+  };
+
+  static const Map<String, String> askReminderTitle = {
+    'en': 'What would you like me to remind you about?',
+    'te': 'మీకు ఏ విషయం గురించి గుర్తు చేయాలి?',
+    'hi': 'आप किस बारे में रिमाइंडर लगाना चाहते हैं?',
+  };
+
+  static const Map<String, String> askReminderTime = {
+    'en': 'When should I remind you?',
+    'te': 'ఏ సమయంలో గుర్తు చేయాలి?',
+    'hi': 'किस समय का रिमाइंडर लगाना है?',
+  };
+
+  static const Map<String, String> askReminderDate = {
+    'en': 'Which day should I remind you?',
+    'te': 'ఏ రోజున గుర్తు చేయాలి?',
+    'hi': 'किस तारीख का रिमाइंडर लगाना है?',
+  };
+
+  static const Map<String, String> invalidReminderTime = {
+    'en': 'Please tell me a valid time, like 8 PM or tomorrow morning.',
+    'te': 'దయచేసి సరైన సమయాన్ని చెప్పండి, ఉదాహరణకు సాయంత్రం 8 గంటలు లేదా రేపు ఉదయం.',
+    'hi': 'कृपया सही समय बताएं, जैसे शाम 8 बजे या कल सुबह।',
+  };
+
+  static const Map<String, String> reminderCancelled = {
+    'en': 'Reminder creation cancelled.',
+    'te': 'రిమైండర్ రద్దు చేయబడింది.',
+    'hi': 'रिमाइंडर रद्द कर दिया गया।',
+  };
+
+  static const Map<String, String> confirmSaveReminder = {
+    'en': 'Should I save this reminder?',
+    'te': 'ఈ రిమైండర్‌ను సేవ్ చేయమంటారా?',
+    'hi': 'क्या मैं इस रिमाइंडर को सहेज लूँ?',
+  };
+
+  static const Map<String, String> yesNoCancelHelp = {
+    'en': 'Say Yes to save, or No to cancel.',
+    'te': 'సేవ్ చేయడానికి "అవును" అని, లేదా రద్దు చేయడానికి "వద్దు" అని చెప్పండి.',
+    'hi': 'सहेजने के लिए "हाँ" कहें, या रद्द करने के लिए "नहीं" कहें।',
+  };
+
+  /// Constructs a clear conversational confirmation prompt for a reminder.
+  static String formatConfirmationPrompt({
+    required String title,
+    required String timeStr,
+    required String dateStr,
+    required String languageCode,
+  }) {
+    switch (languageCode) {
+      case 'te':
+        return 'నేను $dateStr $timeStr సమయంలో "$title" గురించి గుర్తు చేస్తాను. ఈ రిమైండర్‌ను సేవ్ చేయమంటారా?';
+      case 'hi':
+        return 'मैं $dateStr $timeStr को "$title" के लिए याद दिलाऊँगा। क्या मैं इस रिमाइंडर को सहेज लूँ?';
+      case 'en':
+      default:
+        return 'I will remind you $dateStr at $timeStr to $title. Should I save this reminder?';
+    }
+  }
 
   // --- Privacy & Engine Declarations ---
 
   static const Map<String, String> privacyStatement = {
-    'as': 'Smriti AI-য়ে আপোনাৰ মাত বা কণ্ঠ বাৰ্তা সংৰক্ষণ বা আপলোড নকৰে। কণ্ঠ চিনাক্তকৰণ আপোনাৰ ডিভাইচৰ ভইচ সেৱাৰ দ্বাৰা কৰা হয়।',
-    'bn': 'Smriti AI আপনার ভয়েস রেকর্ড, সংরক্ষণ বা আপলোড করে না। ভয়েস শনাক্তকরণ আপনার ডিভাইসের ভয়েস পরিষেবা দ্বারা পরিচালিত হয়।',
-    'hi': 'Smriti AI आपकी आवाज़ को रिकॉर्ड, सहेज या अपलोड नहीं करता है। आवाज़ पहचान आपके डिवाइस की सेवा द्वारा नियंत्रित की जाती है।',
     'en': 'Smriti AI does not record, save, or upload your voice recordings. Speech recognition is handled by your device\'s speech service.',
+    'te': 'స్మృతి AI మీ వాయిస్ రికార్డింగ్‌లను సేవ్ చేయదు లేదా అప్‌లోడ్ చేయదు. మీ పరికర వాయిస్ సేవ ద్వారా వాయిస్ గుర్తించబడుతుంది.',
+    'hi': 'स्मृति AI आपकी आवाज़ रिकॉर्ड या अपलोड नहीं करता है। आवाज़ पहचान आपके डिवाइस द्वारा की जाती है।',
   };
 
   static const Map<String, String> offlineClarification = {
-    'as': 'কণ্ঠ চিনাক্তকৰণ অফলাইনত কাম কৰিব নে নকৰে সেয়া আপোনাৰ ডিভাইচ আৰু ইনষ্টল কৰা ভাষা সমৰ্থনৰ ওপৰত নিৰ্ভৰ কৰে।',
-    'bn': 'ভয়েস শনাক্তকরণ অফলাইনে কাজ করবে কিনা তা আপনার ডিভাইস এবং ইনস্টল করা ভাষার সমর্থনের ওপর নির্ভর করে।',
-    'hi': 'आवाज़ पहचान ऑफ़लाइन काम करेगी या नहीं यह आपके डिवाइस और इंस्टॉल की गई भाषा सहायता पर निर्भर करता है।',
     'en': 'Whether speech recognition works offline depends on your device and installed language support.',
+    'te': 'వాయిస్ గుర్తింపు ఆఫ్‌లైన్‌లో పనిచేస్తుందా లేదా అనేది మీ పరికరం మరియు భాషా మద్దతుపై ఆధారపడి ఉంటుంది.',
+    'hi': 'आवाज़ पहचान ऑफ़लाइन काम करेगी या नहीं यह आपके डिवाइस पर निर्भर करता है।',
   };
 
   static String get(Map<String, String> map, String languageCode) {

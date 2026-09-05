@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/app_localizations.dart';
 import 'screens/matching_image_screen.dart';
 import 'screens/pick_correct_screen.dart';
 import 'screens/number_game_screen.dart';
@@ -13,7 +14,6 @@ import 'screens/recalling_memories_screen.dart';
 
 class GameHubItem {
   final String id;
-  final String titleAs;
   final String titleEn;
   final String subtitle;
   final IconData icon;
@@ -23,7 +23,6 @@ class GameHubItem {
 
   const GameHubItem({
     required this.id,
-    required this.titleAs,
     required this.titleEn,
     required this.subtitle,
     required this.icon,
@@ -31,6 +30,58 @@ class GameHubItem {
     required this.builder,
     this.isReady = true,
   });
+
+  String getLocalizedTitle(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    switch (id) {
+      case 'matching_image':
+        return loc.gameMatchingImageTitle;
+      case 'pick_correct':
+        return loc.gamePickCorrectTitle;
+      case 'number_game':
+        return loc.gameNumberGameTitle;
+      case 'place_correctly':
+        return loc.gamePlaceCorrectlyTitle;
+      case 'find_difference':
+        return loc.gameFindDifferenceTitle;
+      case 'draw_shape':
+        return loc.gameDrawShapeTitle;
+      case 'situation_match':
+        return loc.gameSituationMatchTitle;
+      case 'family_quiz':
+        return loc.gameFamilyQuizTitle;
+      case 'recalling_memories':
+        return loc.gameRecallingMemoriesTitle;
+      default:
+        return titleEn;
+    }
+  }
+
+  String getLocalizedSubtitle(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+    switch (id) {
+      case 'matching_image':
+        return loc.gameMatchingImageDesc;
+      case 'pick_correct':
+        return loc.gamePickCorrectDesc;
+      case 'number_game':
+        return loc.gameNumberGameDesc;
+      case 'place_correctly':
+        return loc.gamePlaceCorrectlyDesc;
+      case 'find_difference':
+        return loc.gameFindDifferenceDesc;
+      case 'draw_shape':
+        return loc.gameDrawShapeDesc;
+      case 'situation_match':
+        return loc.gameSituationMatchDesc;
+      case 'family_quiz':
+        return loc.gameFamilyQuizDesc;
+      case 'recalling_memories':
+        return loc.gameRecallingMemoriesDesc;
+      default:
+        return subtitle;
+    }
+  }
 }
 
 /// Games Hub Screen displaying large, accessible cards for all 9 cognitive games.
@@ -40,25 +91,22 @@ class GamesHubScreen extends StatelessWidget {
   List<GameHubItem> get _games => [
         GameHubItem(
           id: 'matching_image',
-          titleAs: 'ছবি মিলোৱা',
           titleEn: 'Matching Image',
-          subtitle: 'Find identical traditional items or pair memory cards',
+          subtitle: 'Find identical items or pair memory cards',
           icon: Icons.filter_rounded,
           color: const Color(0xFFD9381E),
           builder: (_) => const MatchingImageScreen(),
         ),
         GameHubItem(
           id: 'pick_correct',
-          titleAs: 'সঠিকটো বাছক',
           titleEn: 'Pick the Correct One',
-          subtitle: 'Recognize the right cultural items & instruments',
+          subtitle: 'Recognize the right items and instruments',
           icon: Icons.check_circle_outline_rounded,
           color: const Color(0xFF2E8B57),
           builder: (_) => const PickCorrectScreen(),
         ),
         GameHubItem(
           id: 'number_game',
-          titleAs: 'সংখ্যাৰ খেল',
           titleEn: 'Number Game',
           subtitle: 'Counting, sequences, and gentle visual math',
           icon: Icons.pin_rounded,
@@ -67,52 +115,46 @@ class GamesHubScreen extends StatelessWidget {
         ),
         GameHubItem(
           id: 'place_correctly',
-          titleAs: 'সঠিক স্থানত বহুৱাওক',
           titleEn: 'Place Correctly',
-          subtitle: 'Drag or tap-tap items into their matching slots',
-          icon: Icons.dashboard_customize_rounded,
-          color: const Color(0xFF8B4513),
+          subtitle: 'Position items in their right locations',
+          icon: Icons.grid_view_rounded,
+          color: const Color(0xFFFF8C00),
           builder: (_) => const PlaceCorrectlyScreen(),
         ),
         GameHubItem(
           id: 'find_difference',
-          titleAs: 'পাৰ্থক্য বিচাৰক',
-          titleEn: 'Find Differences',
-          subtitle: 'Spot subtle differences between two cultural scenes',
+          titleEn: 'Find the Difference',
+          subtitle: 'Careful visual comparison of patterns and colors',
           icon: Icons.visibility_rounded,
-          color: const Color(0xFF9370DB),
+          color: const Color(0xFF8A2BE2),
           builder: (_) => const FindDifferenceScreen(),
         ),
         GameHubItem(
           id: 'draw_shape',
-          titleAs: 'মনত ৰাখি আঁকক',
-          titleEn: 'Draw What You Saw',
-          subtitle: 'Look at a shape, remember it, and sketch on canvas',
+          titleEn: 'Draw Shape',
+          subtitle: 'Trace gentle geometry, letters, and numbers',
           icon: Icons.gesture_rounded,
-          color: const Color(0xFFE25822),
+          color: const Color(0xFF20B2AA),
           builder: (_) => const DrawShapeScreen(),
         ),
         GameHubItem(
           id: 'situation_match',
-          titleAs: 'পৰিস্থিতি মিলোৱা',
-          titleEn: 'Match Situation',
-          subtitle: 'Pick the right item for everyday life situations',
-          icon: Icons.lightbulb_outline_rounded,
-          color: const Color(0xFFDAA520),
+          titleEn: 'Situation Match',
+          subtitle: 'Connect actions to scenes and daily events',
+          icon: Icons.psychology_rounded,
+          color: const Color(0xFFB8860B),
           builder: (_) => const SituationMatchScreen(),
         ),
         GameHubItem(
           id: 'family_quiz',
-          titleAs: 'আপোনজনৰ চিনাকি',
           titleEn: 'Family Quiz',
-          subtitle: 'Recognize loved ones and cherish family memories',
+          subtitle: 'Warm and gentle trivia about loved ones and family memories',
           icon: Icons.family_restroom_rounded,
           color: const Color(0xFFC71585),
           builder: (_) => const FamilyQuizScreen(),
         ),
         GameHubItem(
           id: 'recalling_memories',
-          titleAs: 'মধুৰ স্মৃতি',
           titleEn: 'Recalling Memories',
           subtitle: 'Gentle reminiscence with family & heritage photos',
           icon: Icons.auto_stories_rounded,
@@ -123,12 +165,17 @@ class GamesHubScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('মগজুৰ খেল (Brain Games)'),
+        title: Text(
+          loc.cognitiveGames,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, size: 32),
-          tooltip: 'Back to Home',
+          tooltip: loc.back,
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -144,26 +191,26 @@ class GamesHubScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.sports_esports_rounded, size: 40, color: AppTheme.primaryColor),
-                  SizedBox(width: 16),
+                  const Icon(Icons.sports_esports_rounded, size: 40, color: AppTheme.primaryColor),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'দৈনন্দিন স্মৃতি চৰ্চা',
-                          style: TextStyle(
+                          loc.gamesHubTitle,
+                          style: const TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
                             color: AppTheme.textColor,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
-                          'প্ৰতিটো খেল আনন্দ আৰু মগজু সতেজ ৰখাৰ বাবে। (Choose a game to play)',
-                          style: TextStyle(fontSize: 16, color: AppTheme.subtitleColor),
+                          loc.gamesHubSubtitle,
+                          style: const TextStyle(fontSize: 16, color: AppTheme.subtitleColor),
                         ),
                       ],
                     ),
@@ -182,6 +229,8 @@ class GamesHubScreen extends StatelessWidget {
   }
 
   Widget _buildGameCard(BuildContext context, GameHubItem game) {
+    final loc = AppLocalizations.of(context);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Material(
@@ -197,19 +246,16 @@ class GamesHubScreen extends StatelessWidget {
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: Text(
-                    'শীঘ্ৰেই আহি আছে (Coming soon)',
-                    style: TextStyle(fontSize: 18),
+                    loc.comingSoon,
+                    style: const TextStyle(fontSize: 18),
                   ),
                 ),
               );
             }
           },
           child: Container(
-            constraints: const Duration(milliseconds: 0) == Duration.zero
-                ? const BoxConstraints(minHeight: 100)
-                : null,
             padding: const EdgeInsets.all(18),
             child: Row(
               children: [
@@ -232,7 +278,7 @@ class GamesHubScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${game.titleAs} (${game.titleEn})',
+                        game.getLocalizedTitle(context),
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -241,23 +287,22 @@ class GamesHubScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        game.subtitle,
+                        game.getLocalizedSubtitle(context),
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 16,
                           color: AppTheme.subtitleColor,
-                          height: 1.25,
+                          height: 1.3,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
 
-                // Arrow
-                Icon(
-                  game.isReady ? Icons.arrow_forward_ios_rounded : Icons.lock_outline_rounded,
-                  size: 24,
-                  color: game.isReady ? AppTheme.primaryColor : Colors.grey,
+                const SizedBox(width: 8),
+                const Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: AppTheme.primaryColor,
+                  size: 20,
                 ),
               ],
             ),

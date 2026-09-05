@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../core/database/app_database.dart';
 import '../../core/database/repositories/reminder_repository.dart';
+import '../../core/localization/app_localizations.dart';
+import '../voice/screens/voice_assistant_screen.dart';
 import 'reminder_entry_screen.dart';
 import 'services/notification_service.dart';
 import 'widgets/reminder_card.dart';
@@ -98,6 +100,18 @@ class _RemindersScreenState extends State<RemindersScreen> {
     );
   }
 
+  void _navigateToVoiceReminder() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => VoiceAssistantScreen(
+          reminderFocus: true,
+          reminderRepository: _repository,
+          notificationService: _notificationService,
+        ),
+      ),
+    );
+  }
+
   void _navigateToEdit(Reminder reminder) {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -112,17 +126,19 @@ class _RemindersScreenState extends State<RemindersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text(
-          'My Reminders',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        title: Text(
+          loc.remindersTitle,
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, size: 28),
-          tooltip: 'Back to Home',
+          tooltip: loc.back,
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -131,61 +147,134 @@ class _RemindersScreenState extends State<RemindersScreen> {
         backgroundColor: const Color(0xFF006699),
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_rounded, size: 28),
-        label: const Text(
-          'Add Reminder',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        label: Text(
+          loc.addReminder,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
       body: SafeArea(
-        child: StreamBuilder<List<Reminder>>(
-          stream: _remindersStream,
-          initialData: const <Reminder>[],
-          builder: (context, snapshot) {
-            final reminders = snapshot.data ?? [];
+        child: Column(
+          children: [
+            // Two Large Accessible Entry Buttons: TYPE REMINDER & SPEAK REMINDER
+            _buildTopActionButtons(loc),
 
-            return Column(
-              children: [
-                // Permission Warning Banner (if notifications are disabled)
-                if (!_hasNotificationPermission)
-                  Container(
-                    width: double.infinity,
-                    color: const Color(0xFFFFF3E0),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 10),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.notifications_off_rounded,
-                            color: Color(0xFFE65100), size: 24),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Notifications are turned off. Your reminders are still saved safely on this device.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFFE65100),
-                            ),
-                          ),
+            // Permission Warning Banner (if notifications are disabled)
+            if (!_hasNotificationPermission)
+              Container(
+                width: double.infinity,
+                color: const Color(0xFFFFF3E0),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 10),
+                child: Row(
+                  children: [
+                    const Icon(Icons.notifications_off_rounded,
+                        color: Color(0xFFE65100), size: 24),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        loc.notificationsDisabledWarning,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFFE65100),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-
-                // Main Content
-                Expanded(
-                  child: reminders.isEmpty
-                      ? _buildEmptyState()
-                      : _buildRemindersList(reminders),
+                  ],
                 ),
-              ],
-            );
-          },
+              ),
+
+            // Main Content
+            Expanded(
+              child: StreamBuilder<List<Reminder>>(
+                stream: _remindersStream,
+                initialData: const <Reminder>[],
+                builder: (context, snapshot) {
+                  final reminders = snapshot.data ?? [];
+                  return reminders.isEmpty
+                      ? _buildEmptyState(loc)
+                      : _buildRemindersList(reminders, loc);
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildTopActionButtons(AppLocalizations loc) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: SizedBox(
+              height: 64,
+              child: ElevatedButton.icon(
+                onPressed: _navigateToCreate,
+                icon: const Icon(Icons.keyboard_alt_rounded, size: 26),
+                label: Text(
+                  '⌨ ${loc.typeReminder.toUpperCase()}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF006699),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 2,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: SizedBox(
+              height: 64,
+              child: ElevatedButton.icon(
+                onPressed: _navigateToVoiceReminder,
+                icon: const Icon(Icons.mic_rounded, size: 26),
+                label: Text(
+                  '🎤 ${loc.speakReminder.toUpperCase()}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFE65100),
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 2,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(AppLocalizations loc) {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
@@ -205,9 +294,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'No reminders yet',
-              style: TextStyle(
+            Text(
+              loc.noReminders,
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF1A1A1A),
@@ -215,7 +304,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Tap the "Add Reminder" button below to set a gentle reminder for your daily activities or medicine.',
+              loc.noRemindersDesc,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 16,
@@ -238,9 +327,9 @@ class _RemindersScreenState extends State<RemindersScreen> {
                 ),
                 onPressed: _navigateToCreate,
                 icon: const Icon(Icons.add_rounded, size: 26),
-                label: const Text(
-                  'Add Reminder',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                label: Text(
+                  loc.addReminder,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -250,7 +339,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
     );
   }
 
-  Widget _buildRemindersList(List<Reminder> reminders) {
+  Widget _buildRemindersList(List<Reminder> reminders, AppLocalizations loc) {
     final now = DateTime.now();
     final todayStr =
         '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
@@ -286,7 +375,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
       children: [
         // TODAY Section
         if (todayList.isNotEmpty) ...[
-          _buildSectionHeader('TODAY', Icons.today_rounded, const Color(0xFFE65100)),
+          _buildSectionHeader(loc.today.toUpperCase(), Icons.today_rounded, const Color(0xFFE65100)),
           ...todayList.map((r) => ReminderCard(
                 reminder: r,
                 onComplete: () => _handleComplete(r),
@@ -299,7 +388,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
         // UPCOMING Section
         if (upcomingList.isNotEmpty) ...[
           _buildSectionHeader(
-              'UPCOMING', Icons.upcoming_rounded, const Color(0xFF0277BD)),
+              loc.upcoming.toUpperCase(), Icons.upcoming_rounded, const Color(0xFF0277BD)),
           ...upcomingList.map((r) => ReminderCard(
                 reminder: r,
                 onComplete: () => _handleComplete(r),
@@ -312,7 +401,7 @@ class _RemindersScreenState extends State<RemindersScreen> {
         // COMPLETED Section
         if (completedList.isNotEmpty) ...[
           _buildSectionHeader(
-              'COMPLETED', Icons.task_alt_rounded, const Color(0xFF2E7D32)),
+              loc.completed.toUpperCase(), Icons.task_alt_rounded, const Color(0xFF2E7D32)),
           ...completedList.map((r) => ReminderCard(
                 reminder: r,
                 onComplete: () {},

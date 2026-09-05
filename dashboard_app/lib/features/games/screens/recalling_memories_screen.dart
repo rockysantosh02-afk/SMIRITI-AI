@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/database/repositories/family_repository.dart';
 import '../base/base_game_screen.dart';
@@ -13,7 +14,6 @@ class RecallingMemoriesScreen extends BaseGameScreen {
       : super(
           gameId: 'recalling_memories',
           gameTitle: 'Recalling Memories',
-          gameTitleAs: 'মধুৰ স্মৃতি',
           domain: 'REMINISCENCE',
         );
 
@@ -30,46 +30,38 @@ class _RecallingMemoriesScreenState
   Future<List<GameItem>?> getCustomRounds() async {
     final members = await _repo.getAllMembers();
 
-    // Heritage places pool
+    // Heritage & peaceful places pool
     final heritagePlaces = [
       {
-        'key': 'kaziranga',
-        'title': 'কাজিৰঙা ৰাষ্ট্ৰীয় উদ্যান (Kaziranga)',
-        'prompt': 'এই ঠাইডোখৰ মনত পৰিছেনে? (Do you remember visiting Kaziranga?)',
-        'desc': 'গঁড় আৰু প্ৰকৃতিৰে ভৰপূৰ সেউজীয়া কাজিৰঙা',
+        'key': 'garden',
+        'title': 'Peaceful Green Garden',
+        'prompt': 'Do you recall walking in a quiet, blooming garden?',
+        'desc': 'Fresh morning air, singing birds, and blooming flowers',
         'icon': Icons.forest_rounded,
         'itemKey': 'rhino',
       },
       {
-        'key': 'majuli',
-        'title': 'মাজুলীৰ সত্ৰ (Majuli Satra)',
-        'prompt': 'মাজুলীৰ নামঘৰ বা সত্ৰলৈ গৈ পাইছিলনে? (Have you visited the Satras of Majuli?)',
-        'desc': 'ব্ৰহ্মপুত্ৰৰ বুকুত থকা পৱিত্ৰ নদীদ্বীপ',
-        'icon': Icons.temple_buddhist_rounded,
-        'itemKey': 'majuli',
-      },
-      {
-        'key': 'brahmaputra',
-        'title': 'মহাৰথী ব্ৰহ্মপুত্ৰ (Brahmaputra River)',
-        'prompt': 'ব্ৰহ্মপুত্ৰৰ পাৰত বহি সুন্দৰ বতাহ পাইছিলনে? (Memories by the Brahmaputra)',
-        'desc': 'আমাৰ অসমৰ জীৱনৰেখা লুইতৰ ঘাট',
-        'icon': Icons.water_rounded,
-        'itemKey': 'brahmaputra',
-      },
-      {
-        'key': 'kamakhya',
-        'title': 'নীলাচল কামাখ্যা (Kamakhya Temple)',
-        'prompt': 'নীলাচল পাহাৰলৈ গৈ মা কামাখ্যাক সেৱা জনাইছেনে? (Kamakhya pilgrimage)',
-        'desc': 'ঐতিহাসিক প্ৰাচীন শক্তিপীঠ',
+        'key': 'temple',
+        'title': 'Sacred Peaceful Temple',
+        'prompt': 'Do you recall peaceful visits to the temple with family?',
+        'desc': 'Sacred bells, fragrant flowers, and calming prayer',
         'icon': Icons.temple_hindu_rounded,
         'itemKey': 'kamakhya',
       },
       {
-        'key': 'rang_ghar',
-        'title': 'ৰংঘৰৰ বাকৰি (Historic Rang Ghar)',
-        'prompt': 'ৰংঘৰৰ সৌন্দৰ্য্য দেখিছেনে? (Do you recall the royal pavilion?)',
-        'desc': 'স্বৰ্গদেউসকলৰ ঐতিহাসিক ৰংঘৰ',
-        'icon': Icons.stadium_rounded,
+        'key': 'river',
+        'title': 'Calm River Breeze',
+        'prompt': 'Do you remember sitting by the river at sunset?',
+        'desc': 'Gentle flowing waters and a refreshing evening breeze',
+        'icon': Icons.water_rounded,
+        'itemKey': 'brahmaputra',
+      },
+      {
+        'key': 'monument',
+        'title': 'Historic Heritage Monument',
+        'prompt': 'Do you remember visiting historic cultural monuments?',
+        'desc': 'Grand architecture and treasured memories',
+        'icon': Icons.account_balance_rounded,
         'itemKey': 'rang_ghar',
       },
     ];
@@ -82,11 +74,11 @@ class _RecallingMemoriesScreenState
       rounds.add(GameItem(
         id: 'memory_fam_$i',
         image: m.name,
-        prompt: 'এই ছবিখনত থকা ${m.name}ৰ সৈতে কথা মনত পৰিছেনে? (Do you remember sweet memories with ${m.name}?)',
+        prompt: 'Do you remember sweet memories with ${m.name}?',
         options: [
-          'হয়, বৰ সুন্দৰ স্মৃতি! (Yes, sweet memories)',
-          'আৰু কওক (Tell me more)',
-          'পৰৱৰ্তী স্মৃতি চাওঁ (Next memory)',
+          'Yes, sweet memories!',
+          'Tell me more',
+          'Next memory',
         ],
         correctIndex: 0,
         domain: 'REMINISCENCE',
@@ -108,9 +100,9 @@ class _RecallingMemoriesScreenState
         image: place['itemKey'] as String,
         prompt: place['prompt'] as String,
         options: [
-          'হয়, বৰ ভাল স্মৃতি! (Yes, wonderful memories!)',
-          'আৰু কওক (Tell me more)',
-          'পৰৱৰ্তী ছবি চাওঁ (Next photo)',
+          'Yes, wonderful memories!',
+          'Tell me more',
+          'Next photo',
         ],
         correctIndex: 0,
         domain: 'REMINISCENCE',
@@ -216,9 +208,9 @@ class _RecallingMemoriesScreenState
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             icon: const Icon(Icons.favorite_rounded, size: 30, color: Colors.pinkAccent),
-            label: const Text(
-              'হয়, বৰ ভাল স্মৃতি! (Yes, sweet memories!)',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            label: Text(
+              AppLocalizations.of(context).recallingMemoriesYes,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             onPressed: () => submitAnswer(isCorrect: true),
           ),
@@ -235,9 +227,9 @@ class _RecallingMemoriesScreenState
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             ),
             icon: const Icon(Icons.arrow_forward_rounded, size: 28, color: AppTheme.primaryColor),
-            label: const Text(
-              'আৰু কওক / পৰৱৰ্তী ছবি (Tell me more)',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+            label: Text(
+              AppLocalizations.of(context).recallingMemoriesTellMore,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
             ),
             onPressed: () => submitAnswer(isCorrect: true),
           ),

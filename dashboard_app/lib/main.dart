@@ -4,12 +4,19 @@
 // This app is designed to be used independently by the user - no caregiver role.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/firebase/firebase_options.dart';
+import 'core/localization/app_languages.dart';
+import 'core/localization/language_service.dart';
+import 'core/localization/language_provider.dart';
+import 'core/localization/app_localizations.dart';
+import 'features/onboarding/language_onboarding_screen.dart';
 import 'features/auth/login_screen.dart';
 import 'features/dashboard/dashboard_home_screen.dart';
 import 'features/games/games_hub_screen.dart';
@@ -43,7 +50,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   
-  // Load user preferences for theme settings
+  // Load user preferences for theme settings and language
   final prefs = await SharedPreferences.getInstance();
   final textScale = prefs.getDouble('text_scale') ?? 1.0;
   final reducedMotion = prefs.getBool('reduced_motion') ?? false;
@@ -51,21 +58,39 @@ void main() async {
   // Update global theme settings
   globalTextScaleFactor = textScale;
   globalReducedMotion = reducedMotion;
+
+  // Load saved language preference before building UI to prevent flicker
+  final languageService = LanguageService(prefs: prefs);
+  final savedLanguage = await languageService.getSavedLanguage();
+  final hasCompletedOnboarding = await languageService.hasCompletedOnboarding();
+  final savedVoiceMode = await languageService.getVoiceResponseLanguageMode();
   
-  runApp(SmritiApp(
-    textScale: textScale,
-    reducedMotion: reducedMotion,
-  ));
+  runApp(
+    ChangeNotifierProvider<LanguageProvider>(
+      create: (_) => LanguageProvider(
+        service: languageService,
+        initialLanguage: savedLanguage,
+        initialVoiceMode: savedVoiceMode,
+      ),
+      child: SmritiApp(
+        textScale: textScale,
+        reducedMotion: reducedMotion,
+        initialRoute: hasCompletedOnboarding ? '/login' : '/language_onboarding',
+      ),
+    ),
+  );
 }
 
 class SmritiApp extends StatefulWidget {
   final double textScale;
   final bool reducedMotion;
+  final String initialRoute;
 
   const SmritiApp({
     super.key,
     required this.textScale,
     required this.reducedMotion,
+    this.initialRoute = '/login',
   });
 
   @override
@@ -75,9 +100,21 @@ class SmritiApp extends StatefulWidget {
 class _SmritiAppState extends State<SmritiApp> {
   @override
   Widget build(BuildContext context) {
+    final languageProvider = Provider.of<LanguageProvider>(context);
+
     return MaterialApp(
       title: 'Smriti AI',
       debugShowCheckedModeBanner: false,
+      
+      // Centralized localization configuration
+      locale: languageProvider.currentLocale,
+      supportedLocales: AppLanguages.supportedLocales,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       
       // Apply accessibility theme with user's saved preferences
       theme: AppTheme.createTheme(
@@ -86,8 +123,9 @@ class _SmritiAppState extends State<SmritiApp> {
       ),
       
       // Route configuration
-      initialRoute: '/login',
+      initialRoute: widget.initialRoute,
       routes: {
+        '/language_onboarding': (context) => const LanguageOnboardingScreen(),
         '/login': (context) => const LoginScreen(),
         '/dashboard': (context) => const DashboardHomeScreen(),
         '/games': (context) => const GamesHubScreen(),
@@ -106,14 +144,13 @@ class _SmritiAppState extends State<SmritiApp> {
         '/reminders': (context) => const RemindersScreen(),
       },
       
-      // Handle unknown routes - redirect to login
+      // Handle unknown routes - redirect to initial route or login
       onGenerateRoute: (settings) {
         if (settings.name == '/dashboard') {
           return MaterialPageRoute(
             builder: (_) => const DashboardHomeScreen(),
           );
         }
-        // Default to login
         return MaterialPageRoute(
           builder: (_) => const LoginScreen(),
         );

@@ -149,7 +149,9 @@ class _PlaceCorrectlyScreenState
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      targetMeta.nameAs,
+                                      targetMeta.getLocalizedName(
+                                        Localizations.localeOf(context).languageCode,
+                                      ),
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                         fontSize: 13,

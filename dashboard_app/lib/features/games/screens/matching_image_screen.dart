@@ -254,7 +254,9 @@ class _MatchingImageScreenState
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        CulturalVisualHelper.getMeta(optKey).nameAs,
+                        CulturalVisualHelper.getMeta(optKey).getLocalizedName(
+                          Localizations.localeOf(context).languageCode,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(

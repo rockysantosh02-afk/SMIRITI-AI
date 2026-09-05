@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-/// Representation of an authentic North-East India (NER) cultural item
+/// Representation of an authentic cultural wellness item with multilingual support
 class CulturalItemMeta {
   final String key;
-  final String nameAs;
   final String nameEn;
+  final String nameTe;
+  final String nameHi;
   final String description;
   final IconData icon;
   final Color primaryColor;
@@ -12,22 +13,40 @@ class CulturalItemMeta {
 
   const CulturalItemMeta({
     required this.key,
-    required this.nameAs,
     required this.nameEn,
+    required this.nameTe,
+    required this.nameHi,
     required this.description,
     required this.icon,
     required this.primaryColor,
     required this.accentColor,
   });
+
+  /// Backward compatibility getter
+  String get nameAs => nameEn;
+
+  /// Get localized name based on language code ('en', 'te', 'hi')
+  String getLocalizedName(String langCode) {
+    switch (langCode.toLowerCase().trim()) {
+      case 'te':
+        return nameTe;
+      case 'hi':
+        return nameHi;
+      case 'en':
+      default:
+        return nameEn;
+    }
+  }
 }
 
-/// Helper providing metadata and rich illustrated widgets for all NER items
+/// Helper providing metadata and rich illustrated widgets for cultural game items
 class CulturalVisualHelper {
   static const Map<String, CulturalItemMeta> items = {
     'japi': CulturalItemMeta(
       key: 'japi',
-      nameAs: 'জাপি',
       nameEn: 'Japi (Conical Hat)',
+      nameTe: 'జాపి (టోపీ)',
+      nameHi: 'जापी (टोपी)',
       description: 'Traditional woven conical bamboo and palm hat',
       icon: Icons.shield_rounded,
       primaryColor: Color(0xFFD9381E),
@@ -35,8 +54,9 @@ class CulturalVisualHelper {
     ),
     'gamosa': CulturalItemMeta(
       key: 'gamosa',
-      nameAs: 'গামোচা',
       nameEn: 'Gamosa (Handwoven Towel)',
+      nameTe: 'గమోసా (తువ్వాలు)',
+      nameHi: 'गमोसा (तौलिया)',
       description: 'White woven cloth with intricate red floral motifs',
       icon: Icons.dry_cleaning_rounded,
       primaryColor: Color(0xFFC41E3A),
@@ -44,26 +64,29 @@ class CulturalVisualHelper {
     ),
     'dhol': CulturalItemMeta(
       key: 'dhol',
-      nameAs: 'ঢোল',
-      nameEn: 'Dhol (Bihu Drum)',
-      description: 'Traditional two-sided rhythm drum of Bihu',
+      nameEn: 'Dhol (Rhythm Drum)',
+      nameTe: 'ధోల్ (డప్పు)',
+      nameHi: 'ढोल',
+      description: 'Traditional two-sided rhythm drum',
       icon: Icons.album_rounded,
       primaryColor: Color(0xFF8B4513),
       accentColor: Color(0xFFDEB887),
     ),
     'pepa': CulturalItemMeta(
       key: 'pepa',
-      nameAs: 'পেঁপা',
       nameEn: 'Pepa (Horn Pipe)',
-      description: 'Buffalo horn pipe instrument with bamboo reed',
+      nameTe: 'పెపా (కొమ్ము బాజా)',
+      nameHi: 'पेपा (बांसुरी)',
+      description: 'Horn pipe musical instrument with bamboo reed',
       icon: Icons.music_note_rounded,
       primaryColor: Color(0xFF2F4F4F),
       accentColor: Color(0xFFDAA520),
     ),
     'xorai': CulturalItemMeta(
       key: 'xorai',
-      nameAs: 'শৰাই',
       nameEn: 'Xorai (Offering Tray)',
+      nameTe: 'షోరై (పూజా పళ్లెం)',
+      nameHi: 'शोराई (थाली)',
       description: 'Bell-metal offering tray on a raised pedestal',
       icon: Icons.emoji_events_rounded,
       primaryColor: Color(0xFFB8860B),
@@ -71,172 +94,191 @@ class CulturalVisualHelper {
     ),
     'king_chili': CulturalItemMeta(
       key: 'king_chili',
-      nameAs: 'ভোট জলকীয়া',
-      nameEn: 'King Chili (Bhut Jolokia)',
-      description: 'Legendary fragrant fiery red chili',
+      nameEn: 'King Chili',
+      nameTe: 'మిరపకాయ',
+      nameHi: 'राजा मिर्च',
+      description: 'Fragrant fiery red chili',
       icon: Icons.local_fire_department_rounded,
       primaryColor: Color(0xFFD2143A),
       accentColor: Color(0xFFFF6347),
     ),
     'bamboo_shoot': CulturalItemMeta(
       key: 'bamboo_shoot',
-      nameAs: 'বাঁহৰ খৰিচা',
-      nameEn: 'Bamboo Shoot (Khorisa)',
-      description: 'Tender fermented bamboo shoot delicacy',
+      nameEn: 'Bamboo Shoot',
+      nameTe: 'వెదురు చిగురు',
+      nameHi: 'बांस के अंकुर',
+      description: 'Tender bamboo shoot delicacy',
       icon: Icons.spa_rounded,
       primaryColor: Color(0xFF556B2F),
       accentColor: Color(0xFF9ACD32),
     ),
     'assam_tea': CulturalItemMeta(
       key: 'assam_tea',
-      nameAs: 'অসম চাহ',
-      nameEn: 'Assam Tea (Lal Saah)',
-      description: 'World renowned rich black aromatic Assam tea',
+      nameEn: 'Tea Leaves',
+      nameTe: 'టీ ఆకులు',
+      nameHi: 'चाय की पत्तियाँ',
+      description: 'World renowned rich black aromatic tea',
       icon: Icons.coffee_rounded,
       primaryColor: Color(0xFF4A2C11),
       accentColor: Color(0xFF8B5A2B),
     ),
     'muga_silk': CulturalItemMeta(
       key: 'muga_silk',
-      nameAs: 'মুগা ৰেচম',
-      nameEn: 'Muga Silk (Golden Silk)',
-      description: 'Naturally golden wild lustrous silk of Assam',
-      icon: Icons.checkroom_rounded,
-      primaryColor: Color(0xFFCFB53B),
-      accentColor: Color(0xFFFFE4B5),
-    ),
-    'malbhog_kol': CulturalItemMeta(
-      key: 'malbhog_kol',
-      nameAs: 'মালভোগ কল',
-      nameEn: 'Malbhog Banana',
-      description: 'Sweet scented indigenous banana variety',
-      icon: Icons.eco_rounded,
+      nameEn: 'Golden Silk',
+      nameTe: 'బంగారు పట్టు',
+      nameHi: 'सुनहरा रेशम',
+      description: 'Rare shimmering golden wild silk',
+      icon: Icons.auto_awesome_rounded,
       primaryColor: Color(0xFFDAA520),
-      accentColor: Color(0xFFFFFACD),
+      accentColor: Color(0xFFFFFDD0),
     ),
-    'tamul_paan': CulturalItemMeta(
-      key: 'tamul_paan',
-      nameAs: 'তামোল-পাণ',
-      nameEn: 'Tamul-Paan',
-      description: 'Areca nut & betel leaf hospitality offering',
-      icon: Icons.energy_savings_leaf_rounded,
-      primaryColor: Color(0xFF2E8B57),
-      accentColor: Color(0xFF8FBC8F),
+    'malbhog_banana': CulturalItemMeta(
+      key: 'malbhog_banana',
+      nameEn: 'Sweet Banana',
+      nameTe: 'అరటిపండు',
+      nameHi: 'मीठा केला',
+      description: 'Aromatic sweet local banana',
+      icon: Icons.lunch_dining_rounded,
+      primaryColor: Color(0xFFCC8800),
+      accentColor: Color(0xFFFFFFE0),
+    ),
+    'tamol_paan': CulturalItemMeta(
+      key: 'tamol_paan',
+      nameEn: 'Betel Nut & Leaf',
+      nameTe: 'తమలపాకు వక్క',
+      nameHi: 'पान और सुपारी',
+      description: 'Sacred hospitality offering of betel nut and leaf',
+      icon: Icons.eco_rounded,
+      primaryColor: Color(0xFF228B22),
+      accentColor: Color(0xFFE0EEE0),
     ),
     'masor_tenga': CulturalItemMeta(
       key: 'masor_tenga',
-      nameAs: 'মাছৰ টেঙা',
-      nameEn: 'Masor Tenga (Sour Fish)',
-      description: 'Signature light tangy fish curry with elephant apple',
+      nameEn: 'Tangy Fish Curry',
+      nameTe: 'చేపల పులుసు',
+      nameHi: 'मछली का शोरबा',
+      description: 'Light tangy fish curry with elephant apple',
       icon: Icons.set_meal_rounded,
-      primaryColor: Color(0xFFE25822),
-      accentColor: Color(0xFFFFDAB9),
+      primaryColor: Color(0xFFE65100),
+      accentColor: Color(0xFFFFCC80),
     ),
     'joha_rice': CulturalItemMeta(
       key: 'joha_rice',
-      nameAs: 'জোহা চাউল',
-      nameEn: 'Joha Rice',
-      description: 'Fragrant, aromatic heirloom winter rice',
+      nameEn: 'Aromatic Rice',
+      nameTe: 'సువాసన బియ్యం',
+      nameHi: 'सुगंधित चावल',
+      description: 'Naturally fragrant short-grain winter rice',
       icon: Icons.grain_rounded,
-      primaryColor: Color(0xFF8B8589),
-      accentColor: Color(0xFFFFF8DC),
+      primaryColor: Color(0xFF708090),
+      accentColor: Color(0xFFF5F5F5),
     ),
     'bihu_dance': CulturalItemMeta(
       key: 'bihu_dance',
-      nameAs: 'বিহু নৃত্য',
-      nameEn: 'Bihu Dance',
-      description: 'Joyful folk spring dance celebration',
-      icon: Icons.celebration_rounded,
+      nameEn: 'Spring Folk Dance',
+      nameTe: 'జానపద నృత్యం',
+      nameHi: 'लोक नृत्य',
+      description: 'Exuberant celebration of youth and springtime',
+      icon: Icons.accessibility_new_rounded,
       primaryColor: Color(0xFFC71585),
       accentColor: Color(0xFFFFB6C1),
     ),
     'brahmaputra': CulturalItemMeta(
       key: 'brahmaputra',
-      nameAs: 'ব্ৰহ্মপুত্ৰ নদী',
-      nameEn: 'Brahmaputra River',
-      description: 'Majestic red lifeline river of Assam',
+      nameEn: 'Sacred River',
+      nameTe: 'పవిత్ర నది',
+      nameHi: 'पवित्र नदी',
+      description: 'Mighty trans-Himalayan lifeline river',
       icon: Icons.water_rounded,
       primaryColor: Color(0xFF1E90FF),
-      accentColor: Color(0xFFB0E0E6),
+      accentColor: Color(0xFFE0FFFF),
     ),
     'rhino': CulturalItemMeta(
       key: 'rhino',
-      nameAs: 'এশিঙীয়া গঁড়',
       nameEn: 'One-Horned Rhino',
-      description: 'Pride of Kaziranga National Park',
+      nameTe: 'ఖడ్గమృగం',
+      nameHi: 'एक सींग वाला गैंडा',
+      description: 'Majestic great Indian rhinoceros',
       icon: Icons.pets_rounded,
-      primaryColor: Color(0xFF708090),
-      accentColor: Color(0xFFD3D3D3),
+      primaryColor: Color(0xFF696969),
+      accentColor: Color(0xFFDCDCDC),
     ),
-    'kopou_phool': CulturalItemMeta(
-      key: 'kopou_phool',
-      nameAs: 'কপৌ ফুল',
-      nameEn: 'Kopou Phool (Foxtail Orchid)',
-      description: 'Pink foxtail orchid adorning Bihu dancers hair',
-      icon: Icons.filter_vintage_rounded,
-      primaryColor: Color(0xFF9370DB),
+    'kopou_flower': CulturalItemMeta(
+      key: 'kopou_flower',
+      nameEn: 'Foxtail Orchid',
+      nameTe: 'ఆర్కిడ్ పువ్వు',
+      nameHi: 'आर्किड फूल',
+      description: 'Delicate pink-purple wild seasonal orchid',
+      icon: Icons.local_florist_rounded,
+      primaryColor: Color(0xFFBA55D3),
       accentColor: Color(0xFFE6E6FA),
     ),
     'gogona': CulturalItemMeta(
       key: 'gogona',
-      nameAs: 'গগনা',
-      nameEn: 'Gogona',
-      description: 'Delicate bamboo jaw harp played with mouth',
-      icon: Icons.graphic_eq_rounded,
-      primaryColor: Color(0xFF8FBC8F),
+      nameEn: 'Bamboo Jaw Harp',
+      nameTe: 'దవడ వాయిద్యం',
+      nameHi: 'जॉ हार्प',
+      description: 'Slender vibrating bamboo instrument played by women',
+      icon: Icons.music_video_rounded,
+      primaryColor: Color(0xFF8B7355),
       accentColor: Color(0xFFF5DEB3),
     ),
     'tokari': CulturalItemMeta(
       key: 'tokari',
-      nameAs: 'টকাৰী',
-      nameEn: 'Tokari',
-      description: 'Ancient string instrument used in folk geet',
-      icon: Icons.queue_music_rounded,
-      primaryColor: Color(0xFFCD853F),
-      accentColor: Color(0xFFF4A460),
+      nameEn: 'String Lute',
+      nameTe: 'తంత్రీ వాయిద్యం',
+      nameHi: 'तंतु वाद्य',
+      description: 'Ancient plucked string instrument of devotional music',
+      icon: Icons.audiotrack_rounded,
+      primaryColor: Color(0xFF8B4500),
+      accentColor: Color(0xFFFFE4B5),
     ),
-    'pitha': CulturalItemMeta(
-      key: 'pitha',
-      nameAs: 'তিল পিঠা',
-      nameEn: 'Til Pitha',
-      description: 'Crisp roasted rice rolls stuffed with sesame and jaggery',
+    'til_pitha': CulturalItemMeta(
+      key: 'til_pitha',
+      nameEn: 'Sesame Rice Roll',
+      nameTe: 'నువ్వుల తీపి',
+      nameHi: 'तिल की मिठाई',
+      description: 'Crisp rolled rice pancake with black sesame and jaggery',
       icon: Icons.cookie_rounded,
-      primaryColor: Color(0xFFD2691E),
-      accentColor: Color(0xFFFFEFD5),
+      primaryColor: Color(0xFF2F4F4F),
+      accentColor: Color(0xFFFAF0E6),
     ),
-    'taat_xaal': CulturalItemMeta(
-      key: 'taat_xaal',
-      nameAs: 'তাঁত শাল',
-      nameEn: 'Taat-xaal (Handloom)',
-      description: 'Traditional wooden frame weaving loom',
-      icon: Icons.grid_view_rounded,
-      primaryColor: Color(0xFF6A5ACD),
-      accentColor: Color(0xFFE6E6FA),
+    'tat_xal': CulturalItemMeta(
+      key: 'tat_xal',
+      nameEn: 'Village Loom',
+      nameTe: 'మగ్గం',
+      nameHi: 'हथकरघा',
+      description: 'Traditional wooden domestic handloom',
+      icon: Icons.grid_on_rounded,
+      primaryColor: Color(0xFF8B5A2B),
+      accentColor: Color(0xFFD2B48C),
     ),
     'majuli': CulturalItemMeta(
       key: 'majuli',
-      nameAs: 'মাজুলী',
-      nameEn: 'Majuli River Island',
-      description: 'World-famous river island and center of neo-Vaishnavism',
+      nameEn: 'River Island',
+      nameTe: 'నది ద్వీపం',
+      nameHi: 'नदी द्वीप',
+      description: 'Cradle of neo-Vaishnavite culture and monastic sattras',
       icon: Icons.landscape_rounded,
       primaryColor: Color(0xFF2E8B57),
-      accentColor: Color(0xFFE0FFFF),
+      accentColor: Color(0xFFE0F2E9),
     ),
     'kamakhya': CulturalItemMeta(
       key: 'kamakhya',
-      nameAs: 'কামাখ্যা মন্দিৰ',
-      nameEn: 'Kamakhya Temple',
-      description: 'Historic Nilachal hill Shakti peeth',
+      nameEn: 'Hilltop Temple',
+      nameTe: 'దేవాలయం',
+      nameHi: 'मंदिर',
+      description: 'Ancient sacred shrine on Nilachal Hill',
       icon: Icons.temple_hindu_rounded,
       primaryColor: Color(0xFFB22222),
-      accentColor: Color(0xFFFFD700),
+      accentColor: Color(0xFFFFDAB9),
     ),
     'rang_ghar': CulturalItemMeta(
       key: 'rang_ghar',
-      nameAs: 'ৰংঘৰ',
-      nameEn: 'Rang Ghar',
-      description: 'Historic two-storeyed royal Ahom pavilion',
-      icon: Icons.stadium_rounded,
+      nameEn: 'Royal Pavilion',
+      nameTe: 'ప్రాసాదం',
+      nameHi: 'रंग घर',
+      description: 'Historic two-storey royal amphitheatre',
+      icon: Icons.account_balance_rounded,
       primaryColor: Color(0xFF8B0000),
       accentColor: Color(0xFFFFE4C4),
     ),
@@ -246,8 +288,9 @@ class CulturalVisualHelper {
     return items[key] ??
         CulturalItemMeta(
           key: key,
-          nameAs: key,
           nameEn: key.replaceAll('_', ' '),
+          nameTe: key.replaceAll('_', ' '),
+          nameHi: key.replaceAll('_', ' '),
           description: '',
           icon: Icons.category_rounded,
           primaryColor: const Color(0xFF8B6B4D),
@@ -276,15 +319,21 @@ class CulturalVisualCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final meta = CulturalVisualHelper.getMeta(itemKey);
+    final locale = Localizations.localeOf(context).languageCode;
+    final localizedTitle = meta.getLocalizedName(locale);
 
     Widget content = Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
-        color: isSelected ? meta.primaryColor.withValues(alpha: 0.25) : meta.accentColor.withValues(alpha: 0.35),
+        color: isSelected
+            ? meta.primaryColor.withValues(alpha: 0.25)
+            : meta.accentColor.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isSelected ? meta.primaryColor : meta.primaryColor.withValues(alpha: 0.4),
+          color: isSelected
+              ? meta.primaryColor
+              : meta.primaryColor.withValues(alpha: 0.4),
           width: isSelected ? 3.5 : 1.5,
         ),
         boxShadow: isSelected
@@ -317,7 +366,7 @@ class CulturalVisualCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: Text(
-                meta.nameAs,
+                localizedTitle,
                 textAlign: TextAlign.center,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -325,19 +374,6 @@ class CulturalVisualCard extends StatelessWidget {
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: meta.primaryColor,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: Text(
-                meta.nameEn.split(' ').first,
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[700],
                 ),
               ),
             ),

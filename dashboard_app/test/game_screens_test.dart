@@ -13,6 +13,7 @@ import 'package:dashboard_app/features/games/screens/pick_correct_screen.dart';
 import 'package:dashboard_app/features/games/screens/number_game_screen.dart';
 import 'package:dashboard_app/features/games/screens/family_quiz_screen.dart';
 import 'package:dashboard_app/features/games/screens/recalling_memories_screen.dart';
+import 'package:dashboard_app/features/games/screens/draw_shape_screen.dart';
 import 'package:dashboard_app/features/games/services/content_pack_service.dart';
 import 'package:dashboard_app/features/games/services/cultural_visual_helper.dart';
 
@@ -70,7 +71,7 @@ void main() {
       final correctMeta = CulturalVisualHelper.getMeta(correctKey);
 
       // Find the option widget with this text
-      final correctOptionFinder = find.widgetWithText(ElevatedButton, correctMeta.nameAs);
+      final correctOptionFinder = find.widgetWithText(ElevatedButton, correctMeta.nameEn);
       expect(correctOptionFinder, findsOneWidget);
 
       // Tap the correct option
@@ -111,7 +112,7 @@ void main() {
       final correctKey = currentItem.options[currentItem.correctIndex];
       final correctMeta = CulturalVisualHelper.getMeta(correctKey);
 
-      final correctOptionFinder = find.widgetWithText(ElevatedButton, correctMeta.nameAs);
+      final correctOptionFinder = find.widgetWithText(ElevatedButton, correctMeta.nameEn);
       expect(correctOptionFinder, findsOneWidget);
 
       await tester.tap(correctOptionFinder);
@@ -217,7 +218,7 @@ void main() {
         await tester.pump(const Duration(milliseconds: 100));
       }
 
-      final responseButtonFinder = find.widgetWithText(ElevatedButton, 'হয়, বৰ ভাল স্মৃতি! (Yes, sweet memories!)');
+      final responseButtonFinder = find.widgetWithText(ElevatedButton, 'Yes, wonderful memories!');
       expect(responseButtonFinder, findsOneWidget);
 
       await tester.tap(responseButtonFinder);
@@ -227,6 +228,58 @@ void main() {
       expect(attempts.length, equals(1));
       expect(attempts.first.correct, isTrue);
       expect(attempts.first.gameId, equals('recalling_memories'));
+
+      await tester.pump(const Duration(seconds: 2));
+      await tester.pumpWidget(const SizedBox());
+      await tester.pump();
+    });
+
+    testWidgets('DrawShapeScreen: canvas gesture drawing, undo, clear, and submission works',
+        (WidgetTester tester) async {
+      tester.view.physicalSize = const Size(800, 1400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: DrawShapeScreen(initialDifficulty: 1),
+        ),
+      );
+      // Wait for target shape preview countdown to expire and canvas to appear
+      for (int i = 0; i < 6; i++) {
+        await tester.pump(const Duration(seconds: 1));
+      }
+
+      // Locate GestureDetector canvas
+      final gestureDetectorFinder = find.byType(GestureDetector);
+      expect(gestureDetectorFinder, findsWidgets);
+
+      // Perform dragging gesture on the drawing canvas
+      await tester.drag(gestureDetectorFinder.first, const Offset(60, 60));
+      await tester.pump();
+
+      // Verify Undo and Clear buttons exist
+      expect(find.widgetWithText(ElevatedButton, 'Undo'), findsOneWidget);
+      expect(find.widgetWithText(ElevatedButton, 'Clear Canvas'), findsOneWidget);
+
+      // Test Undo button
+      await tester.tap(find.widgetWithText(ElevatedButton, 'Undo'));
+      await tester.pump();
+
+      // Draw another stroke
+      await tester.drag(gestureDetectorFinder.first, const Offset(80, 80));
+      await tester.pump();
+
+      // Tap 'I am Done'
+      final doneButton = find.widgetWithText(ElevatedButton, 'I am Done');
+      expect(doneButton, findsOneWidget);
+      await tester.tap(doneButton);
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Verify attempt recorded
+      final attempts = await database.getAllAttempts();
+      expect(attempts.length, equals(1));
+      expect(attempts.first.gameId, equals('draw_shape'));
 
       await tester.pump(const Duration(seconds: 2));
       await tester.pumpWidget(const SizedBox());

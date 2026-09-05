@@ -118,6 +118,7 @@ class GameSessionController extends ChangeNotifier {
       gameId: gameId,
       currentLevel: difficultyLevel,
       accuracy: accuracy,
+      score: correctCount,
     );
 
     int stars = 1;
@@ -142,3 +143,4 @@ class GameSessionController extends ChangeNotifier {
     );
   }
 }
+

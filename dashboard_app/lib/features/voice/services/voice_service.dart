@@ -6,6 +6,7 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 
 import '../models/voice_intent.dart';
 import 'voice_intent_matcher.dart';
+import '../../../core/localization/app_languages.dart';
 
 /// Voice assistant status states.
 enum VoiceAssistantStatus {
@@ -206,13 +207,12 @@ class VoiceService with ChangeNotifier implements IVoiceService {
   String? _resolveLocaleId(String langCode) {
     if (_availableLocales.isEmpty) return null;
 
-    // Preferred locale tags for each language
-    final candidates = switch (langCode) {
-      'as' => ['as_IN', 'as', 'bn_IN', 'en_IN'], // Assamese with regional fallback
-      'bn' => ['bn_IN', 'bn_BD', 'bn', 'en_IN'],
-      'hi' => ['hi_IN', 'hi', 'en_IN'],
-      _ => ['en_IN', 'en_US', 'en_GB', 'en'],
-    };
+    final appLang = AppLanguages.fromCode(langCode);
+    final candidates = [
+      ...appLang.sttLocales,
+      // If the selected language is not English, include English as fallback
+      if (appLang != AppLanguage.english) ...AppLanguage.english.sttLocales,
+    ];
 
     for (final candidate in candidates) {
       for (final locale in _availableLocales) {

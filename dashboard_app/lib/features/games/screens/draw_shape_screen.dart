@@ -10,8 +10,8 @@ class DrawShapeScreen extends BaseGameScreen {
       : super(
           gameId: 'draw_shape',
           gameTitle: 'Draw What You Saw',
-          gameTitleAs: 'মনত ৰাখি আঁকক',
           domain: 'VISUAL_MEMORY',
+          enableScroll: false, // Prevents parent scroll from intercepting canvas drawing gestures
         );
 
   @override
@@ -21,7 +21,7 @@ class DrawShapeScreen extends BaseGameScreen {
 class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
   String? _lastItemId;
   bool _isShowingPreview = true;
-  int _countdownSeconds = 5;
+  int _countdownSeconds = 3;
   Timer? _countdownTimer;
   bool _hasUsedRepeek = false;
 
@@ -34,7 +34,7 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
     _strokes.clear();
     _currentStroke = [];
     _hasUsedRepeek = false;
-    _startPreview(5);
+    _startPreview(3);
   }
 
   void _startPreview(int seconds) {
@@ -69,17 +69,37 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
   }
 
   void _evaluateAndSubmit() {
-    // Forgiving engagement scoring: if at least 8 points or 1 stroke, pass!
-    final totalPoints = _strokes.fold<int>(0, (sum, stroke) => sum + stroke.length);
+    // Forgiving engagement scoring: if at least 1 stroke and 6 points, pass!
+    final totalPoints =
+        _strokes.fold<int>(0, (sum, stroke) => sum + stroke.length);
     final passed = totalPoints >= 6;
     submitAnswer(isCorrect: passed);
+  }
+
+  String _getShapeDisplayName(String shapeKey) {
+    switch (shapeKey.toLowerCase()) {
+      case 'circle':
+        return 'Circle';
+      case 'triangle':
+        return 'Triangle';
+      case 'square':
+        return 'Square';
+      case 'star':
+        return 'Star';
+      case 'diamond':
+        return 'Diamond';
+      case 'cone':
+        return 'Shield / Cone';
+      default:
+        return 'Shape';
+    }
   }
 
   @override
   Widget buildGameContent(BuildContext context, GameItem currentItem) {
     _setupRound(currentItem);
     final shapeKey = currentItem.raw['shape'] as String? ?? 'circle';
-    final shapeName = currentItem.raw['shapeName'] as String? ?? 'আকৃতি (Shape)';
+    final shapeName = _getShapeDisplayName(shapeKey);
 
     if (_isShowingPreview) {
       // 5s calm countdown view
@@ -96,7 +116,7 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
                   width: 140,
                   height: 140,
                   child: CircularProgressIndicator(
-                    value: _countdownSeconds / 5.0,
+                    value: _countdownSeconds / 3.0,
                     strokeWidth: 8,
                     backgroundColor: Colors.grey[200],
                     color: AppTheme.secondaryColor,
@@ -131,14 +151,14 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
             Text(
               shapeName,
               style: const TextStyle(
-                fontSize: 24,
+                fontSize: 26,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.primaryColor,
               ),
             ),
             const SizedBox(height: 6),
             const Text(
-              'মন দি মনত ৰাখক (Memorize this shape)',
+              'Memorize this shape',
               style: TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
             ),
             const SizedBox(height: 16),
@@ -148,8 +168,8 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
                 setState(() => _isShowingPreview = false);
               },
               child: const Text(
-                'মই সাজু (I am ready)',
-                style: TextStyle(fontSize: 18, color: AppTheme.primaryColor),
+                'I am ready',
+                style: TextStyle(fontSize: 20, color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -157,12 +177,15 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
       );
     }
 
-    // Finger drawing canvas
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          height: 280,
+    // Finger drawing canvas with touch clamping and opaque hit test behavior
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final canvasWidth = constraints.maxWidth;
+        const canvasHeight = 280.0;
+
+        return Container(
+          width: canvasWidth,
+          height: canvasHeight,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
@@ -178,25 +201,37 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(18),
             child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onPanStart: (details) {
+                final clampedX =
+                    details.localPosition.dx.clamp(0.0, canvasWidth);
+                final clampedY =
+                    details.localPosition.dy.clamp(0.0, canvasHeight);
                 setState(() {
-                  _currentStroke = [details.localPosition];
+                  _currentStroke = [Offset(clampedX, clampedY)];
                   _strokes.add(_currentStroke);
                 });
               },
               onPanUpdate: (details) {
+                final clampedX =
+                    details.localPosition.dx.clamp(0.0, canvasWidth);
+                final clampedY =
+                    details.localPosition.dy.clamp(0.0, canvasHeight);
                 setState(() {
-                  _currentStroke.add(details.localPosition);
+                  _currentStroke.add(Offset(clampedX, clampedY));
                 });
+              },
+              onPanEnd: (_) {
+                setState(() {});
               },
               child: CustomPaint(
                 painter: _DrawingPainter(strokes: _strokes),
-                size: Size.infinite,
+                size: const Size(double.infinity, canvasHeight),
               ),
             ),
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -223,65 +258,80 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
 
     return Column(
       children: [
-        // Action toolbar: Undo (min 80dp target), Clear (min 80dp target), Repeek
+        // Action toolbar: Undo (80dp target), Clear (80dp target), Repeek
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             // Undo button
-            SizedBox(
-              height: 70,
-              child: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppTheme.primaryColor, width: 2),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+            Expanded(
+              child: SizedBox(
+                height: 80,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                  icon: const Icon(Icons.undo_rounded, size: 28),
+                  label: const Text('Undo', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  onPressed: _strokes.isNotEmpty
+                      ? () {
+                          setState(() => _strokes.removeLast());
+                        }
+                      : null,
                 ),
-                icon: const Icon(Icons.undo_rounded, size: 28),
-                label: const Text('পূৰ্বৰ (Undo)', style: TextStyle(fontSize: 16)),
-                onPressed: _strokes.isNotEmpty
-                    ? () {
-                        setState(() => _strokes.removeLast());
-                      }
-                    : null,
               ),
             ),
+
+            const SizedBox(width: 10),
 
             // Clear button
-            SizedBox(
-              height: 70,
-              child: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.redAccent, width: 2),
-                  foregroundColor: Colors.redAccent,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+            Expanded(
+              child: SizedBox(
+                height: 80,
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade700,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                  icon: const Icon(Icons.delete_outline_rounded, size: 28),
+                  label: const Text('Clear Canvas', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  onPressed: _strokes.isNotEmpty
+                      ? () {
+                          setState(() => _strokes.clear());
+                        }
+                      : null,
                 ),
-                icon: const Icon(Icons.delete_outline_rounded, size: 28),
-                label: const Text('মচি পেলাওক (Clear)', style: TextStyle(fontSize: 16)),
-                onPressed: _strokes.isNotEmpty
-                    ? () {
-                        setState(() => _strokes.clear());
-                      }
-                    : null,
               ),
             ),
 
-            // Re-peek button ("Show me again")
-            SizedBox(
-              height: 70,
-              child: TextButton.icon(
-                style: TextButton.styleFrom(
-                  foregroundColor: AppTheme.secondaryColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+            const SizedBox(width: 10),
+
+            // Re-peek button ("Show again")
+            Expanded(
+              child: SizedBox(
+                height: 80,
+                child: TextButton.icon(
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppTheme.secondaryColor,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(color: AppTheme.secondaryColor.withValues(alpha: 0.3)),
+                    ),
+                  ),
+                  icon: const Icon(Icons.visibility_rounded, size: 26),
+                  label: const Text('Show\nagain', textAlign: TextAlign.center, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  onPressed: !_hasUsedRepeek
+                      ? () {
+                          _hasUsedRepeek = true;
+                          _startPreview(3);
+                        }
+                      : null,
                 ),
-                icon: const Icon(Icons.visibility_rounded, size: 28),
-                label: const Text('আকৌ চাওক\n(Show again)', textAlign: TextAlign.center, style: TextStyle(fontSize: 14)),
-                onPressed: !_hasUsedRepeek
-                    ? () {
-                        _hasUsedRepeek = true;
-                        _startPreview(3);
-                      }
-                    : null,
               ),
             ),
           ],
@@ -297,11 +347,11 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
               backgroundColor: AppTheme.primaryColor,
               foregroundColor: Colors.white,
               elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
             ),
             icon: const Icon(Icons.check_circle_rounded, size: 36),
             label: const Text(
-              'অঁকা শেষ হ\'ল (I am Done)',
+              'I am Done',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             onPressed: _evaluateAndSubmit,

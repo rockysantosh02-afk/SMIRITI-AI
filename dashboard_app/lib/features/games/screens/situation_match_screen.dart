@@ -114,7 +114,9 @@ class _SituationMatchScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        meta.nameAs,
+                        meta.getLocalizedName(
+                          Localizations.localeOf(context).languageCode,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(

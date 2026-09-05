@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../core/database/app_database.dart';
 import '../../core/database/repositories/journal_repository.dart';
 import 'journal_entry_screen.dart';
@@ -50,31 +51,33 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Future<void> _confirmDelete(JournalEntry entry) async {
+  Future<void> _confirmDelete(JournalEntry entry, AppLocalizations loc) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppTheme.surfaceColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'স্মৃতি আঁতৰাবনে? (Remove Memory?)',
-          style: TextStyle(
+        title: Text(
+          loc.deleteMemoryConfirmTitle,
+          style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: AppTheme.textColor,
           ),
         ),
         content: Text(
-          'আপুনি "${entry.title.isNotEmpty ? entry.title : 'এই স্মৃতি'}" আঁতৰাব বিচাৰিছেনে? (Are you sure you want to remove this memory?)',
+          entry.title.isNotEmpty
+              ? '${loc.deleteMemoryConfirmMessage}\n\n"${entry.title}"'
+              : loc.deleteMemoryConfirmMessage,
           style: const TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
             style: TextButton.styleFrom(minimumSize: const Size(100, 56)),
-            child: const Text(
-              'থাকক (Keep)',
-              style: TextStyle(fontSize: 18, color: AppTheme.primaryColor),
+            child: Text(
+              loc.cancel,
+              style: const TextStyle(fontSize: 18, color: AppTheme.primaryColor),
             ),
           ),
           ElevatedButton(
@@ -85,9 +88,9 @@ class _JournalScreenState extends State<JournalScreen> {
               minimumSize: const Size(110, 56),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text(
-              'আঁতৰাওক (Remove)',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            child: Text(
+              loc.delete,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -98,13 +101,13 @@ class _JournalScreenState extends State<JournalScreen> {
       await _repository.softDelete(entry.id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             backgroundColor: AppTheme.primaryColor,
             content: Text(
-              'স্মৃতি আঁতৰোৱা হ\'ল (Memory removed)',
-              style: TextStyle(fontSize: 18, color: Colors.white),
+              loc.deleteEntry,
+              style: const TextStyle(fontSize: 18, color: Colors.white),
             ),
-            duration: Duration(seconds: 2),
+            duration: const Duration(seconds: 2),
           ),
         );
       }
@@ -113,16 +116,18 @@ class _JournalScreenState extends State<JournalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: const Text(
-          'মোৰ দিনলিপি (My Journal)',
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        title: Text(
+          loc.journal,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, size: 30),
-          tooltip: 'Back to Dashboard',
+          tooltip: loc.back,
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -140,19 +145,19 @@ class _JournalScreenState extends State<JournalScreen> {
                   color: AppTheme.primaryColor.withValues(alpha: 0.2),
                 ),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.lock_outline_rounded,
                     color: AppTheme.primaryColor,
                     size: 26,
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'আপোনাৰ দিনলিপি সম্পূৰ্ণ নিজা আৰু সুৰক্ষিত। (Your memory journal is completely private to you.)',
-                      style: TextStyle(
-                        fontSize: 16,
+                      loc.journalPrivacyNotice,
+                      style: const TextStyle(
+                        fontSize: 15,
                         color: AppTheme.subtitleColor,
                         fontWeight: FontWeight.w500,
                       ),
@@ -179,7 +184,7 @@ class _JournalScreenState extends State<JournalScreen> {
                   final entries = snapshot.data ?? [];
 
                   if (entries.isEmpty) {
-                    return _buildEmptyState();
+                    return _buildEmptyState(loc);
                   }
 
                   return ListView.builder(
@@ -187,7 +192,7 @@ class _JournalScreenState extends State<JournalScreen> {
                     itemCount: entries.length,
                     itemBuilder: (context, index) {
                       final entry = entries[index];
-                      return _buildMemoryCard(entry);
+                      return _buildMemoryCard(entry, loc);
                     },
                   );
                 },
@@ -214,10 +219,10 @@ class _JournalScreenState extends State<JournalScreen> {
             key: const Key('add_memory_button'),
             onPressed: _openNewEntryScreen,
             icon: const Icon(Icons.add_rounded, size: 36),
-            label: const Text(
-              'নতুন স্মৃতি যোগ কৰক\n(+ Add Memory)',
+            label: Text(
+              loc.newEntry,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 height: 1.2,
@@ -237,7 +242,7 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(AppLocalizations loc) {
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(28),
@@ -258,10 +263,10 @@ class _JournalScreenState extends State<JournalScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              'আপোনাৰ স্মৃতিবোৰ ইয়াত সংৰক্ষিত থাকিব\n(Your memories will appear here)',
+            Text(
+              loc.noMemoriesYet,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: AppTheme.textColor,
@@ -269,10 +274,10 @@ class _JournalScreenState extends State<JournalScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
-              'প্ৰতিটো স্মৃতিয়েই বিশেষ আৰু আনন্দদায়ক।\n(Every memory is special and treasured.)',
+            Text(
+              loc.emptyJournalDesc,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 18,
                 color: AppTheme.subtitleColor,
                 height: 1.3,
@@ -285,10 +290,10 @@ class _JournalScreenState extends State<JournalScreen> {
               child: ElevatedButton.icon(
                 onPressed: _openNewEntryScreen,
                 icon: const Icon(Icons.edit_note_rounded, size: 36),
-                label: const Text(
-                  'প্ৰথম স্মৃতি যোগ কৰক\n(Add Your First Memory)',
+                label: Text(
+                  loc.writeFirstMemory,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     height: 1.2,
@@ -311,7 +316,7 @@ class _JournalScreenState extends State<JournalScreen> {
     );
   }
 
-  Widget _buildMemoryCard(JournalEntry entry) {
+  Widget _buildMemoryCard(JournalEntry entry, AppLocalizations loc) {
     final dateFormat = DateFormat('d MMMM yyyy, h:mm a');
     final formattedDate = dateFormat.format(entry.createdAt);
     final hasPhotoPath = entry.photoPath != null && entry.photoPath!.isNotEmpty;
@@ -360,7 +365,7 @@ class _JournalScreenState extends State<JournalScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      entry.title.isNotEmpty ? entry.title : 'স্মৃতি (Memory)',
+                      entry.title.isNotEmpty ? entry.title : loc.memoryTitle,
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -372,8 +377,8 @@ class _JournalScreenState extends State<JournalScreen> {
                   IconButton(
                     icon: const Icon(Icons.delete_outline_rounded, size: 28),
                     color: Colors.grey[600],
-                    tooltip: 'Remove Memory',
-                    onPressed: () => _confirmDelete(entry),
+                    tooltip: loc.deleteEntry,
+                    onPressed: () => _confirmDelete(entry, loc),
                   ),
                 ],
               ),
@@ -439,7 +444,7 @@ class _JournalScreenState extends State<JournalScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '✨ আপোনাৰ কাহিনী (Your Story)',
+                            loc.storyReflection,
                             style: TextStyle(
                               fontSize: 17,
                               fontWeight: FontWeight.bold,
@@ -470,7 +475,7 @@ class _JournalScreenState extends State<JournalScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    'চাবলৈ বা সলাবলৈ স্পৰ্শ কৰক (Tap to view / edit)',
+                    loc.editEntry,
                     style: TextStyle(
                       fontSize: 14,
                       color: AppTheme.primaryColor.withValues(alpha: 0.8),
@@ -514,7 +519,7 @@ class _JournalScreenState extends State<JournalScreen> {
             ),
             SizedBox(width: 10),
             Text(
-              'ছবি উপলব্ধ নহয় (Photo not found on device)',
+              'Photo not found on device',
               style: TextStyle(
                 fontSize: 15,
                 color: AppTheme.subtitleColor,
