@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/database/app_database.dart';
 import '../../../core/database/repositories/family_repository.dart';
 
 /// Screen for managing family member memories and photos for personal memory games.
 class FamilyMemberScreen extends StatefulWidget {
-  const FamilyMemberScreen({super.key});
+  final FamilyRepository? repository;
+
+  const FamilyMemberScreen({super.key, this.repository});
 
   @override
   State<FamilyMemberScreen> createState() => _FamilyMemberScreenState();
@@ -21,10 +24,11 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
   @override
   void initState() {
     super.initState();
-    _repository = FamilyRepository(DatabaseProvider.instance);
+    _repository = widget.repository ?? FamilyRepository(DatabaseProvider.instance);
   }
 
   void _showAddMemberDialog() {
+    final loc = AppLocalizations.of(context);
     final nameController = TextEditingController();
     final notesController = TextEditingController();
     String selectedRelation = 'Daughter';
@@ -33,6 +37,8 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
     final relations = [
       'Daughter',
       'Son',
+      'Father',
+      'Mother',
       'Granddaughter',
       'Grandson',
       'Spouse',
@@ -64,16 +70,15 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Add Family Member',
-                      style: TextStyle(
+                    Text(
+                      loc.addFamilyMember,
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                         color: AppTheme.primaryColor,
                       ),
                     ),
                     IconButton(
-
                       icon: const Icon(Icons.close_rounded, size: 28),
                       onPressed: () => Navigator.pop(ctx),
                     ),
@@ -122,15 +127,15 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                                 ),
                               ),
                             )
-                          : const Column(
+                          : Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.add_a_photo_rounded, size: 40, color: AppTheme.primaryColor),
-                                SizedBox(height: 6),
+                                const Icon(Icons.add_a_photo_rounded, size: 40, color: AppTheme.primaryColor),
+                                const SizedBox(height: 6),
                                 Text(
-                                  'Pick photo',
+                                  loc.pickPhoto,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 14, color: AppTheme.subtitleColor),
+                                  style: const TextStyle(fontSize: 14, color: AppTheme.subtitleColor),
                                 ),
                               ],
                             ),
@@ -144,7 +149,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                   controller: nameController,
                   style: const TextStyle(fontSize: 22, color: AppTheme.textColor),
                   decoration: InputDecoration(
-                    labelText: 'Full Name',
+                    labelText: loc.fullName,
                     labelStyle: const TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
                     filled: true,
                     fillColor: AppTheme.surfaceColor,
@@ -158,7 +163,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                   initialValue: selectedRelation,
                   style: const TextStyle(fontSize: 18, color: AppTheme.textColor),
                   decoration: InputDecoration(
-                    labelText: 'Relation',
+                    labelText: loc.relation,
                     labelStyle: const TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
                     filled: true,
                     fillColor: AppTheme.surfaceColor,
@@ -178,7 +183,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                   controller: notesController,
                   style: const TextStyle(fontSize: 18, color: AppTheme.textColor),
                   decoration: InputDecoration(
-                    labelText: 'Notes (optional)',
+                    labelText: loc.notesOptional,
                     labelStyle: const TextStyle(fontSize: 16, color: AppTheme.subtitleColor),
                     filled: true,
                     fillColor: AppTheme.surfaceColor,
@@ -198,31 +203,56 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
                     icon: const Icon(Icons.check_circle_rounded, size: 32),
-                    label: const Text(
-                      'Save Member',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    label: Text(
+                      loc.saveMember,
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     onPressed: () async {
                       final name = nameController.text.trim();
-                      if (name.isEmpty) return;
+                      if (name.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              loc.pleaseFillRequiredDetails,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            backgroundColor: AppTheme.errorColor,
+                          ),
+                        );
+                        return;
+                      }
 
                       final navigator = Navigator.of(ctx);
                       final messenger = ScaffoldMessenger.of(context);
 
-                      await _repository.addMember(
-                        name: name,
-                        relation: selectedRelation,
-                        photoPath: pickedImagePath,
-                        notes: notesController.text.trim(),
-                      );
-
-                      if (mounted) {
-                        navigator.pop();
-                        messenger.showSnackBar(
-                          const SnackBar(
-                            content: Text('Family member added successfully'),
-                          ),
+                      try {
+                        await _repository.addMember(
+                          name: name,
+                          relation: selectedRelation,
+                          photoPath: pickedImagePath,
+                          notes: notesController.text.trim(),
                         );
+
+                        if (mounted) {
+                          navigator.pop();
+                          setState(() {});
+                          messenger.showSnackBar(
+                            SnackBar(
+                              content: Text(loc.familyMemberAdded),
+                              backgroundColor: const Color(0xFF2E8B57),
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        debugPrint('Error adding family member: $e');
+                        if (mounted) {
+                          messenger.showSnackBar(
+                            const SnackBar(
+                              content: Text('Could not save family member. Please try again.'),
+                              backgroundColor: AppTheme.errorColor,
+                            ),
+                          );
+                        }
                       }
                     },
                   ),
@@ -237,6 +267,7 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Family Memories'),
@@ -297,10 +328,10 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                               color: Colors.grey[400],
                             ),
                             const SizedBox(height: 16),
-                            const Text(
-                              'No family members added yet',
+                            Text(
+                              loc.noFamilyMembers,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: AppTheme.subtitleColor,
@@ -400,9 +431,9 @@ class _FamilyMemberScreenState extends State<FamilyMemberScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                   ),
                   icon: const Icon(Icons.add_rounded, size: 36),
-                  label: const Text(
-                    'Add Family Member',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  label: Text(
+                    loc.addFamilyMember,
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   onPressed: _showAddMemberDialog,
                 ),

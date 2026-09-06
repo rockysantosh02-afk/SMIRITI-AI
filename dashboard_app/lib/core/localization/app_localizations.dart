@@ -185,6 +185,23 @@ class AppLocalizations {
   String get notificationsDisabledWarning => _t('notificationsDisabledWarning');
   String get recallingMemoriesYes => _t('recallingMemoriesYes');
   String get recallingMemoriesTellMore => _t('recallingMemoriesTellMore');
+  String get pleaseFillRequiredDetails => _t('pleaseFillRequiredDetails');
+  String get speechUnavailableForLanguage => _t('speechUnavailableForLanguage');
+  String get memorySavedNoStory => _t('memorySavedNoStory');
+  String get changeTime => _t('changeTime');
+  String get familyMemberAdded => _t('familyMemberAdded');
+  String get noFamilyMembers => _t('noFamilyMembers');
+  String get addFamilyMember => _t('addFamilyMember');
+  String get fullName => _t('fullName');
+  String get relation => _t('relation');
+  String get notesOptional => _t('notesOptional');
+  String get saveMember => _t('saveMember');
+  String get pickPhoto => _t('pickPhoto');
+  String get levelComplete => _t('levelComplete');
+  String get nextLevel => _t('nextLevel');
+  String get currentLevel => _t('currentLevel');
+  String get encouragementPositive => _t('encouragementPositive');
+  String get encouragementGentle => _t('encouragementGentle');
 
   // --- LOCALIZED STRINGS DICTIONARY ---
   static const Map<String, Map<String, String>> _localizedValues = {
@@ -345,6 +362,23 @@ class AppLocalizations {
       'notificationsDisabledWarning': 'Notifications are turned off. Your reminders are still saved safely on this device.',
       'recallingMemoriesYes': 'Yes, wonderful memories!',
       'recallingMemoriesTellMore': 'Tell me more / Next picture',
+      'pleaseFillRequiredDetails': 'Please fill in the required details.',
+      'speechUnavailableForLanguage': 'Speech recognition is not available for this language on this device.',
+      'memorySavedNoStory': 'Your memory has been saved. We could not create the story right now.',
+      'changeTime': 'Change Time',
+      'familyMemberAdded': 'Family member added successfully',
+      'noFamilyMembers': 'No family members added yet',
+      'addFamilyMember': 'Add Family Member',
+      'fullName': 'Full Name',
+      'relation': 'Relation',
+      'notesOptional': 'Notes (optional)',
+      'saveMember': 'Save Member',
+      'pickPhoto': 'Pick photo',
+      'levelComplete': 'Level Complete! You played wonderfully today!',
+      'nextLevel': 'Next Level',
+      'currentLevel': 'Current Level',
+      'encouragementPositive': 'Well done! Excellent work!',
+      'encouragementGentle': 'Good try. Take your time, let\'s try again!',
     },
 
     // ================= TELUGU =================
@@ -504,6 +538,23 @@ class AppLocalizations {
       'notificationsDisabledWarning': 'నోటిఫికేషన్‌లు ఆఫ్ చేయబడ్డాయి. మీ రిమైండర్‌లు పరికరంలో సురక్షితంగా ఉన్నాయి.',
       'recallingMemoriesYes': 'అవును, చక్కటి జ్ఞాపకాలు!',
       'recallingMemoriesTellMore': 'ఇంకా చెప్పండి / తదుపరి చిత్రం',
+      'pleaseFillRequiredDetails': 'దయచేసి అవసరమైన వివరాలను పూరించండి.',
+      'speechUnavailableForLanguage': 'ఈ పరికరంలో ఈ భాషకు వాయిస్ గుర్తింపు అందుబాటులో లేదు.',
+      'memorySavedNoStory': 'మీ జ్ఞాపకం భద్రపరచబడింది. ప్రస్తుతం కథను సృష్టించలేకపోయాము.',
+      'changeTime': 'సమయం మార్చండి',
+      'familyMemberAdded': 'కుటుంబ సభ్యుడు విజయవంతంగా జోడించబడ్డారు',
+      'noFamilyMembers': 'ఇంకా కుటుంబ సభ్యులు జోడించబడలేదు',
+      'addFamilyMember': 'కుటుంబ సభ్యుడిని జోడించండి',
+      'fullName': 'పూర్తి పేరు',
+      'relation': 'సంబంధం',
+      'notesOptional': 'గమనికలు (ఐచ్ఛికం)',
+      'saveMember': 'సభ్యుడిని భద్రపరచండి',
+      'pickPhoto': 'ఫోటోను ఎంచుకోండి',
+      'levelComplete': 'లెవెల్ పూర్తయింది! మీరు ఈరోజు అద్భుతంగా ఆడారు!',
+      'nextLevel': 'తరువాతి లెవెల్',
+      'currentLevel': 'ప్రస్తుత లెవెల్',
+      'encouragementPositive': 'చాలా బాగుంది! అద్భుతమైన పని!',
+      'encouragementGentle': 'మంచి ప్రయత్నం. నెమ్మదిగా ఆలోచించండి, మళ్ళీ ప్రయత్నిద్దాం!',
     },
 
     // ================= HINDI =================
@@ -663,6 +714,23 @@ class AppLocalizations {
       'notificationsDisabledWarning': 'सूचनाएं बंद हैं। आपके रिमाइंडर डिवाइस में सुरक्षित हैं।',
       'recallingMemoriesYes': 'हाँ, बहुत सुंदर यादें!',
       'recallingMemoriesTellMore': 'और बताएं / अगली तस्वीर',
+      'pleaseFillRequiredDetails': 'कृपया आवश्यक विवरण भरें।',
+      'speechUnavailableForLanguage': 'इस डिवाइस पर इस भाषा के लिए भाषण पहचान उपलब्ध नहीं है।',
+      'memorySavedNoStory': 'आपकी याद सुरक्षित रूप से सहेज ली गई है। हम अभी कहानी नहीं बना सके।',
+      'changeTime': 'समय बदलें',
+      'familyMemberAdded': 'परिवार का सदस्य सफलतापूर्वक जोड़ा गया',
+      'noFamilyMembers': 'अभी तक कोई परिवार का सदस्य नहीं जोड़ा गया',
+      'addFamilyMember': 'परिवार का सदस्य जोड़ें',
+      'fullName': 'पूरा नाम',
+      'relation': 'रिश्ता',
+      'notesOptional': 'नोट्स (वैकल्पिक)',
+      'saveMember': 'सदस्य सहेजें',
+      'pickPhoto': 'फोटो चुनें',
+      'levelComplete': 'स्तर पूरा हुआ! आपने आज बहुत अच्छा खेला!',
+      'nextLevel': 'अगला स्तर',
+      'currentLevel': 'वर्तमान स्तर',
+      'encouragementPositive': 'बहुत बढ़िया! शानदार काम!',
+      'encouragementGentle': 'अच्छा प्रयास। अपना समय लें, फिर से कोशिश करें!',
     },
   };
 }

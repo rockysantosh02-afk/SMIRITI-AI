@@ -40,6 +40,9 @@ class MockVoiceService with ChangeNotifier implements IVoiceService {
   List<stt.LocaleName> get availableLocales => [];
 
   @override
+  bool isLanguageSupported(String langCode) => true;
+
+  @override
   Future<bool> initialize() async => true;
 
   @override
@@ -190,7 +193,7 @@ void main() {
       expect(find.textContaining('Go Now'), findsOneWidget);
     });
 
-    testWidgets('Unknown command displays calm, non-distressing feedback',
+    testWidgets('Empty or truly unsupported input displays calm, non-distressing feedback',
         (tester) async {
       final mockVoice = MockVoiceService();
 
@@ -204,8 +207,8 @@ void main() {
       await tester.tap(find.bySemanticsLabel('Start listening'));
       await tester.pump();
 
-      // Finish speech with unknown phrase
-      mockVoice.simulateSpeechFinish('fly to the moon');
+      // Finish speech with empty transcript (truly unsupported)
+      mockVoice.simulateSpeechFinish('');
       await tester.pump();
 
       expect(find.textContaining('didn\'t understand'), findsOneWidget);

@@ -10,7 +10,6 @@ class PickCorrectScreen extends BaseGameScreen {
       : super(
           gameId: 'pick_correct',
           gameTitle: 'Pick the Correct One',
-          gameTitleAs: 'সঠিকটো বাছক',
           domain: 'RECALL',
         );
 
@@ -29,29 +28,37 @@ class _PickCorrectScreenState extends BaseGameScreenState<PickCorrectScreen> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.15)),
       ),
-      child: const Column(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
+          const Icon(
             Icons.touch_app_rounded,
             size: 64,
             color: AppTheme.primaryColor,
           ),
-          SizedBox(height: 12),
+          const SizedBox(height: 12),
           Text(
-            'তলৰ চাৰিটা বিকল্পৰ পৰা বাছনি কৰক',
+            Localizations.localeOf(context).languageCode == 'te'
+                ? 'సరైన ఎంపికను ఎంచుకోండి'
+                : (Localizations.localeOf(context).languageCode == 'hi'
+                    ? 'सही विकल्प चुनें'
+                    : 'Choose the correct option'),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w600,
               color: AppTheme.textColor,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
-            'Tap the card that matches the prompt',
+            Localizations.localeOf(context).languageCode == 'te'
+                ? 'సూచనకు సరిపోయే కార్డును నొక్కండి'
+                : (Localizations.localeOf(context).languageCode == 'hi'
+                    ? 'संकेत से मेल खाने वाले कार्ड पर टैप करें'
+                    : 'Tap the card that matches the prompt'),
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               color: AppTheme.subtitleColor,
             ),

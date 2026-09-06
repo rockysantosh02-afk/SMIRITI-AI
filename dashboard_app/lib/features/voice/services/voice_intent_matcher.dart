@@ -135,13 +135,36 @@ class VoiceIntentMatcher {
     'set reminder',
     'create a reminder',
     'create reminder',
-    'remind me to',
-    'remind me at',
-    'remind me tomorrow',
-    'remind me today',
-    'remind me',
     'add a reminder',
     'add reminder',
+    'remind me to',
+    'remind me at',
+    'remind me in',
+    'remind me after',
+    'remind me for',
+    'remind me tomorrow',
+    'remind me today',
+    'can you remind me',
+    'please remind me',
+    'remind me',
+    'set an alarm for',
+    'set an alarm in',
+    'set an alarm after',
+    'set an alarm to',
+    'set an alarm',
+    'set alarm for',
+    'set alarm in',
+    'set alarm after',
+    'set alarm to',
+    'set alarm',
+    'alarm for',
+    'alarm in',
+    'alarm after',
+    'wake me up in',
+    'wake me up at',
+    'wake me up after',
+    'wake me up',
+    'alarm',
 
     // Telugu
     'రిమైండర్ పెట్టు',
@@ -151,6 +174,10 @@ class VoiceIntentMatcher {
     'రిమైండర్ సెట్ చేయి',
     'గుర్తుచేయి',
     'రిమైండర్ ఉంచు',
+    'అలారం పెట్టు',
+    'అలారం సెట్ చేయి',
+    'అలారం ఉంచు',
+    'అలారం',
 
     // Hindi
     'रिमाइंडर लगाओ',
@@ -160,6 +187,9 @@ class VoiceIntentMatcher {
     'रिमाइंडर सेट करो',
     'रिमाइंडर जोड़ो',
     'अलार्म लगाओ',
+    'अलार्म सेट करो',
+    'अलार्म जोड़ो',
+    'अलार्म',
   ];
 
   static const List<String> _openRemindersKeywords = [
@@ -226,6 +256,8 @@ class VoiceIntentMatcher {
 
   static const List<String> _openJournalKeywords = [
     // English
+    'open my memories',
+    'open memories',
     'open my journal',
     'open journal',
     'show my memories',
@@ -240,6 +272,12 @@ class VoiceIntentMatcher {
     'memories',
 
     // Telugu
+    'నా మెమరీస్ తెరువు',
+    'మెమరీస్ తెరువు',
+    'నా మెమరీస్ తెరవండి',
+    'మెమరీస్ తెరవండి',
+    'నా మెమరీస్',
+    'జ్ఞాపకాలు తెరువు',
     'నా డైరీ తెరవండి',
     'జర్నల్ తెరవండి',
     'డైరీ తెరవండి',
@@ -251,6 +289,10 @@ class VoiceIntentMatcher {
     'జ్ఞాపకాలు',
 
     // Hindi
+    'मेरी मेमोरी खोलो',
+    'मेमोरी खोलो',
+    'मेरी मेमोरी',
+    'यादें खोलो',
     'मेरी डायरी खोलो',
     'डायरी खोलो',
     'जर्नल खोलो',

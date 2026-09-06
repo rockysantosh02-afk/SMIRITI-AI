@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Centralized application configuration for SMIRITI-AI.
@@ -12,14 +11,15 @@ class AppConfig {
   /// Whether the app is running in production mode.
   static bool get isProduction => environment == 'production';
 
+  /// Centralized production API Base URL for deployed Render backend.
+  static const String productionApiBaseUrl = 'https://smiriti-ai.onrender.com';
+
   /// Centralized API Base URL for backend communication.
   ///
-  /// Evaluation priority:
-  /// 1. `--dart-define=API_BASE_URL=...` (Production builds / CI)
-  /// 2. `.env` file (`API_BASE_URL`) if initialized
-  /// 3. Platform default fallback:
-  ///    - Android emulator: `http://10.0.2.2:8000`
-  ///    - iOS Simulator / Web / Desktop: `http://127.0.0.1:8000`
+  /// Priority:
+  /// 1. `--dart-define=API_BASE_URL=...` (CI / custom build overrides)
+  /// 2. `.env` file (`API_BASE_URL`) if set to a valid non-localhost URL
+  /// 3. Default production URL: `https://smiriti-ai.onrender.com`
   static String get apiBaseUrl {
     const fromDefine = String.fromEnvironment('API_BASE_URL');
     if (fromDefine.isNotEmpty) {
@@ -29,14 +29,17 @@ class AppConfig {
     if (dotenv.isInitialized) {
       final fromEnv = dotenv.env['API_BASE_URL'];
       if (fromEnv != null && fromEnv.trim().isNotEmpty) {
-        return _normalizeUrl(fromEnv.trim());
+        final trimmed = fromEnv.trim();
+        // Never use obsolete localhost/emulator stubs in production builds
+        if (!trimmed.contains('localhost') &&
+            !trimmed.contains('127.0.0.1') &&
+            !trimmed.contains('10.0.2.2')) {
+          return _normalizeUrl(trimmed);
+        }
       }
     }
 
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://10.0.2.2:8000';
-    }
-    return 'http://127.0.0.1:8000';
+    return productionApiBaseUrl;
   }
 
   static String _normalizeUrl(String url) {

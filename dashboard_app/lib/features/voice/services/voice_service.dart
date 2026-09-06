@@ -29,6 +29,7 @@ abstract class IVoiceService {
   List<stt.LocaleName> get availableLocales;
 
   Future<bool> initialize();
+  bool isLanguageSupported(String langCode) => true;
   Future<void> startListening({
     required ValueChanged<String> onResult,
     VoidCallback? onComplete,
@@ -60,6 +61,11 @@ class VoiceService with ChangeNotifier implements IVoiceService {
   ValueChanged<String>? _activeResultCallback;
   VoidCallback? _activeCompleteCallback;
   String _currentLanguageCode = 'en';
+  String _activeSessionId = '';
+  int _sessionCounter = 0;
+  Completer<String>? _finalResultCompleter;
+  bool _isSessionFinalized = false;
+  bool _isDisposed = false;
 
   VoiceService({
     stt.SpeechToText? speechToText,
@@ -82,6 +88,9 @@ class VoiceService with ChangeNotifier implements IVoiceService {
   @override
   List<stt.LocaleName> get availableLocales => List.unmodifiable(_availableLocales);
 
+  /// Current active listening session token for race-condition protection.
+  String get activeSessionId => _activeSessionId;
+
   /// Initialize the underlying speech recognition engine and discover available locales.
   @override
   Future<bool> initialize() async {
@@ -98,21 +107,21 @@ class VoiceService with ChangeNotifier implements IVoiceService {
         try {
           _availableLocales = await _speech.locales();
           debugPrint(
-            '[VoiceService] Discovered ${_availableLocales.length} speech recognition locales',
+            '[STT] Discovered ${_availableLocales.length} speech recognition locales',
           );
         } catch (e) {
-          debugPrint('[VoiceService] Could not fetch locales list: $e');
+          debugPrint('[STT] Could not fetch locales list: $e');
         }
         _isInitialized = true;
         _setStatus(VoiceAssistantStatus.idle);
         return true;
       } else {
-        debugPrint('[VoiceService] Speech recognition unavailable or permission denied');
+        debugPrint('[STT] Speech recognition unavailable or permission denied');
         _setStatus(VoiceAssistantStatus.unavailable);
         return false;
       }
     } catch (e) {
-      debugPrint('[VoiceService] Exception during initialization: $e');
+      debugPrint('[STT] Exception during initialization: $e');
       _setStatus(VoiceAssistantStatus.unavailable);
       return false;
     }
@@ -130,9 +139,15 @@ class VoiceService with ChangeNotifier implements IVoiceService {
   }) async {
     // Prevent duplicate concurrent listening sessions
     if (_status == VoiceAssistantStatus.listening) {
-      debugPrint('[VoiceService] Already listening. Ignoring duplicate start request.');
+      debugPrint('[STT] Already listening. Ignoring duplicate start request.');
       return;
     }
+
+    _sessionCounter++;
+    final sessionToken = 'session_${_sessionCounter}_${DateTime.now().millisecondsSinceEpoch}';
+    _activeSessionId = sessionToken;
+    _isSessionFinalized = false;
+    _finalResultCompleter = Completer<String>();
 
     _activeResultCallback = onResult;
     _activeCompleteCallback = onComplete;
@@ -152,12 +167,21 @@ class VoiceService with ChangeNotifier implements IVoiceService {
     try {
       await _speech.listen(
         onResult: (SpeechRecognitionResult result) {
+          // Stale callback guard: discard results if session has changed
+          if (_activeSessionId != sessionToken) {
+            debugPrint('[STT] Ignoring speech result from stale session $sessionToken');
+            return;
+          }
+
           _lastRecognizedWords = result.recognizedWords;
           _activeResultCallback?.call(_lastRecognizedWords);
           notifyListeners();
 
           if (result.finalResult) {
-            _finalizeRecognition(_lastRecognizedWords);
+            if (!(_finalResultCompleter?.isCompleted ?? true)) {
+              _finalResultCompleter?.complete(_lastRecognizedWords);
+            }
+            _finalizeRecognition(_lastRecognizedWords, sessionToken: sessionToken);
           }
         },
         localeId: targetLocaleId,
@@ -170,7 +194,7 @@ class VoiceService with ChangeNotifier implements IVoiceService {
         ),
       );
     } catch (e) {
-      debugPrint('[VoiceService] Error while starting listen: $e');
+      debugPrint('[STT] Error while starting listen: $e');
       _setStatus(VoiceAssistantStatus.error);
     }
   }
@@ -180,58 +204,120 @@ class VoiceService with ChangeNotifier implements IVoiceService {
   Future<void> stopListening() async {
     if (_status != VoiceAssistantStatus.listening) return;
 
+    final sessionToken = _activeSessionId;
     _setStatus(VoiceAssistantStatus.processing);
     try {
       await _speech.stop();
+      // Safely wait for native recognizer to deliver final result before processing
+      if (!(_finalResultCompleter?.isCompleted ?? true)) {
+        await _finalResultCompleter?.future.timeout(
+          const Duration(milliseconds: 500),
+          onTimeout: () => _lastRecognizedWords,
+        );
+      }
     } catch (e) {
-      debugPrint('[VoiceService] Error during stop: $e');
+      debugPrint('[STT] Error during stop: $e');
     }
 
-    _finalizeRecognition(_lastRecognizedWords);
+    _finalizeRecognition(_lastRecognizedWords, sessionToken: sessionToken);
   }
 
   /// Cancel speech recognition and discard recognized text without taking action.
   @override
   Future<void> cancelListening() async {
+    _activeSessionId = '';
+    _isSessionFinalized = true;
+    if (!(_finalResultCompleter?.isCompleted ?? true)) {
+      _finalResultCompleter?.complete('');
+    }
     try {
       await _speech.cancel();
     } catch (e) {
-      debugPrint('[VoiceService] Error during cancel: $e');
+      debugPrint('[STT] Error during cancel: $e');
     }
     _lastRecognizedWords = '';
     _lastIntentResult = null;
     _setStatus(VoiceAssistantStatus.idle);
   }
 
-  /// Resolve the best available device locale for the requested language code.
-  String? _resolveLocaleId(String langCode) {
+  /// Normalize a locale tag for robust comparison: lowercase with hyphens and underscores removed.
+  /// E.g. "te-IN" -> "tein", "te_IN" -> "tein", "te" -> "te".
+  static String normalizeLocaleTag(String tag) {
+    return tag.toLowerCase().replaceAll('-', '').replaceAll('_', '').trim();
+  }
+
+  /// Check whether the requested language is supported by available device speech recognition locales.
+  @override
+  bool isLanguageSupported(String langCode) {
+    if (_availableLocales.isEmpty) {
+      // When availableLocales is empty (e.g. initialization in progress or simulator),
+      // do not falsely block user interaction.
+      return true;
+    }
+    return _findMatchingLocaleId(langCode, allowEnglishFallback: false) != null;
+  }
+
+  /// Public locale resolver for testing and diagnostics.
+  String? resolveLocaleId(String langCode, {bool allowEnglishFallback = true}) {
+    return _findMatchingLocaleId(langCode, allowEnglishFallback: allowEnglishFallback);
+  }
+
+  /// Internal robust locale matcher supporting exact normalized matching,
+  /// prefix matching (e.g., 'te' matches 'te-IN'), and controlled English fallback.
+  String? _findMatchingLocaleId(String langCode, {bool allowEnglishFallback = true}) {
     if (_availableLocales.isEmpty) return null;
 
     final appLang = AppLanguages.fromCode(langCode);
-    final candidates = [
-      ...appLang.sttLocales,
-      // If the selected language is not English, include English as fallback
-      if (appLang != AppLanguage.english) ...AppLanguage.english.sttLocales,
-    ];
+    final targetCandidates = appLang.sttLocales;
 
-    for (final candidate in candidates) {
+    // 1. Exact normalized match against target candidates (e.g. 'te_IN' matches 'te-IN')
+    for (final candidate in targetCandidates) {
+      final normCand = normalizeLocaleTag(candidate);
       for (final locale in _availableLocales) {
-        if (locale.localeId.toLowerCase().replaceAll('-', '_') ==
-            candidate.toLowerCase().replaceAll('-', '_')) {
+        if (normalizeLocaleTag(locale.localeId) == normCand) {
           return locale.localeId;
         }
       }
     }
 
-    // Default to the first available or null (system default)
+    // 2. Prefix matching on base language (e.g. 'te' matches 'te-IN' or 'te_IN')
+    final langPrefix = normalizeLocaleTag(langCode.split(RegExp(r'[-_]')).first);
+    for (final locale in _availableLocales) {
+      final normLoc = normalizeLocaleTag(locale.localeId);
+      if (normLoc == langPrefix || normLoc.startsWith(langPrefix)) {
+        return locale.localeId;
+      }
+    }
+
+    // 3. Fallback to English candidates only if explicitly allowed
+    if (allowEnglishFallback && appLang != AppLanguage.english) {
+      for (final candidate in AppLanguage.english.sttLocales) {
+        final normCand = normalizeLocaleTag(candidate);
+        for (final locale in _availableLocales) {
+          if (normalizeLocaleTag(locale.localeId) == normCand) {
+            return locale.localeId;
+          }
+        }
+      }
+    }
+
     return null;
   }
 
-  void _finalizeRecognition(String words) {
-    if (_status == VoiceAssistantStatus.success ||
-        _status == VoiceAssistantStatus.notUnderstood) {
+  String? _resolveLocaleId(String langCode) {
+    return _findMatchingLocaleId(langCode, allowEnglishFallback: true);
+  }
+
+  void _finalizeRecognition(String words, {String? sessionToken}) {
+    if (sessionToken != null && sessionToken != _activeSessionId) {
+      debugPrint('[STT] Ignoring finalize from stale session $sessionToken');
+      return;
+    }
+
+    if (_isSessionFinalized) {
       return; // Already finalized
     }
+    _isSessionFinalized = true;
 
     _setStatus(VoiceAssistantStatus.processing);
 
@@ -255,17 +341,20 @@ class VoiceService with ChangeNotifier implements IVoiceService {
   }
 
   void _handleStatus(String status) {
-    debugPrint('[VoiceService] SpeechToText status: $status');
+    debugPrint('[STT] SpeechToText status: $status');
     if (status == 'notListening' || status == 'done') {
       if (_status == VoiceAssistantStatus.listening) {
-        _finalizeRecognition(_lastRecognizedWords);
+        if (!(_finalResultCompleter?.isCompleted ?? true)) {
+          _finalResultCompleter?.complete(_lastRecognizedWords);
+        }
+        _finalizeRecognition(_lastRecognizedWords, sessionToken: _activeSessionId);
       }
     }
   }
 
   void _handleError(SpeechRecognitionError errorNotification) {
     debugPrint(
-      '[VoiceService] SpeechToText error: ${errorNotification.errorMsg} (permanent: ${errorNotification.permanent})',
+      '[STT] SpeechToText error: ${errorNotification.errorMsg} (permanent: ${errorNotification.permanent})',
     );
 
     if (errorNotification.errorMsg.contains('error_permission') ||
@@ -280,12 +369,14 @@ class VoiceService with ChangeNotifier implements IVoiceService {
   }
 
   void _setStatus(VoiceAssistantStatus newStatus) {
+    if (_isDisposed) return;
     _status = newStatus;
     notifyListeners();
   }
 
   @override
   void dispose() {
+    _isDisposed = true;
     _activeResultCallback = null;
     _activeCompleteCallback = null;
     _speech.cancel();

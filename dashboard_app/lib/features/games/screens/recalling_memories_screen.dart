@@ -122,10 +122,69 @@ class _RecallingMemoriesScreenState
   @override
   Widget buildGameContent(BuildContext context, GameItem currentItem) {
     final isFamily = currentItem.raw['isFamily'] as bool? ?? false;
-    final title = currentItem.raw['title'] as String? ?? '';
-    final desc = currentItem.raw['desc'] as String? ?? '';
     final photo = currentItem.raw['photo'] as String?;
-    final itemKey = currentItem.raw['itemKey'] as String? ?? 'xorai';
+    final itemKey = currentItem.raw['itemKey'] as String? ?? 'garden';
+    final lang = Localizations.localeOf(context).languageCode.toLowerCase();
+
+    String displayTitle = currentItem.raw['title'] as String? ?? '';
+    String displayDesc = currentItem.raw['desc'] as String? ?? '';
+
+    if (!isFamily) {
+      switch (itemKey) {
+        case 'garden':
+        case 'rhino':
+          if (lang == 'te') {
+            displayTitle = 'ప్రశాంతమైన పచ్చని తోట';
+            displayDesc = 'తాజా ఉదయపు గాలి, పక్షుల కిలకిలారావాలు, వికసించిన పూలు';
+          } else if (lang == 'hi') {
+            displayTitle = 'शांत हरा-भरा बगीचा';
+            displayDesc = 'ताज़ी सुबह की हवा, चहकते पक्षी और खिले हुए फूल';
+          } else {
+            displayTitle = 'Peaceful Green Garden';
+            displayDesc = 'Fresh morning air, singing birds, and blooming flowers';
+          }
+          break;
+        case 'temple':
+        case 'kamakhya':
+          if (lang == 'te') {
+            displayTitle = 'పవిత్ర ప్రశాంత దేవాలయం';
+            displayDesc = 'పవిత్ర ఘంటానాదాలు, సువాసనల పూలు మరియు ప్రశాంత ప్రార్థనలు';
+          } else if (lang == 'hi') {
+            displayTitle = 'पवित्र शांत मंदिर';
+            displayDesc = 'पवित्र घंटियाँ, सुगंधित फूल और शांतिपूर्ण प्रार्थना';
+          } else {
+            displayTitle = 'Sacred Peaceful Temple';
+            displayDesc = 'Sacred bells, fragrant flowers, and calming prayer';
+          }
+          break;
+        case 'river':
+        case 'brahmaputra':
+          if (lang == 'te') {
+            displayTitle = 'ప్రశాంత నదీ గాలులు';
+            displayDesc = 'సౌమ్యంగా ప్రవహించే నీరు మరియు ఆహ్లాదకరమైన సాయంత్రపు గాలి';
+          } else if (lang == 'hi') {
+            displayTitle = 'शांत नदी की हवा';
+            displayDesc = 'बहता हुआ निर्मल जल और शाम की ताज़ा हवा';
+          } else {
+            displayTitle = 'Calm River Breeze';
+            displayDesc = 'Gentle flowing waters and a refreshing evening breeze';
+          }
+          break;
+        case 'monument':
+        case 'rang_ghar':
+          if (lang == 'te') {
+            displayTitle = 'చారిత్రక వారసత్వ ప్రదేశం';
+            displayDesc = 'గొప్ప శిల్పకళ మరియు విలువైన జ్ఞాపకాలు';
+          } else if (lang == 'hi') {
+            displayTitle = 'ऐतिहासिक धरोहर स्थल';
+            displayDesc = 'भव्य वास्तुकला और अनमोल यादें';
+          } else {
+            displayTitle = 'Historic Heritage Monument';
+            displayDesc = 'Grand architecture and treasured memories';
+          }
+          break;
+      }
+    }
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -171,7 +230,7 @@ class _RecallingMemoriesScreenState
 
         // Title and caption
         Text(
-          title,
+          displayTitle,
           textAlign: TextAlign.center,
           style: const TextStyle(
             fontSize: 22,
@@ -179,10 +238,10 @@ class _RecallingMemoriesScreenState
             color: AppTheme.primaryColor,
           ),
         ),
-        if (desc.isNotEmpty) ...[
+        if (displayDesc.isNotEmpty) ...[
           const SizedBox(height: 4),
           Text(
-            desc,
+            displayDesc,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 16, color: AppTheme.subtitleColor),
           ),

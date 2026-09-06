@@ -11,7 +11,6 @@ class MatchingImageScreen extends BaseGameScreen {
       : super(
           gameId: 'matching_image',
           gameTitle: 'Matching Image',
-          gameTitleAs: 'ছবি মিলোৱা',
           domain: 'VISUAL_MEMORY',
         );
 
@@ -123,9 +122,13 @@ class _MatchingImageScreenState
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Column(
           children: [
-            const Text(
-              'দুটা একে কাৰ্ড বিচাৰি স্পৰ্শ কৰক (Tap two cards to match pairs)',
-              style: TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
+            Text(
+              Localizations.localeOf(context).languageCode == 'te'
+                  ? 'జతలను సరిపోల్చడానికి రెండు కార్డులను నొక్కండి'
+                  : (Localizations.localeOf(context).languageCode == 'hi'
+                      ? 'जोड़े मिलाने के लिए दो कार्डों पर टैप करें'
+                      : 'Tap two cards to match pairs'),
+              style: const TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
             ),
             const SizedBox(height: 16),
             Wrap(
@@ -194,7 +197,7 @@ class _MatchingImageScreenState
         ),
         const SizedBox(height: 12),
         Text(
-          meta.nameEn,
+          meta.getLocalizedName(Localizations.localeOf(context).languageCode),
           style: const TextStyle(
             fontSize: 18,
             color: AppTheme.subtitleColor,
@@ -215,9 +218,13 @@ class _MatchingImageScreenState
     // Tier 1-2: 3-4 bottom option buttons (min 80dp tall)
     return Column(
       children: [
-        const Text(
-          'তলৰ পৰা একে ছবিখন বাছক (Choose the matching one below):',
-          style: TextStyle(fontSize: 17, color: AppTheme.subtitleColor),
+        Text(
+          Localizations.localeOf(context).languageCode == 'te'
+              ? 'కింద సరిపోలే చిత్రాన్ని ఎంచుకోండి:'
+              : (Localizations.localeOf(context).languageCode == 'hi'
+                  ? 'नीचे से मेल खाती तस्वीर चुनें:'
+                  : 'Choose the matching one below:'),
+          style: const TextStyle(fontSize: 17, color: AppTheme.subtitleColor),
         ),
         const SizedBox(height: 10),
         Wrap(

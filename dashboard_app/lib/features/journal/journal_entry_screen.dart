@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/localization/app_languages.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/localization/language_provider.dart';
 import '../../core/database/app_database.dart';
@@ -107,18 +108,37 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
   }
 
   void _startDictation() {
+    String? langCode;
+    try {
+      langCode = Provider.of<LanguageProvider>(context, listen: false).languageCode;
+    } catch (_) {}
+    final effectiveLang = langCode ?? 'en';
+
+    if (_voiceService.availableLocales.isNotEmpty &&
+        !_voiceService.isLanguageSupported(effectiveLang)) {
+      final loc = AppLocalizations.of(context);
+      final warning = effectiveLang == 'te'
+          ? 'ఈ పరికరంలో తెలుగు వాయిస్ గుర్తింపు అందుబాటులో లేదు. దయచేసి Android సెట్టింగ్స్‌లో ఎనేబుల్ చేయండి.'
+          : (effectiveLang == 'hi'
+              ? 'इस डिवाइस पर हिन्दी आवाज़ पहचान उपलब्ध नहीं है. कृपया Android सेटिंग्स में सक्षम करें.'
+              : loc.speechUnavailableForLanguage);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(warning, style: const TextStyle(fontSize: 16)),
+          backgroundColor: AppTheme.errorColor,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _isDictating = true;
       _dictationLivePreview = '';
     });
 
-    String? langCode;
-    try {
-      langCode = Provider.of<LanguageProvider>(context, listen: false).languageCode;
-    } catch (_) {}
-
     _voiceService.startListening(
-      languageCode: langCode ?? 'en',
+      languageCode: effectiveLang,
       onResult: (words) {
         if (mounted) {
           setState(() {
@@ -177,17 +197,23 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
       _isGeneratingStory = true;
     });
 
+    String languageName = 'English';
+    try {
+      final lang = Provider.of<LanguageProvider>(context, listen: false).currentLanguage;
+      languageName = lang.displayName;
+    } catch (_) {}
+
     try {
       final storyResult = await _storyService.generateStory(
         title: _titleController.text.trim(),
         content: memoryText,
+        language: languageName,
       );
 
       if (storyResult.success && storyResult.story != null) {
         if (mounted) {
           setState(() {
             _generatedStory = storyResult.story;
-            _isGeneratingStory = false;
           });
         }
 
@@ -213,9 +239,6 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
         }
       } else {
         if (mounted) {
-          setState(() {
-            _isGeneratingStory = false;
-          });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               backgroundColor: AppTheme.primaryColor,
@@ -232,10 +255,6 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
     } catch (e) {
       debugPrint('[JournalEntryScreen] Story generation exception: $e');
       if (mounted) {
-        setState(() {
-          _isGeneratingStory = false;
-        });
-
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             backgroundColor: AppTheme.primaryColor,
@@ -246,6 +265,12 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
             duration: Duration(seconds: 3),
           ),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isGeneratingStory = false;
+        });
       }
     }
   }
@@ -287,14 +312,19 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
     final titleText = _titleController.text.trim();
 
     if (bodyText.isEmpty && titleText.isEmpty && _photoPath == null) {
+      final validationMsg = Localizations.localeOf(context).languageCode == 'te'
+          ? 'దయచేసి మీ జ్ఞాపకాన్ని నమోదు చేయండి. అవసరమైన వివరాలను పూరించండి.'
+          : (Localizations.localeOf(context).languageCode == 'hi'
+              ? 'कृपया अपनी याद दर्ज करें. आवश्यक विवरण भरें.'
+              : 'Please add a little memory before saving. Please fill in the required details.');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           backgroundColor: AppTheme.secondaryColor,
           content: Text(
-            'Please add a little memory before saving.',
-            style: TextStyle(fontSize: 16, color: AppTheme.textColor),
+            validationMsg,
+            style: const TextStyle(fontSize: 16, color: AppTheme.textColor),
           ),
-          duration: Duration(seconds: 2),
+          duration: const Duration(seconds: 2),
         ),
       );
       return;
@@ -311,22 +341,51 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
             ? (bodyText.length > 30 ? '${bodyText.substring(0, 30)}...' : bodyText)
             : loc.newEntry);
 
+    String preferredLanguage = 'English';
     try {
+      final lang = Provider.of<LanguageProvider>(context, listen: false).currentLanguage;
+      preferredLanguage = lang.displayName;
+    } catch (_) {}
+
+    try {
+      // 1. ALWAYS SAVE TO SQLITE FIRST
+      String savedId;
       if (widget.existingEntry != null) {
+        savedId = widget.existingEntry!.id;
         await _repository.update(
-          id: widget.existingEntry!.id,
+          id: savedId,
           title: effectiveTitle,
           body: bodyText,
           photoPath: _photoPath,
           generatedStory: _generatedStory,
         );
       } else {
-        await _repository.create(
+        savedId = await _repository.create(
           title: effectiveTitle,
           body: bodyText,
           photoPath: _photoPath,
           generatedStory: _generatedStory,
         );
+      }
+
+      // 2. ATTEMPT STORY GENERATION IF NOT ALREADY GENERATED
+      if (_generatedStory == null && bodyText.isNotEmpty) {
+        try {
+          final storyResult = await _storyService.generateStory(
+            title: effectiveTitle,
+            content: bodyText,
+            language: preferredLanguage,
+          );
+          if (storyResult.success && storyResult.story != null) {
+            _generatedStory = storyResult.story;
+            await _repository.saveGeneratedStory(
+              id: savedId,
+              story: storyResult.story!,
+            );
+          }
+        } catch (storyErr) {
+          debugPrint('[JournalEntryScreen] Story generation skipped/failed: $storyErr');
+        }
       }
 
       if (mounted) {
@@ -345,9 +404,6 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
     } catch (e) {
       debugPrint('[JournalEntryScreen] Error saving entry: $e');
       if (mounted) {
-        setState(() {
-          _isSaving = false;
-        });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: AppTheme.errorColor,
@@ -357,6 +413,12 @@ class _JournalEntryScreenState extends State<JournalEntryScreen> {
             ),
           ),
         );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+        });
       }
     }
   }

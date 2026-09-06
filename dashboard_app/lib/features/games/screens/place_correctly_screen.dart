@@ -10,7 +10,6 @@ class PlaceCorrectlyScreen extends BaseGameScreen {
       : super(
           gameId: 'place_correctly',
           gameTitle: 'Place Correctly',
-          gameTitleAs: 'সঠিক স্থানত বহুৱাওক',
           domain: 'SPATIAL',
         );
 
@@ -58,12 +57,16 @@ class _PlaceCorrectlyScreenState
         _selectedForTapTap = null;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'আন এটা স্থানত যত্ন কৰক (Try a different slot)',
-            style: TextStyle(fontSize: 18),
+            Localizations.localeOf(context).languageCode == 'te'
+                ? 'మరొక స్థానంలో ప్రయత్నించండి'
+                : (Localizations.localeOf(context).languageCode == 'hi'
+                    ? 'दूसरे स्थान पर प्रयास करें'
+                    : 'Try a different slot'),
+            style: const TextStyle(fontSize: 18),
           ),
-          duration: Duration(seconds: 1),
+          duration: const Duration(seconds: 1),
         ),
       );
     }
@@ -86,9 +89,13 @@ class _PlaceCorrectlyScreenState
           ),
           child: Column(
             children: [
-              const Text(
-                'লক্ষ্য স্থানসমূহ (Target Slots):',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
+              Text(
+                Localizations.localeOf(context).languageCode == 'te'
+                    ? 'లక్ష్య స్థానాలు:'
+                    : (Localizations.localeOf(context).languageCode == 'hi'
+                        ? 'लक्ष्य स्थान:'
+                        : 'Target Slots:'),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
               ),
               const SizedBox(height: 12),
               Wrap(
@@ -171,10 +178,14 @@ class _PlaceCorrectlyScreenState
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
-          'টানি বহুৱাওক বা স্পৰ্শ কৰি স্থান নিৰ্বাচন কৰক\n(Drag or tap item then tap slot)',
+        Text(
+          Localizations.localeOf(context).languageCode == 'te'
+              ? 'లాగి ఉంచండి లేదా వస్తువును నొక్కి ఆపై స్థానాన్ని ఎంచుకోండి'
+              : (Localizations.localeOf(context).languageCode == 'hi'
+                  ? 'खींच कर रखें या वस्तु चुनकर स्थान पर टैप करें'
+                  : 'Drag or tap item then tap slot'),
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 17, color: AppTheme.subtitleColor),
+          style: const TextStyle(fontSize: 17, color: AppTheme.subtitleColor),
         ),
       ],
     );

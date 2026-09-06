@@ -10,7 +10,6 @@ class NumberGameScreen extends BaseGameScreen {
       : super(
           gameId: 'number_game',
           gameTitle: 'Number Game',
-          gameTitleAs: 'সংখ্যাৰ খেল',
           domain: 'NUMERACY',
         );
 
@@ -78,9 +77,13 @@ class _NumberGameScreenState extends BaseGameScreenState<NumberGameScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
-            'খালী স্থানত কি সংখ্যা বহিব? (Tap the next number)',
-            style: TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
+          Text(
+            Localizations.localeOf(context).languageCode == 'te'
+                ? 'తదుపరి సంఖ్యను ఎంచుకోండి'
+                : (Localizations.localeOf(context).languageCode == 'hi'
+                    ? 'अगली संख्या पर टैप करें'
+                    : 'Tap the next number'),
+            style: const TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
           ),
         ],
       );
@@ -163,7 +166,11 @@ class _NumberGameScreenState extends BaseGameScreenState<NumberGameScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            '$op1 + $op2 = কিমান হ\'ব? (What is the total sum?)',
+            Localizations.localeOf(context).languageCode == 'te'
+                ? '$op1 + $op2 = మొత్తం ఎంత అవుతుంది?'
+                : (Localizations.localeOf(context).languageCode == 'hi'
+                    ? '$op1 + $op2 = कुल कितना होगा?'
+                    : '$op1 + $op2 = What is the total sum?'),
             style: const TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
           ),
         ],
@@ -191,9 +198,13 @@ class _NumberGameScreenState extends BaseGameScreenState<NumberGameScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        const Text(
-          'বস্তুবোৰ গণনা কৰক আৰু উত্তৰটো বাছক (Count the items above)',
-          style: TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
+        Text(
+          Localizations.localeOf(context).languageCode == 'te'
+              ? 'పై వస్తువులను లెక్కించి సరైన సమాధానం ఎంచుకోండి'
+              : (Localizations.localeOf(context).languageCode == 'hi'
+                  ? 'ऊपर दी गई वस्तुओं को गिनें और सही उत्तर चुनें'
+                  : 'Count the items above and choose the answer'),
+          style: const TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
         ),
       ],
     );

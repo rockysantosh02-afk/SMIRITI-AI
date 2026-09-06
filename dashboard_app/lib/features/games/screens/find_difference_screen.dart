@@ -11,7 +11,6 @@ class FindDifferenceScreen extends BaseGameScreen {
       : super(
           gameId: 'find_difference',
           gameTitle: 'Find Differences',
-          gameTitleAs: 'পাৰ্থক্য বিচাৰক',
           domain: 'ATTENTION',
         );
 
@@ -114,7 +113,11 @@ class _FindDifferenceScreenState
               const Icon(Icons.check_circle_rounded, color: Color(0xFF2E8B57), size: 28),
               const SizedBox(width: 10),
               Text(
-                'বিচাৰি পোৱা গ\'ল: ${_foundIndices.length} / ${_differences.length}',
+                Localizations.localeOf(context).languageCode == 'te'
+                    ? 'కనుగొనబడినవి: ${_foundIndices.length} / ${_differences.length}'
+                    : (Localizations.localeOf(context).languageCode == 'hi'
+                        ? 'मिले अंतर: ${_foundIndices.length} / ${_differences.length}'
+                        : 'Found: ${_foundIndices.length} / ${_differences.length}'),
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -133,15 +136,22 @@ class _FindDifferenceScreenState
             final itemWidth = isWide ? (constraints.maxWidth - 20) / 2 : constraints.maxWidth;
             const itemHeight = 220.0;
 
+            final scene1Title = Localizations.localeOf(context).languageCode == 'te'
+                ? 'చిత్రం 1'
+                : (Localizations.localeOf(context).languageCode == 'hi' ? 'दृश्य 1' : 'Scene 1');
+            final scene2Title = Localizations.localeOf(context).languageCode == 'te'
+                ? 'చిత్రం 2'
+                : (Localizations.localeOf(context).languageCode == 'hi' ? 'दृश्य 2' : 'Scene 2');
+
             final scene1 = _buildScene(
-              title: 'ছবি ১ (Scene 1)',
+              title: scene1Title,
               meta: meta,
               width: itemWidth,
               height: itemHeight,
               isAltered: false,
             );
             final scene2 = _buildScene(
-              title: 'ছবি ২ (Scene 2)',
+              title: scene2Title,
               meta: meta,
               width: itemWidth,
               height: itemHeight,
@@ -266,10 +276,14 @@ class _FindDifferenceScreenState
   Widget buildOptions(BuildContext context, GameItem currentItem) {
     return Container(
       padding: const EdgeInsets.all(12),
-      child: const Text(
-        'যিকোনো এখন ছবিত পাৰ্থক্য স্পৰ্শ কৰক (Tap difference on either image)',
+      child: Text(
+        Localizations.localeOf(context).languageCode == 'te'
+            ? 'ఏదైనా చిత్రంపై తేడాను నొక్కండి'
+            : (Localizations.localeOf(context).languageCode == 'hi'
+                ? 'किसी भी तस्वीर पर अंतर पर टैप करें'
+                : 'Tap difference on either image'),
         textAlign: TextAlign.center,
-        style: TextStyle(fontSize: 17, color: AppTheme.subtitleColor),
+        style: const TextStyle(fontSize: 17, color: AppTheme.subtitleColor),
       ),
     );
   }

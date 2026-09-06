@@ -12,7 +12,6 @@ class FamilyQuizScreen extends BaseGameScreen {
       : super(
           gameId: 'family_quiz',
           gameTitle: 'Family Quiz',
-          gameTitleAs: 'আপোনজনৰ চিনাকি',
           domain: 'RECALL',
         );
 
@@ -30,11 +29,11 @@ class _FamilyQuizScreenState extends BaseGameScreenState<FamilyQuizScreen> {
 
     // Built-in friendly backup members if user has not yet added any
     final sampleMembers = [
-      {'name': 'ৰাহুল (Rahul)', 'relation': 'Grandson (নাতি)', 'photo': null},
-      {'name': 'অনিতা (Anita)', 'relation': 'Daughter (কন্যা)', 'photo': null},
-      {'name': 'বিকাশ (Bikash)', 'relation': 'Son (পুত্ৰ)', 'photo': null},
-      {'name': 'পূজা (Pooja)', 'relation': 'Granddaughter (নাতিনী)', 'photo': null},
-      {'name': 'প্ৰিয়া (Priya)', 'relation': 'Niece (ভাগিনী)', 'photo': null},
+      {'name': 'Rahul', 'relation': 'Grandson', 'photo': null},
+      {'name': 'Anita', 'relation': 'Daughter', 'photo': null},
+      {'name': 'Bikash', 'relation': 'Son', 'photo': null},
+      {'name': 'Pooja', 'relation': 'Granddaughter', 'photo': null},
+      {'name': 'Priya', 'relation': 'Niece', 'photo': null},
     ];
 
     final activeList = members.isNotEmpty
@@ -60,8 +59,8 @@ class _FamilyQuizScreenState extends BaseGameScreenState<FamilyQuizScreen> {
           .toList();
 
       while (otherNames.length < 2) {
-        otherNames.add('মৰমৰ বন্ধু (Dear Friend)');
-        otherNames.add('প্ৰিয় চুবুৰীয়া (Neighbor)');
+        otherNames.add('Friend');
+        otherNames.add('Neighbor');
       }
 
       final opts = [otherNames[0], otherNames[1]];
@@ -72,8 +71,8 @@ class _FamilyQuizScreenState extends BaseGameScreenState<FamilyQuizScreen> {
         id: 'fam_quiz_$i',
         image: targetName,
         prompt: widget.initialDifficulty != null && widget.initialDifficulty! >= 2
-            ? 'এখেতৰ নাম আৰু চিনাকি কি? (Recognize this family member)'
-            : 'এখেত কোন হয়? (Who is this person?)',
+            ? 'Recognize this family member'
+            : 'Who is this person?',
         options: opts,
         correctIndex: correctIdx,
         domain: 'RECALL',
@@ -81,6 +80,7 @@ class _FamilyQuizScreenState extends BaseGameScreenState<FamilyQuizScreen> {
           'name': targetName,
           'relation': targetRelation,
           'photo': target['photo'],
+          'tier': widget.initialDifficulty ?? 1,
         },
       ));
     }
@@ -143,7 +143,7 @@ class _FamilyQuizScreenState extends BaseGameScreenState<FamilyQuizScreen> {
             border: Border.all(color: AppTheme.secondaryColor),
           ),
           child: Text(
-            'সম্পৰ্ক: $relation',
+            'Relation: $relation',
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,

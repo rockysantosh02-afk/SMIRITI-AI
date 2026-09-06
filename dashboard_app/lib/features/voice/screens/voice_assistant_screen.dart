@@ -16,7 +16,17 @@ import '../services/voice_service.dart';
 import '../services/voice_intent_matcher.dart';
 import '../services/reminder_voice_parser.dart';
 import '../services/language_detector.dart';
+import '../services/voice_conversation_service.dart';
 import '../voice_prompts.dart';
+
+/// Authoritative single voice state machine for Voice Assistant.
+enum VoiceState {
+  idle,
+  listening,
+  thinking,
+  speaking,
+  error,
+}
 
 /// Conversation states for multi-turn voice workflows (such as reminder creation).
 enum ReminderConversationState {
@@ -40,6 +50,7 @@ class VoiceAssistantScreen extends StatefulWidget {
   final ITtsService? ttsService;
   final ReminderRepository? reminderRepository;
   final NotificationService? notificationService;
+  final IVoiceConversationService? conversationService;
   final String? initialLanguage;
   final bool reminderFocus;
 
@@ -49,6 +60,7 @@ class VoiceAssistantScreen extends StatefulWidget {
     this.ttsService,
     this.reminderRepository,
     this.notificationService,
+    this.conversationService,
     this.initialLanguage,
     this.reminderFocus = false,
   });
@@ -63,8 +75,12 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
   late final ITtsService _ttsService;
   late final ReminderRepository _reminderRepository;
   late final NotificationService _notificationService;
+  late final IVoiceConversationService _conversationService;
   late final VoiceIntentMatcher _matcher;
   late final ReminderVoiceParser _reminderParser;
+
+  VoiceState _voiceState = VoiceState.idle;
+  final List<ChatMessage> _conversationHistory = [];
 
   String _selectedLanguage = 'en';
   String _recognizedText = '';
@@ -91,6 +107,8 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
         ReminderRepository(DatabaseProvider.instance);
     _notificationService =
         widget.notificationService ?? LocalNotificationService();
+    _conversationService =
+        widget.conversationService ?? VoiceConversationService();
     _reminderParser = const ReminderVoiceParser();
     _matcher = VoiceIntentMatcher(reminderParser: _reminderParser);
 
@@ -108,26 +126,33 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
       (_voiceService as ChangeNotifier).addListener(_onVoiceStatusChanged);
     }
 
-    // Initialize voice and TTS services silently
-    _voiceService.initialize();
-    if (_ttsService is TtsService) {
-      (_ttsService as TtsService).initialize();
+    // Initialize voice and TTS services cleanly
+    _initVoiceAssistant();
+  }
+
+  Future<void> _initVoiceAssistant() async {
+    try {
+      await _voiceService.initialize();
+      await _ttsService.initialize();
+    } catch (e) {
+      debugPrint('[VOICE] Error during service initialization: $e');
     }
 
-    // Automatic greeting or reminder focus prompt on screen load
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      if (widget.reminderFocus) {
-        setState(() {
-          _conversationState = ReminderConversationState.awaitingReminderTitle;
-        });
-        final prompt = VoicePrompts.get(VoicePrompts.askReminderTitle, _selectedLanguage);
-        respondToUser(prompt, languageCode: _selectedLanguage);
-      } else {
-        final greeting = VoicePrompts.get(VoicePrompts.initialGreeting, _selectedLanguage);
-        respondToUser(greeting, languageCode: _selectedLanguage);
-      }
-    });
+    if (!mounted) return;
+    if (widget.reminderFocus) {
+      setState(() {
+        _conversationState = ReminderConversationState.awaitingReminderTitle;
+      });
+      final prompt = VoicePrompts.get(VoicePrompts.askReminderTitle, _selectedLanguage);
+      await respondToUser(prompt, languageCode: _selectedLanguage);
+    } else {
+      final greeting = VoicePrompts.get(VoicePrompts.initialGreeting, _selectedLanguage);
+      setState(() {
+        _lastAssistantResponse = greeting;
+      });
+      final appLang = AppLanguages.fromCode(_selectedLanguage);
+      await _ttsService.speak(greeting, languageCode: appLang.ttsLocale);
+    }
   }
 
   @override
@@ -191,15 +216,43 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     if (!mounted) return;
     setState(() {
       _lastAssistantResponse = message;
+      _voiceState = VoiceState.speaking;
     });
 
     final targetCode = languageCode ?? _selectedLanguage;
     final appLang = AppLanguages.fromCode(targetCode);
     try {
+      if (_voiceService.isListening) {
+        await _voiceService.stopListening();
+      }
       await _ttsService.stop();
+
+      // Check if language is available for TTS
+      final isAvailable = await _ttsService.isLanguageAvailable(appLang.ttsLocale);
+      if (!isAvailable && (targetCode == 'te' || targetCode == 'hi')) {
+        debugPrint('[TTS] Regional TTS voice for $targetCode is unavailable on device');
+        if (mounted) {
+          final notice = targetCode == 'te'
+              ? 'ఈ పరికరంలో తెలుగు వాయిస్ లేదు'
+              : 'इस डिवाइस पर हिन्दी आवाज़ नहीं है';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(notice),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+
       await _ttsService.speak(message, languageCode: appLang.ttsLocale);
-    } catch (e) {
-      debugPrint('[VoiceAssistantScreen] TTS error in respondToUser: $e');
+    } catch (e, stack) {
+      debugPrint('[TTS] Error in respondToUser: $e\n$stack');
+    } finally {
+      if (mounted && _voiceState == VoiceState.speaking) {
+        setState(() {
+          _voiceState = VoiceState.idle;
+        });
+      }
     }
   }
 
@@ -231,35 +284,41 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     }
   }
 
-  void _promptForConfirmation(String title, DateTime dt, String langCode) {
-    setState(() {
-      _conversationState = ReminderConversationState.awaitingConfirmation;
-      _pendingReminderTitle = title;
-      _pendingReminderDateTime = dt;
-      _pendingReminderTimeOfDay =
-          '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
-    });
-    final (dateStr, timeStr) = _formatDateTimeForPrompt(dt, langCode);
-    final prompt = VoicePrompts.formatConfirmationPrompt(
-      title: title,
-      timeStr: timeStr,
-      dateStr: dateStr,
-      languageCode: langCode,
-    );
-    respondToUser(prompt, languageCode: langCode);
-  }
-
   void _handleMicrophoneTap() {
-    // If TTS is currently speaking, stop it immediately when user taps mic
-    _ttsService.stop();
+    // FIX #3: The microphone MUST NOT listen while Smriti is speaking or thinking.
+    if (_voiceState == VoiceState.speaking || _voiceState == VoiceState.thinking) {
+      debugPrint('[VOICE] Microphone tap ignored: currently $_voiceState');
+      return;
+    }
 
-    if (_voiceService.isListening) {
+    if (_voiceState == VoiceState.listening || _voiceService.isListening) {
       _stopListeningWithAnimation();
     } else {
+      // Check if device supports speech recognition for selected language
+      if (_voiceService.availableLocales.isNotEmpty &&
+          !_voiceService.isLanguageSupported(_selectedLanguage)) {
+        final loc = AppLocalizations.of(context);
+        final warning = _selectedLanguage == 'te'
+            ? 'ఈ పరికరంలో తెలుగు వాయిస్ గుర్తింపు అందుబాటులో లేదు. దయచేసి Android సెట్టింగ్స్‌లో ఎనేబుల్ చేయండి.'
+            : (_selectedLanguage == 'hi'
+                ? 'इस डिवाइस पर हिन्दी आवाज़ पहचान उपलब्ध नहीं है. कृपया Android सेटिंग्स में सक्षम करें.'
+                : loc.speechUnavailableForLanguage);
+        respondToUser(warning, languageCode: _selectedLanguage);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(warning, style: const TextStyle(fontSize: 16)),
+            backgroundColor: AppTheme.errorColor,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+        return;
+      }
+
       _autoNavigateTimer?.cancel();
       setState(() {
         _recognizedText = '';
         _intentResult = null;
+        _voiceState = VoiceState.listening;
       });
 
       _pulseController.repeat(reverse: true);
@@ -276,6 +335,9 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
         onComplete: () {
           _stopPulseAnimation();
           if (mounted) {
+            setState(() {
+              _voiceState = VoiceState.thinking;
+            });
             _processCompletedSpeech(_recognizedText);
           }
         },
@@ -285,6 +347,9 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
 
   void _stopListeningWithAnimation() {
     _stopPulseAnimation();
+    setState(() {
+      _voiceState = VoiceState.thinking;
+    });
     _voiceService.stopListening();
   }
 
@@ -313,7 +378,11 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
       mode: responseMode,
     );
 
+    debugPrint('[VOICE] Processing speech: "$effectiveWords" (normalized: "$clean", lang: $responseLang)');
+
+    // 1. Empty transcript validation
     if (clean.isEmpty) {
+      debugPrint('[VOICE] Empty transcript received. Not understood.');
       final prompt = VoicePrompts.get(VoicePrompts.notUnderstood, responseLang);
       await respondToUser(prompt, languageCode: responseLang);
       return;
@@ -325,13 +394,15 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
       });
     }
 
-    // Check for cancellation in ANY state
-    if (ReminderVoiceParser.isCancelCommand(clean)) {
+    // 2. Cancellation check in multi-turn state
+    if (ReminderVoiceParser.isCancelCommand(clean) &&
+        _conversationState != ReminderConversationState.idle) {
+      debugPrint('[INTENT] Cancellation command detected');
       await _cancelPendingReminder(languageCode: responseLang);
       return;
     }
 
-    // MULTI-TURN: Awaiting Confirmation
+    // 3. MULTI-TURN: Awaiting Confirmation
     if (_conversationState == ReminderConversationState.awaitingConfirmation) {
       if (ReminderVoiceParser.isAffirmative(clean)) {
         await _savePendingReminder(languageCode: responseLang);
@@ -351,13 +422,14 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
       return;
     }
 
-    // MULTI-TURN: Awaiting Reminder Title
+    // 4. MULTI-TURN: Awaiting Reminder Title
     if (_conversationState == ReminderConversationState.awaitingReminderTitle) {
       final parsedTitle = ReminderVoiceParser.parseTitle(effectiveWords);
       if (parsedTitle != null && parsedTitle.isNotEmpty) {
         _pendingReminderTitle = parsedTitle;
         if (_pendingReminderDateTime != null) {
-          _promptForConfirmation(_pendingReminderTitle!, _pendingReminderDateTime!, responseLang);
+          // Both title and datetime ready: save immediately
+          await _savePendingReminder(languageCode: responseLang);
         } else {
           setState(() {
             _conversationState = ReminderConversationState.awaitingReminderDateTime;
@@ -372,17 +444,13 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
       return;
     }
 
-    // MULTI-TURN: Awaiting Reminder Date & Time
+    // 5. MULTI-TURN: Awaiting Reminder Date & Time
     if (_conversationState == ReminderConversationState.awaitingReminderDateTime) {
       final parsed = _reminderParser.parseDateTime(effectiveWords);
       if (parsed != null) {
         _pendingReminderDateTime = parsed.$1;
         _pendingReminderTimeOfDay = parsed.$2;
-        _promptForConfirmation(
-          _pendingReminderTitle ?? 'Reminder',
-          _pendingReminderDateTime!,
-          responseLang,
-        );
+        await _savePendingReminder(languageCode: responseLang);
       } else {
         final prompt = VoicePrompts.get(VoicePrompts.invalidReminderTime, responseLang);
         await respondToUser(prompt, languageCode: responseLang);
@@ -390,20 +458,21 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
       return;
     }
 
-    // IDLE: Match intent from spoken speech
+    // 6. INTENT MATCHING: Detect reminder or navigation action
     final matchResult = _matcher.match(effectiveWords, languageCode: responseLang);
     setState(() {
       _intentResult = matchResult;
     });
 
-    // 1. Reminder Intent
+    // 6A. Reminder Intent
     if (matchResult.intent == VoiceIntent.setReminder) {
+      debugPrint('[INTENT] Matched setReminder: title="${matchResult.reminderTitle}", dt="${matchResult.reminderDateTime}"');
       if (matchResult.reminderTitle != null && matchResult.reminderDateTime != null) {
-        _promptForConfirmation(
-          matchResult.reminderTitle!,
-          matchResult.reminderDateTime!,
-          responseLang,
-        );
+        // Complete reminder intent: directly save and schedule!
+        _pendingReminderTitle = matchResult.reminderTitle;
+        _pendingReminderDateTime = matchResult.reminderDateTime;
+        _pendingReminderTimeOfDay = matchResult.reminderTimeOfDay;
+        await _savePendingReminder(languageCode: responseLang);
       } else if (matchResult.reminderTitle == null) {
         _pendingReminderDateTime = matchResult.reminderDateTime;
         _pendingReminderTimeOfDay = matchResult.reminderTimeOfDay;
@@ -423,24 +492,66 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
       return;
     }
 
-    // 2. Navigation or Other Intent
-    await respondToUser(matchResult.feedbackMessage, languageCode: responseLang);
+    // 6B. Navigation Intents
+    if (matchResult.targetRoute != null) {
+      debugPrint('[INTENT] Navigation to ${matchResult.targetRoute}');
+      await respondToUser(matchResult.feedbackMessage, languageCode: responseLang);
+      final route = matchResult.targetRoute!;
+      if (mounted) {
+        _autoNavigateTimer = Timer(const Duration(milliseconds: 1800), () {
+          if (mounted) {
+            _executeNavigation(route);
+          }
+        });
+      }
+      return;
+    }
 
-    final route = matchResult.targetRoute;
-    if (route != null && mounted) {
-      _autoNavigateTimer = Timer(const Duration(milliseconds: 1800), () {
-        if (mounted) {
-          _executeNavigation(route);
-        }
-      });
+    // 6C. Conversational AI fallback
+    debugPrint('[AI] Routing utterance to VoiceConversationService: "$effectiveWords"');
+    try {
+      final reply = await _conversationService.generateResponse(
+        userText: effectiveWords,
+        conversationHistory: List.unmodifiable(_conversationHistory),
+        languageCode: responseLang,
+      );
+
+      _conversationHistory.add(ChatMessage(
+        role: 'user',
+        content: effectiveWords,
+        timestamp: DateTime.now(),
+      ));
+      _conversationHistory.add(ChatMessage(
+        role: 'assistant',
+        content: reply,
+        timestamp: DateTime.now(),
+      ));
+
+      await respondToUser(reply, languageCode: responseLang);
+    } catch (e, stack) {
+      debugPrint('[AI] Conversational error: $e\n$stack');
+      final prompt = VoicePrompts.get(VoicePrompts.notUnderstood, responseLang);
+      await respondToUser(prompt, languageCode: responseLang);
     }
   }
 
   Future<void> _savePendingReminder({String? languageCode}) async {
     final langCode = languageCode ?? _selectedLanguage;
     final title = _pendingReminderTitle ?? 'Reminder';
-    final dt = _pendingReminderDateTime ??
-        DateTime.now().add(const Duration(hours: 1));
+    final dt = _pendingReminderDateTime;
+
+    // FIX #7: Future date validation
+    final now = DateTime.now();
+    if (dt == null || dt.isBefore(now) || dt.isAtSameMomentAs(now)) {
+      debugPrint('[REMINDER] Rejected invalid or past reminder date: $dt (now: $now)');
+      final prompt = VoicePrompts.get(VoicePrompts.invalidReminderTime, langCode);
+      await respondToUser(prompt, languageCode: langCode);
+      setState(() {
+        _conversationState = ReminderConversationState.awaitingReminderDateTime;
+      });
+      return;
+    }
+
     final tod = _pendingReminderTimeOfDay ??
         '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}';
     final daysOfWeek =
@@ -449,6 +560,7 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
     final userId = FirebaseService.instance.currentUser?.uid;
 
     try {
+      debugPrint('[REMINDER] Persisting to SQLite: title="$title", time="$tod", days="$daysOfWeek"');
       final reminderId = await _reminderRepository.create(
         title: title,
         timeOfDay: tod,
@@ -456,6 +568,8 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
         enabled: true,
         userId: userId,
       );
+
+      debugPrint('[REMINDER] Reminder persisted successfully with id=$reminderId');
 
       final notifId = notificationIdFromReminderId(reminderId);
       final hasPermission = await _notificationService.hasPermission();
@@ -470,11 +584,14 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
         scheduledDate: dt,
       );
 
+      debugPrint('[REMINDER] Local notification scheduled with id=$notifId at $dt');
+
       final prompt = VoicePrompts.get(VoicePrompts.reminderCreated, langCode);
       await respondToUser(prompt, languageCode: langCode);
-    } catch (e) {
-      debugPrint('[VoiceAssistantScreen] Error persisting reminder: $e');
-      final prompt = VoicePrompts.get(VoicePrompts.reminderCreated, langCode);
+    } catch (e, stack) {
+      // FIX #10: NEVER FAKE SUCCESS
+      debugPrint('[REMINDER] Error persisting or scheduling reminder: $e\n$stack');
+      final prompt = VoicePrompts.get(VoicePrompts.reminderFailed, langCode);
       await respondToUser(prompt, languageCode: langCode);
     } finally {
       if (mounted) {
@@ -864,8 +981,14 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
         color: AppTheme.surfaceColor,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: _voiceService.isListening ? AppTheme.primaryColor : Colors.grey.shade300,
-          width: _voiceService.isListening ? 2 : 1,
+          color: (_voiceState == VoiceState.listening || _voiceService.isListening)
+              ? AppTheme.primaryColor
+              : _voiceState == VoiceState.speaking
+                  ? const Color(0xFF0D9488)
+                  : _voiceState == VoiceState.thinking
+                      ? Colors.amber.shade700
+                      : Colors.grey.shade300,
+          width: (_voiceState == VoiceState.listening || _voiceService.isListening) ? 2 : 1,
         ),
         boxShadow: [
           BoxShadow(
@@ -886,20 +1009,27 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
                   : _conversationState ==
                           ReminderConversationState.awaitingReminderDateTime
                       ? VoicePrompts.get(VoicePrompts.askReminderTime, _selectedLanguage)
-                      : _voiceService.isListening
+                      : (_voiceState == VoiceState.listening || _voiceService.isListening)
                           ? VoicePrompts.get(VoicePrompts.listening, _selectedLanguage)
-                          : switch (_selectedLanguage) {
-                              'te' => 'నేను వినడానికి సిద్ధంగా ఉన్నాను',
-                              'hi' => 'मैं सुनने के लिए तैयार हूँ',
-                              _ => 'Ready to listen',
-                            },
+                          : _voiceState == VoiceState.thinking
+                              ? VoicePrompts.get(VoicePrompts.processing, _selectedLanguage)
+                              : switch (_selectedLanguage) {
+                                  'te' => 'నేను వినడానికి సిద్ధంగా ఉన్నాను',
+                                  'hi' => 'मैं सुनने के लिए तैयार हूँ',
+                                  _ => 'Ready to listen',
+                                },
               style: TextStyle(
                 fontSize: 20,
-                color: _voiceService.isListening
+                color: (_voiceState == VoiceState.listening || _voiceService.isListening)
                     ? AppTheme.primaryColor
-                    : AppTheme.subtitleColor,
-                fontWeight:
-                    _voiceService.isListening ? FontWeight.w600 : FontWeight.normal,
+                    : _voiceState == VoiceState.speaking
+                        ? const Color(0xFF0D9488)
+                        : _voiceState == VoiceState.thinking
+                            ? Colors.amber.shade800
+                            : AppTheme.subtitleColor,
+                fontWeight: (_voiceState == VoiceState.listening || _voiceService.isListening)
+                    ? FontWeight.w600
+                    : FontWeight.normal,
               ),
             ),
           ] else ...[
@@ -988,26 +1118,48 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
   }
 
   Widget _buildMicrophoneButton() {
-    final isListening = _voiceService.isListening;
+    final isListening = _voiceState == VoiceState.listening || _voiceService.isListening;
+    final isSpeaking = _voiceState == VoiceState.speaking;
+    final isThinking = _voiceState == VoiceState.thinking;
+
+    final buttonColor = isListening
+        ? Colors.red.shade600
+        : isSpeaking
+            ? const Color(0xFF0D9488)
+            : isThinking
+                ? Colors.amber.shade700
+                : AppTheme.primaryColor;
+
+    final buttonIcon = isListening
+        ? Icons.stop_rounded
+        : isSpeaking
+            ? Icons.volume_up_rounded
+            : isThinking
+                ? Icons.hourglass_top_rounded
+                : Icons.mic_rounded;
+
+    final semanticsLabel = isListening
+        ? 'Stop listening'
+        : 'Start listening';
 
     return ScaleTransition(
       scale: isListening ? _pulseAnimation : const AlwaysStoppedAnimation(1.0),
       child: Semantics(
-        label: isListening ? 'Stop listening' : 'Start listening',
+        label: semanticsLabel,
         button: true,
         child: Material(
           shape: const CircleBorder(),
           elevation: isListening ? 8 : 4,
-          color: isListening ? Colors.red.shade600 : AppTheme.primaryColor,
+          color: buttonColor,
           child: InkWell(
             customBorder: const CircleBorder(),
-            onTap: _handleMicrophoneTap,
+            onTap: (isSpeaking || isThinking) ? null : _handleMicrophoneTap,
             child: Container(
               width: 96,
               height: 96,
               alignment: Alignment.center,
               child: Icon(
-                isListening ? Icons.stop_rounded : Icons.mic_rounded,
+                buttonIcon,
                 color: Colors.white,
                 size: 48,
               ),
@@ -1019,16 +1171,32 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
   }
 
   Widget _buildButtonStatusLabel() {
-    final isListening = _voiceService.isListening;
+    final isListening = _voiceState == VoiceState.listening || _voiceService.isListening;
+    final isSpeaking = _voiceState == VoiceState.speaking;
+    final isThinking = _voiceState == VoiceState.thinking;
+
+    final label = isListening
+        ? VoicePrompts.get(VoicePrompts.tapToStop, _selectedLanguage)
+        : isSpeaking
+            ? VoicePrompts.get(VoicePrompts.speaking, _selectedLanguage)
+            : isThinking
+                ? VoicePrompts.get(VoicePrompts.processing, _selectedLanguage)
+                : VoicePrompts.get(VoicePrompts.tapToSpeak, _selectedLanguage);
+
+    final color = isListening
+        ? Colors.red.shade700
+        : isSpeaking
+            ? const Color(0xFF0F766E)
+            : isThinking
+                ? Colors.amber.shade900
+                : AppTheme.textColor;
 
     return Text(
-      isListening
-          ? VoicePrompts.get(VoicePrompts.tapToStop, _selectedLanguage)
-          : VoicePrompts.get(VoicePrompts.tapToSpeak, _selectedLanguage),
+      label,
       style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: isListening ? Colors.red.shade700 : AppTheme.textColor,
+        color: color,
       ),
     );
   }

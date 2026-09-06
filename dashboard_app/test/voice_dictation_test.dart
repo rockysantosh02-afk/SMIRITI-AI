@@ -40,6 +40,9 @@ class FakeVoiceService with ChangeNotifier implements IVoiceService {
   List<stt.LocaleName> get availableLocales => [];
 
   @override
+  bool isLanguageSupported(String langCode) => true;
+
+  @override
   Future<bool> initialize() async => true;
 
   @override

@@ -9,6 +9,7 @@ import '../controllers/game_session_controller.dart';
 import '../models/game_item.dart';
 import '../models/game_result.dart';
 import '../services/content_pack_service.dart';
+import '../services/game_localized_content.dart';
 
 /// Abstract base screen for all Smriti AI cognitive and memory games.
 /// Provides:
@@ -139,6 +140,21 @@ abstract class BaseGameScreenState<T extends BaseGameScreen> extends State<T> {
   /// Optional prompt override if subclass wants custom text
   String getPromptText(GameItem currentItem) => currentItem.prompt;
 
+  /// Localized prompt resolver supporting English, Telugu, and Hindi
+  String getLocalizedPromptText(BuildContext context, GameItem currentItem) {
+    final custom = getPromptText(currentItem);
+    if (custom != currentItem.prompt) {
+      return custom;
+    }
+    final langCode = Localizations.localeOf(context).languageCode;
+    return GameLocalizedContent.getLocalizedPrompt(
+      currentItem,
+      gameId: widget.gameId,
+      languageCode: langCode,
+      context: context,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -201,7 +217,7 @@ abstract class BaseGameScreenState<T extends BaseGameScreen> extends State<T> {
                       border: Border.all(color: AppTheme.primaryColor.withValues(alpha: 0.2)),
                     ),
                     child: Text(
-                      getPromptText(currentItem),
+                      getLocalizedPromptText(context, currentItem),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 24,
@@ -363,9 +379,7 @@ abstract class BaseGameScreenState<T extends BaseGameScreen> extends State<T> {
               ),
               const SizedBox(height: 8),
               Text(
-                isCorrect
-                    ? 'Well done! Excellent work!'
-                    : 'Good try. Take your time, let\'s try again!',
+                isCorrect ? loc.encouragementPositive : loc.encouragementGentle,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 20, color: AppTheme.subtitleColor),
               ),
@@ -410,7 +424,7 @@ abstract class BaseGameScreenState<T extends BaseGameScreen> extends State<T> {
 
                 // Affirming warm text
                 Text(
-                  hasPassed ? loc.congratulations : 'Good try!',
+                  hasPassed ? loc.congratulations : loc.tryAgain,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 28,
@@ -420,9 +434,7 @@ abstract class BaseGameScreenState<T extends BaseGameScreen> extends State<T> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  hasPassed
-                      ? 'Level Complete! You played wonderfully today!'
-                      : 'You\'re doing well. Take your time!',
+                  hasPassed ? loc.levelComplete : loc.encouragementGentle,
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 20, color: AppTheme.subtitleColor),
                 ),
@@ -444,13 +456,13 @@ abstract class BaseGameScreenState<T extends BaseGameScreen> extends State<T> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Current Level: ${result.difficultyLevel}',
+                        '${loc.currentLevel}: ${result.difficultyLevel}',
                         style: const TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
                       ),
                       if (canAdvance) ...[
                         const SizedBox(height: 4),
                         Text(
-                          'Next Level Unlocked: Level ${result.newDifficultyLevel}!',
+                          '${loc.nextLevel}: ${loc.round} ${result.newDifficultyLevel}!',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -476,7 +488,7 @@ abstract class BaseGameScreenState<T extends BaseGameScreen> extends State<T> {
                       ),
                       icon: const Icon(Icons.arrow_forward_rounded, size: 36),
                       label: Text(
-                        'Next Level (Level ${result.newDifficultyLevel})',
+                        '${loc.nextLevel} (${loc.round} ${result.newDifficultyLevel})',
                         style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                       ),
                       onPressed: () => _initSession(targetDifficulty: result.newDifficultyLevel),

@@ -10,7 +10,6 @@ class SituationMatchScreen extends BaseGameScreen {
       : super(
           gameId: 'situation_match',
           gameTitle: 'Match Situation',
-          gameTitleAs: 'পৰিস্থিতি মিলোৱা',
           domain: 'REASONING',
         );
 
@@ -53,18 +52,26 @@ class _SituationMatchScreenState
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
-            'দৈনন্দিন জীৱনৰ উচিত বাছনি',
-            style: TextStyle(
+          Text(
+            Localizations.localeOf(context).languageCode == 'te'
+                ? 'రోజువారీ జీవితంలో సరైన ఎంపిక'
+                : (Localizations.localeOf(context).languageCode == 'hi'
+                    ? 'दैनिक जीवन में सही चुनाव'
+                    : 'Everyday Life Choices'),
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: AppTheme.primaryColor,
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Think what makes the most sense in this situation',
-            style: TextStyle(fontSize: 15, color: AppTheme.subtitleColor),
+          Text(
+            Localizations.localeOf(context).languageCode == 'te'
+                ? 'ఈ పరిస్థితిలో ఏది సరైనదో ఆలోచించండి'
+                : (Localizations.localeOf(context).languageCode == 'hi'
+                    ? 'इस स्थिति में क्या सही है सोचें'
+                    : 'Think what makes the most sense in this situation'),
+            style: const TextStyle(fontSize: 15, color: AppTheme.subtitleColor),
           ),
         ],
       ),

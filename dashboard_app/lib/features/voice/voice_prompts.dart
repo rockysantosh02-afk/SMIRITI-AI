@@ -129,6 +129,18 @@ class VoicePrompts {
     'hi': 'ठीक है, आपका रिमाइंडर सेट कर दिया गया है।',
   };
 
+  static const Map<String, String> reminderFailed = {
+    'en': 'I couldn\'t set the reminder right now. Please try again.',
+    'te': 'ప్రస్తుతం రిమైండర్ సెట్ చేయడం సాధ్యం కాలేదు. దయచేసి మళ్ళీ ప్రయత్నించండి.',
+    'hi': 'अभी रिमाइंडर सेट नहीं किया जा सका। कृपया दोबारा प्रयास करें।',
+  };
+
+  static const Map<String, String> speaking = {
+    'en': 'Smriti is speaking...',
+    'te': 'స్మృతి మాట్లాడుతోంది...',
+    'hi': 'स्मृति बोल रही हैं...',
+  };
+
   static const Map<String, String> reminderUpdated = {
     'en': 'Your reminder has been updated.',
     'te': 'మీ రిమైండర్ నవీకరించబడింది.',

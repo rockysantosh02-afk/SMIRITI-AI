@@ -349,60 +349,77 @@ class _ReminderEntryScreenState extends State<ReminderEntryScreen> {
               const SizedBox(height: 24),
 
               // Time Picker Card (Accessible, large touch target)
-              const Text(
-                'Reminder Time',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1A1A1A),
-                ),
-              ),
-              const SizedBox(height: 8),
-              InkWell(
-                onTap: _pickTime,
-                borderRadius: BorderRadius.circular(14),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(
-                      color: const Color(0xFF006699),
-                      width: 2,
+              // Time Picker Card (Clean, Simple, Large for elderly users)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: const Color(0xFF006699),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.access_time_filled_rounded,
-                          size: 32, color: Color(0xFF006699)),
-                      const SizedBox(width: 14),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Time',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                              fontWeight: FontWeight.bold,
-                            ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.access_time_filled_rounded,
+                          size: 26,
+                          color: Color(0xFF006699),
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          'Reminder Time',
+                          style: TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1A1A1A),
                           ),
-                          Text(
-                            formattedTime,
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF006699),
-                            ),
-                          ),
-                        ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      formattedTime,
+                      style: const TextStyle(
+                        fontSize: 34,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF006699),
+                        letterSpacing: 1.5,
                       ),
-                      const Spacer(),
-                      const Icon(Icons.touch_app_rounded,
-                          color: Color(0xFF006699), size: 28),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      height: 54,
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        key: const Key('change_time_button'),
+                        onPressed: _pickTime,
+                        icon: const Icon(Icons.edit_calendar_rounded, size: 22),
+                        label: const Text(
+                          'Change Time',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF006699),
+                          side: const BorderSide(color: Color(0xFF006699), width: 2),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 20),
