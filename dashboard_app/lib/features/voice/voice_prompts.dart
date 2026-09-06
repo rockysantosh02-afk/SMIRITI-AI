@@ -103,6 +103,22 @@ class VoicePrompts {
     'bn': 'রিমাইন্ডার খোলা হচ্ছে...',
   };
 
+  static const Map<String, String> openingSettings = {
+    'en': 'Opening Settings...',
+    'te': 'సెట్టింగ్‌లు తెరవబడుతున్నాయి...',
+    'hi': 'सेटिंग्स खुल रही हैं...',
+    'as': 'ছেটিংছ খোলা হৈছে...',
+    'bn': 'সেটিংস খোলা হচ্ছে...',
+  };
+
+  static const Map<String, String> openingProfile = {
+    'en': 'Opening Profile...',
+    'te': 'ప్రొఫైల్ తెరవబడుతోంది...',
+    'hi': 'प्रोफ़ाइल खुल रही है...',
+    'as': 'প্ৰফাইল খোলা হৈছে...',
+    'bn': 'প্রোফাইল খোলা হচ্ছে...',
+  };
+
   static const Map<String, String> permissionDenied = {
     'en': 'Microphone permission is needed for voice commands. You can still use Smriti AI without voice.',
     'te': 'వాయిస్ కమాండ్ల కోసం మైక్రోఫోన్ అనుమతి అవసరం. మీరు బటన్లను ఉపయోగించవచ్చు.',
@@ -127,6 +143,12 @@ class VoicePrompts {
     'en': 'Okay, I have created your reminder.',
     'te': 'సరే, మీ రిమైండర్ సేవ్ చేయబడింది.',
     'hi': 'ठीक है, आपका रिमाइंडर सेट कर दिया गया है।',
+  };
+
+  static const Map<String, String> reminderSavedNoNotification = {
+    'en': 'Your reminder was saved, but I couldn\'t schedule its notification.',
+    'te': 'మీ రిమైండర్ సేవ్ చేయబడింది, కానీ నోటిఫికేషన్ షెడ్యూల్ చేయడం సాధ్యం కాలేదు.',
+    'hi': 'आपका रिमाइंडर सेव हो गया है, लेकिन नोटिफिकेशन शेड्यूल नहीं हो सका।',
   };
 
   static const Map<String, String> reminderFailed = {

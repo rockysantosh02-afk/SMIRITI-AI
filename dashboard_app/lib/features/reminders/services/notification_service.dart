@@ -51,6 +51,21 @@ class LocalNotificationService implements NotificationService {
 
     try {
       tz.initializeTimeZones();
+      try {
+        final timeZoneName = DateTime.now().timeZoneName;
+        tz.setLocalLocation(tz.getLocation(timeZoneName));
+      } catch (_) {
+        try {
+          final offset = DateTime.now().timeZoneOffset;
+          final matchingLocation = tz.timeZoneDatabase.locations.values.firstWhere(
+            (loc) => loc.currentTimeZone.offset == offset.inMilliseconds,
+            orElse: () => tz.getLocation('UTC'),
+          );
+          tz.setLocalLocation(matchingLocation);
+        } catch (_) {
+          // Keep default if location resolution fails
+        }
+      }
 
       const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
       const darwinInit = DarwinInitializationSettings(
@@ -71,6 +86,22 @@ class LocalNotificationService implements NotificationService {
           debugPrint('[NotificationService] Notification tapped: ${details.id}');
         },
       );
+
+      if (!kIsWeb && Platform.isAndroid) {
+        final androidPlugin = _plugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+        if (androidPlugin != null) {
+          const channel = AndroidNotificationChannel(
+            channelId,
+            channelName,
+            description: channelDescription,
+            importance: Importance.max,
+            enableVibration: true,
+            playSound: true,
+          );
+          await androidPlugin.createNotificationChannel(channel);
+        }
+      }
 
       _isInitialized = success ?? true;
       return _isInitialized;
@@ -167,7 +198,15 @@ class LocalNotificationService implements NotificationService {
       );
 
       final tzLocation = tz.local;
-      var targetDate = tz.TZDateTime.from(scheduledDate, tzLocation);
+      var targetDate = tz.TZDateTime(
+        tzLocation,
+        scheduledDate.year,
+        scheduledDate.month,
+        scheduledDate.day,
+        scheduledDate.hour,
+        scheduledDate.minute,
+        scheduledDate.second,
+      );
 
       if (isDaily) {
         // Ensure daily reminder starts in future
@@ -176,39 +215,71 @@ class LocalNotificationService implements NotificationService {
           targetDate = targetDate.add(const Duration(days: 1));
         }
 
-        await _plugin.zonedSchedule(
-          notificationId,
-          title,
-          body,
-          targetDate,
-          notificationDetails,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-          matchDateTimeComponents: DateTimeComponents.time,
-        );
+        debugPrint('[NotificationService] Scheduling daily notification id=$notificationId at $targetDate, tz=${tzLocation.name}');
+        try {
+          await _plugin.zonedSchedule(
+            notificationId,
+            title,
+            body,
+            targetDate,
+            notificationDetails,
+            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation:
+                UILocalNotificationDateInterpretation.absoluteTime,
+            matchDateTimeComponents: DateTimeComponents.time,
+          );
+        } catch (scheduleErr) {
+          debugPrint('[NotificationService] Exact daily schedule failed ($scheduleErr), falling back to inexact');
+          await _plugin.zonedSchedule(
+            notificationId,
+            title,
+            body,
+            targetDate,
+            notificationDetails,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation:
+                UILocalNotificationDateInterpretation.absoluteTime,
+            matchDateTimeComponents: DateTimeComponents.time,
+          );
+        }
       } else {
         // One-time reminder: skip if already in the past
         if (targetDate.isBefore(tz.TZDateTime.now(tzLocation))) {
-          debugPrint('[NotificationService] Scheduled date is in the past, skipping');
+          debugPrint('[NotificationService] Scheduled date is in the past for id=$notificationId: $targetDate');
           return false;
         }
 
-        await _plugin.zonedSchedule(
-          notificationId,
-          title,
-          body,
-          targetDate,
-          notificationDetails,
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-              UILocalNotificationDateInterpretation.absoluteTime,
-        );
+        debugPrint('[NotificationService] Scheduling one-time notification id=$notificationId at $targetDate, tz=${tzLocation.name}');
+        try {
+          await _plugin.zonedSchedule(
+            notificationId,
+            title,
+            body,
+            targetDate,
+            notificationDetails,
+            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation:
+                UILocalNotificationDateInterpretation.absoluteTime,
+          );
+        } catch (scheduleErr) {
+          debugPrint('[NotificationService] Exact one-time schedule failed ($scheduleErr), falling back to inexact');
+          await _plugin.zonedSchedule(
+            notificationId,
+            title,
+            body,
+            targetDate,
+            notificationDetails,
+            androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+            uiLocalNotificationDateInterpretation:
+                UILocalNotificationDateInterpretation.absoluteTime,
+          );
+        }
       }
 
+      debugPrint('[NotificationService] Successfully scheduled notification id=$notificationId at $targetDate');
       return true;
     } catch (e) {
-      debugPrint('[NotificationService] scheduleReminder error: $e');
+      debugPrint('[NotificationService] scheduleReminder failed for id=$notificationId: ${e.runtimeType}: $e');
       return false;
     }
   }

@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import '../../../../core/config/app_config.dart';
 import '../../../../core/sync/http_client.dart';
+import 'conversational_intent_engine.dart';
 
 /// Representation of a message turn in a conversational voice session.
 class ChatMessage {
@@ -141,118 +142,13 @@ class VoiceConversationService implements IVoiceConversationService {
       }
     }
 
-    // 2. Greeting / Well-being queries ("How are you?", "How are you doing today?")
-    final isGreeting = lower.contains('how are you') ||
-        lower.contains('how do you do') ||
-        lower.contains('how are you doing') ||
-        lower.contains('how you feeling') ||
-        lower.contains('ఎలా ఉన్నారు') ||
-        lower.contains('బాగున్నారా') ||
-        lower.contains('आप कैसे हैं') ||
-        lower.contains('कैसी हो') ||
-        lower.contains('कैसा चल रहा है');
-
-    if (isGreeting) {
-      switch (lang) {
-        case 'te':
-          return 'నేను చాలా బాగున్నాను, ధన్యవాదాలు! ఈ రోజు మీరు ఎలా ఉన్నారు? మీతో మాట్లాడటం నాకు చాలా సంతోషంగా ఉంది.';
-        case 'hi':
-          return 'मैं बहुत अच्छा हूँ, धन्यवाद! आज आप कैसा महसूस कर रहे हैं? आपसे बात करके मुझे बहुत खुशी हुई।';
-        case 'en':
-        default:
-          return 'I am doing wonderful, thank you for asking! How are you feeling today? It is always lovely talking with you.';
-      }
-    }
-
-    // 3. User sharing personal activities ("I went to the market", "I visited my village", "I had tea in the garden")
-    final isPersonalActivity = lower.contains('market') ||
-        lower.contains('village') ||
-        lower.contains('garden') ||
-        lower.contains('walk') ||
-        lower.contains('temple') ||
-        lower.contains('friend') ||
-        lower.contains('family') ||
-        lower.contains('tea') ||
-        lower.contains('lunch') ||
-        lower.contains('వెళ్లాను') ||
-        lower.contains('తోట') ||
-        lower.contains('గుడి') ||
-        lower.contains('గ్రామం') ||
-        lower.contains('టీ') ||
-        lower.contains('बाजार') ||
-        lower.contains('गाँव') ||
-        lower.contains('गांव') ||
-        lower.contains('बगीचे') ||
-        lower.contains('मंदिर') ||
-        lower.contains('चाय');
-
-    if (isPersonalActivity) {
-      switch (lang) {
-        case 'te':
-          return 'అది చాలా మంచి విషయం! ఆ విశేషాల గురించి ఇంకాస్త చెబుతారా? మీ అనుభవాలు వినడం నాకు చాలా ఇష్టం.';
-        case 'hi':
-          return 'यह तो बहुत अच्छी बात है! क्या आप इसके बारे में थोड़ा और बताएंगे? आपकी बातें सुनना मुझे बहुत अच्छा लगता है।';
-        case 'en':
-        default:
-          return 'That sounds wonderful! Would you like to tell me more about it? I always enjoy listening to your experiences.';
-      }
-    }
-
-    // 4. Positive Emotion / Happiness ("I feel good", "I am happy today")
-    final isPositiveEmotion = lower.contains('happy') ||
-        lower.contains('glad') ||
-        lower.contains('good') ||
-        lower.contains('peaceful') ||
-        lower.contains('సంతోషం') ||
-        lower.contains('ఆనందం') ||
-        lower.contains('खुश') ||
-        lower.contains('प्रसन्न') ||
-        lower.contains('अच्छा');
-
-    if (isPositiveEmotion) {
-      switch (lang) {
-        case 'te':
-          return 'మీరు సంతోషంగా ఉన్నారని తెలిసి నాకు ఎంతో ఆనందంగా ఉంది! మీ రోజు మరింత ఆహ్లాదకరంగా గడవాలని కోరుకుంటున్నాను.';
-        case 'hi':
-          return 'यह जानकर मुझे बहुत प्रसन्नता हुई कि आप खुश हैं! आपका दिन और भी आनंदमय बीते, यही मेरी कामना है।';
-        case 'en':
-        default:
-          return 'Hearing that brings joy to my heart! I hope the rest of your day is just as peaceful and bright.';
-      }
-    }
-
-    // 5. General / Trivia / Stories ("Tell me something interesting", "Tell me a story", "Talk to me")
-    final isStoryRequest = lower.contains('tell me something') ||
-        lower.contains('tell me a story') ||
-        lower.contains('talk to me') ||
-        lower.contains('ఏదైనా చెప్పు') ||
-        lower.contains('కథ చెప్పు') ||
-        lower.contains('మాట్లాడు') ||
-        lower.contains('कुछ बताओ') ||
-        lower.contains('कहानी सुनाओ') ||
-        lower.contains('बात करो');
-
-    if (isStoryRequest) {
-      switch (lang) {
-        case 'te':
-          return 'మన మనసును ప్రశాంతంగా ఉంచుకోవడానికి రోజూ కొద్దిసేపు పచ్చని తోటలో నడవడం ఎంతో మేలు చేస్తుంది. మీకు మొక్కలు అంటే ఇష్టమా?';
-        case 'hi':
-          return 'प्रकृति के बीच थोड़ा समय बिताना और गहरी साँस लेना मन को असीम शांति देता है। क्या आपको प्रकृति में टहलना पसंद है?';
-        case 'en':
-        default:
-          return 'Did you know that taking a gentle stroll in a garden and listening to the birds can instantly refresh the mind? What is your favorite place to relax?';
-      }
-    }
-
-    // 6. Natural warm conversational fallback
-    switch (lang) {
-      case 'te':
-        return 'నేను విన్నాను. మీరు చెప్పిన విషయం చాలా ఆసక్తికరంగా ఉంది. మీతో మాట్లాడటం ఎల్లప్పుడూ సంతోషాన్నిస్తుంది.';
-      case 'hi':
-        return 'मैंने आपकी बात सुनी। यह बहुत अच्छी बात है। आपसे बात करना हमेशा सुखद लगता है।';
-      case 'en':
-      default:
-        return 'I hear you. Thank you for sharing that with me. It is always a pleasure conversing with you.';
-    }
+    // 2. Delegate to context-aware elderly conversational engine
+    const engine = ConversationalIntentEngine();
+    final analysis = engine.detect(userText);
+    return engine.generateResponse(
+      analysis: analysis,
+      userText: userText,
+      languageCode: lang,
+    );
   }
 }

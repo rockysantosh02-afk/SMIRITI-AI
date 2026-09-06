@@ -194,17 +194,21 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 40),
                     
                     // App logo/title
-                    const Icon(
-                      Icons.psychology_rounded,
-                      size: 80,
-                      color: AppTheme.primaryColor,
+                    Center(
+                      child: Image.asset(
+                        'assets/branding/smriti_logo.png',
+                        height: 96,
+                        fit: BoxFit.contain,
+                        semanticLabel: 'SMRITI-AI logo',
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Smriti AI',
+                      'SMRITI-AI',
                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         color: AppTheme.primaryColor,
                         fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
                       ),
                       textAlign: TextAlign.center,
                     ),

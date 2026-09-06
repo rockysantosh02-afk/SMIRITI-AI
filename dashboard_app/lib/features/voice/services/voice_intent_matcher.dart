@@ -90,7 +90,27 @@ class VoiceIntentMatcher {
       );
     }
 
-    // 6. Return to Dashboard / Home Intent
+    // 6. Open Settings Intent
+    if (_matchesAny(clean, _openSettingsKeywords)) {
+      return VoiceIntentResult(
+        intent: VoiceIntent.openSettings,
+        rawText: rawText,
+        feedbackMessage: VoicePrompts.get(VoicePrompts.openingSettings, languageCode),
+        targetRoute: '/settings',
+      );
+    }
+
+    // 7. Open Profile Intent
+    if (_matchesAny(clean, _openProfileKeywords)) {
+      return VoiceIntentResult(
+        intent: VoiceIntent.openProfile,
+        rawText: rawText,
+        feedbackMessage: VoicePrompts.get(VoicePrompts.openingProfile, languageCode),
+        targetRoute: '/profile',
+      );
+    }
+
+    // 8. Return to Dashboard / Home Intent
     if (_matchesAny(clean, _dashboardKeywords)) {
       return VoiceIntentResult(
         intent: VoiceIntent.openDashboard,
@@ -100,7 +120,7 @@ class VoiceIntentMatcher {
       );
     }
 
-    // 7. Open Reminders Screen Intent
+    // 9. Open Reminders Screen Intent
     if (_matchesAny(clean, _openRemindersKeywords)) {
       return VoiceIntentResult(
         intent: VoiceIntent.openReminders,
@@ -120,8 +140,22 @@ class VoiceIntentMatcher {
 
   bool _matchesAny(String text, List<String> patterns) {
     for (final pattern in patterns) {
-      if (text == pattern || text.contains(pattern)) {
+      if (text == pattern) {
         return true;
+      }
+      if (pattern.contains(' ')) {
+        if (text == pattern ||
+            text.startsWith('$pattern ') ||
+            text.endsWith(' $pattern') ||
+            text.contains(' $pattern ')) {
+          return true;
+        }
+      } else {
+        if (text == pattern) return true;
+        final words = text.split(' ');
+        if (words.length <= 2 && words.contains(pattern)) {
+          return true;
+        }
       }
     }
     return false;
@@ -195,7 +229,10 @@ class VoiceIntentMatcher {
   static const List<String> _openRemindersKeywords = [
     // English
     'open reminders',
+    'open the reminders',
     'show reminders',
+    'go to reminders',
+    'take me to reminders',
     'view reminders',
     'my reminders',
     'reminders',
@@ -256,17 +293,29 @@ class VoiceIntentMatcher {
 
   static const List<String> _openJournalKeywords = [
     // English
+    'open journal',
+    'open the journal',
+    'show journal',
+    'show the journal',
+    'take me to journal',
+    'take me to the journal',
+    'go to journal',
+    'go to the journal',
+    'navigate to journal',
+    'view journal',
+    'write in journal',
+    'write in my journal',
     'open my memories',
     'open memories',
     'open my journal',
-    'open journal',
     'show my memories',
     'show memories',
-    'view journal',
+    'view memories',
     'my journal',
     'my memories',
     'journal',
     'open diary',
+    'open the diary',
     'my diary',
     'diary',
     'memories',
@@ -310,14 +359,19 @@ class VoiceIntentMatcher {
 
   static const List<String> _openGamesKeywords = [
     // English
-    'play a game',
-    'play game',
     'open games',
+    'open the games',
     'open game',
+    'show games',
+    'go to games',
+    'take me to games',
+    'navigate to games',
+    'play a game',
+    'play games',
+    'play game',
     'games hub',
     'games',
     'game',
-    'play',
 
     // Telugu
     'ఆటలు తెరవండి',
@@ -342,11 +396,81 @@ class VoiceIntentMatcher {
     'খেলা খোলো',
   ];
 
+  static const List<String> _openSettingsKeywords = [
+    // English
+    'open settings',
+    'open the settings',
+    'show settings',
+    'go to settings',
+    'take me to settings',
+    'navigate to settings',
+    'view settings',
+    'settings',
+    'settings screen',
+
+    // Telugu
+    'సెట్టింగ్‌లు తెరవండి',
+    'సెట్టింగ్స్ తెరవండి',
+    'సెట్టింగ్‌లు చూపించండి',
+    'సెట్టింగ్‌లు',
+    'సెట్టింగ్స్',
+
+    // Hindi
+    'सेटिंग्स खोलो',
+    'सेटिंग्स दिखाओ',
+    'सेटिंग्स',
+    'सेटिंग्स पेज',
+
+    // Backwards compatibility
+    'ছেটিংছ খোলক',
+    'ছেটিংছ',
+    'সেটিংস খোলো',
+    'সেটিংস',
+  ];
+
+  static const List<String> _openProfileKeywords = [
+    // English
+    'open profile',
+    'open the profile',
+    'show profile',
+    'go to profile',
+    'take me to profile',
+    'view profile',
+    'my profile',
+    'profile',
+    'profile screen',
+
+    // Telugu
+    'ప్రొఫైల్ తెరవండి',
+    'నా ప్రొఫైల్',
+    'ప్రొఫైల్ చూపించండి',
+    'ప్రొఫైల్',
+
+    // Hindi
+    'प्रोफ़ाइल खोलो',
+    'मेरी प्रोफ़ाइल',
+    'प्रोफ़ाइल दिखाओ',
+    'प्रोफ़ाइल',
+
+    // Backwards compatibility
+    'প্ৰফাইল খোলক',
+    'প্ৰফাইল',
+    'প্রোফাইল খোলো',
+    'প্রোফাইল',
+  ];
+
   static const List<String> _dashboardKeywords = [
     // English
     'go home',
+    'open home',
+    'open the home',
+    'show home',
+    'take me home',
+    'take me to home',
     'open dashboard',
     'go to dashboard',
+    'show dashboard',
+    'take me to dashboard',
     'back to home',
     'dashboard',
     'home screen',

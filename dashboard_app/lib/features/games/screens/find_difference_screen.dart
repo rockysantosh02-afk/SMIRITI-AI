@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_theme.dart';
@@ -6,11 +5,90 @@ import '../base/base_game_screen.dart';
 import '../models/game_item.dart';
 import '../services/cultural_visual_helper.dart';
 
+/// Normalized region representing the location of a visual difference (0.0 to 1.0).
+class DifferenceRegion {
+  final double normalizedX;
+  final double normalizedY;
+  final double normalizedRadius;
+  final String description;
+
+  const DifferenceRegion({
+    required this.normalizedX,
+    required this.normalizedY,
+    this.normalizedRadius = 0.18, // Generous 18% radius for elderly touch
+    required this.description,
+  });
+
+  Rect toRect(Size size) {
+    final centerX = normalizedX * size.width;
+    final centerY = normalizedY * size.height;
+    final minDim = size.width < size.height ? size.width : size.height;
+    final r = normalizedRadius * minDim;
+    return Rect.fromCircle(center: Offset(centerX, centerY), radius: r);
+  }
+
+  bool contains(Offset localPoint, Size size) {
+    final centerX = normalizedX * size.width;
+    final centerY = normalizedY * size.height;
+    final minDim = size.width < size.height ? size.width : size.height;
+    final r = normalizedRadius * minDim;
+    // Allow at least 48px touch target
+    final hitRadius = r < 48.0 ? 48.0 : r;
+    final dist = (localPoint - Offset(centerX, centerY)).distance;
+    return dist <= hitRadius;
+  }
+}
+
+/// Level specification ensuring distinct visual difference regions per round.
+class DifferenceLevel {
+  final String id;
+  final DifferenceRegion region;
+
+  const DifferenceLevel({
+    required this.id,
+    required this.region,
+  });
+
+  // Pre-authored distinct difference regions for sequential scenes
+  static const List<DifferenceRegion> defaultRegions = [
+    DifferenceRegion(
+      normalizedX: 0.22,
+      normalizedY: 0.25,
+      description: 'Upper-left detail',
+    ),
+    DifferenceRegion(
+      normalizedX: 0.78,
+      normalizedY: 0.75,
+      description: 'Lower-right detail',
+    ),
+    DifferenceRegion(
+      normalizedX: 0.50,
+      normalizedY: 0.50,
+      description: 'Center detail',
+    ),
+    DifferenceRegion(
+      normalizedX: 0.78,
+      normalizedY: 0.25,
+      description: 'Upper-right detail',
+    ),
+    DifferenceRegion(
+      normalizedX: 0.22,
+      normalizedY: 0.75,
+      description: 'Lower-left detail',
+    ),
+  ];
+
+  static DifferenceRegion getRegionForRound(int roundIndex, {String? itemId}) {
+    final idx = roundIndex % defaultRegions.length;
+    return defaultRegions[idx];
+  }
+}
+
 class FindDifferenceScreen extends BaseGameScreen {
   const FindDifferenceScreen({super.key, super.initialDifficulty})
       : super(
           gameId: 'find_difference',
-          gameTitle: 'Find Differences',
+          gameTitle: 'Find the Difference',
           domain: 'ATTENTION',
         );
 
@@ -19,76 +97,61 @@ class FindDifferenceScreen extends BaseGameScreen {
       _FindDifferenceScreenState();
 }
 
-class _DifferencePoint {
-  final double x;
-  final double y;
-  final double radius;
-  final String desc;
-
-  _DifferencePoint({
-    required this.x,
-    required this.y,
-    this.radius = 60.0,
-    required this.desc,
-  });
-}
-
 class _FindDifferenceScreenState
     extends BaseGameScreenState<FindDifferenceScreen> {
   String? _lastItemId;
-  List<_DifferencePoint> _differences = [];
-  final Set<int> _foundIndices = {};
+  late DifferenceRegion _activeRegion;
+  bool _differenceFound = false;
+  String? _missNotice;
 
   void _setupRound(GameItem item) {
     if (_lastItemId == item.id) return;
     _lastItemId = item.id;
-    _foundIndices.clear();
+    _differenceFound = false;
+    _missNotice = null;
 
-    final rawDiffs = (item.raw['differences'] as List<dynamic>?) ?? [];
-    _differences = rawDiffs.map((d) {
-      final map = d as Map<String, dynamic>;
-      return _DifferencePoint(
-        x: (map['x'] as num).toDouble(),
-        y: (map['y'] as num).toDouble(),
-        radius: (map['radius'] as num?)?.toDouble() ?? 60.0,
-        desc: map['desc'] as String? ?? 'Difference',
+    final roundIdx = controller.currentRoundIndex;
+    final rawDiffs = item.raw['differences'] as List<dynamic>?;
+
+    if (rawDiffs != null && rawDiffs.isNotEmpty) {
+      final first = rawDiffs.first as Map<String, dynamic>;
+      _activeRegion = DifferenceRegion(
+        normalizedX: (first['x'] as num).toDouble(),
+        normalizedY: (first['y'] as num).toDouble(),
+        normalizedRadius: (first['radius'] as num?)?.toDouble() ?? 0.18,
+        description: first['desc'] as String? ?? 'Difference',
       );
-    }).toList();
-
-    if (_differences.isEmpty) {
-      _differences = [
-        _DifferencePoint(x: 0.3, y: 0.35, desc: 'Top difference'),
-        _DifferencePoint(x: 0.7, y: 0.4, desc: 'Middle difference'),
-        _DifferencePoint(x: 0.5, y: 0.75, desc: 'Bottom difference'),
-      ];
+    } else {
+      _activeRegion = DifferenceLevel.getRegionForRound(roundIdx, itemId: item.id);
     }
   }
 
   void _handleTap(Offset localPos, Size size) {
-    if (controller.isSessionComplete) return;
+    if (controller.isSessionComplete || _differenceFound) return;
 
-    for (int i = 0; i < _differences.length; i++) {
-      if (_foundIndices.contains(i)) continue;
+    if (_activeRegion.contains(localPos, size)) {
+      setState(() {
+        _differenceFound = true;
+        _missNotice = null;
+      });
 
-      final diff = _differences[i];
-      final targetX = diff.x * size.width;
-      final targetY = diff.y * size.height;
-
-      final dist = sqrt(pow(localPos.dx - targetX, 2) + pow(localPos.dy - targetY, 2));
-
-      // Generous 60px tap radius
-      if (dist <= diff.radius) {
-        setState(() {
-          _foundIndices.add(i);
-        });
-
-        if (_foundIndices.length >= _differences.length) {
-          Future.delayed(const Duration(milliseconds: 400), () {
-            if (mounted) submitAnswer(isCorrect: true);
-          });
+      Future.delayed(const Duration(milliseconds: 300), () {
+        if (mounted) {
+          submitAnswer(
+            isCorrect: true,
+            feedbackTitle: 'You found it!',
+            explanation: 'Great eye! You spotted the difference accurately.',
+          );
         }
-        return;
-      }
+      });
+    } else {
+      setState(() {
+        _missNotice = Localizations.localeOf(context).languageCode == 'te'
+            ? 'అక్కడ కాదు. రెండు చిత్రాలను జాగ్రత్తగా పరిశీలించండి.'
+            : (Localizations.localeOf(context).languageCode == 'hi'
+                ? 'वहाँ नहीं। दोनों चित्रों को ध्यान से देखें।'
+                : 'Not there. Look carefully at both pictures.');
+      });
     }
   }
 
@@ -96,10 +159,11 @@ class _FindDifferenceScreenState
   Widget buildGameContent(BuildContext context, GameItem currentItem) {
     _setupRound(currentItem);
     final meta = CulturalVisualHelper.getMeta(currentItem.image);
+    final lang = Localizations.localeOf(context).languageCode;
 
     return Column(
       children: [
-        // Status row
+        // Status & instruction badge
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           decoration: BoxDecoration(
@@ -110,40 +174,78 @@ class _FindDifferenceScreenState
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check_circle_rounded, color: Color(0xFF2E8B57), size: 28),
+              Icon(
+                _differenceFound ? Icons.check_circle_rounded : Icons.search_rounded,
+                color: _differenceFound ? const Color(0xFF2E8B57) : AppTheme.primaryColor,
+                size: 28,
+              ),
               const SizedBox(width: 10),
               Text(
-                Localizations.localeOf(context).languageCode == 'te'
-                    ? 'కనుగొనబడినవి: ${_foundIndices.length} / ${_differences.length}'
-                    : (Localizations.localeOf(context).languageCode == 'hi'
-                        ? 'मिले अंतर: ${_foundIndices.length} / ${_differences.length}'
-                        : 'Found: ${_foundIndices.length} / ${_differences.length}'),
-                style: const TextStyle(
-                  fontSize: 20,
+                _differenceFound
+                    ? (lang == 'te'
+                        ? 'తేడా కనుగొనబడింది!'
+                        : (lang == 'hi' ? 'अंतर मिल गया!' : 'Difference Found!'))
+                    : (lang == 'te'
+                        ? 'తేడా ఉన్న ప్రదేశాన్ని తాకండి'
+                        : (lang == 'hi'
+                            ? 'अंतर वाले स्थान को स्पर्श करें'
+                            : 'Tap where you see a difference')),
+                style: TextStyle(
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: AppTheme.primaryColor,
+                  color: _differenceFound ? const Color(0xFF2E8B57) : AppTheme.primaryColor,
                 ),
               ),
             ],
           ),
         ),
+
+        // Gentle miss banner if tapped away
+        if (_missNotice != null && !_differenceFound) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.amber.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.amber.shade700, width: 1.5),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.info_outline_rounded, size: 20, color: Colors.amber.shade800),
+                const SizedBox(width: 8),
+                Text(
+                  _missNotice!,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.amber.shade900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+
         const SizedBox(height: 16),
 
-        // Side-by-side scenes
+        // Side-by-side or stacked scenes
         LayoutBuilder(
           builder: (context, constraints) {
             final isWide = constraints.maxWidth > 550;
             final itemWidth = isWide ? (constraints.maxWidth - 20) / 2 : constraints.maxWidth;
             const itemHeight = 220.0;
 
-            final scene1Title = Localizations.localeOf(context).languageCode == 'te'
+            final scene1Title = lang == 'te'
                 ? 'చిత్రం 1'
-                : (Localizations.localeOf(context).languageCode == 'hi' ? 'दृश्य 1' : 'Scene 1');
-            final scene2Title = Localizations.localeOf(context).languageCode == 'te'
+                : (lang == 'hi' ? 'दृश्य 1' : 'Picture 1');
+            final scene2Title = lang == 'te'
                 ? 'చిత్రం 2'
-                : (Localizations.localeOf(context).languageCode == 'hi' ? 'दृश्य 2' : 'Scene 2');
+                : (lang == 'hi' ? 'दृश्य 2' : 'Picture 2');
 
             final scene1 = _buildScene(
+              key: const Key('find_difference_scene_a'),
               title: scene1Title,
               meta: meta,
               width: itemWidth,
@@ -151,6 +253,7 @@ class _FindDifferenceScreenState
               isAltered: false,
             );
             final scene2 = _buildScene(
+              key: const Key('find_difference_scene_b'),
               title: scene2Title,
               meta: meta,
               width: itemWidth,
@@ -183,20 +286,31 @@ class _FindDifferenceScreenState
   }
 
   Widget _buildScene({
+    required Key key,
     required String title,
     required CulturalItemMeta meta,
     required double width,
     required double height,
     required bool isAltered,
   }) {
+    // Exact coordinates of the visual difference on the scene
+    final targetX = _activeRegion.normalizedX * width;
+    final targetY = _activeRegion.normalizedY * height;
+
     return Column(
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.subtitleColor),
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: AppTheme.subtitleColor,
+          ),
         ),
         const SizedBox(height: 6),
         GestureDetector(
+          key: key,
+          behavior: HitTestBehavior.opaque,
           onTapUp: (details) => _handleTap(details.localPosition, Size(width, height)),
           child: Container(
             width: width,
@@ -229,41 +343,53 @@ class _FindDifferenceScreenState
                   ),
                 ),
 
-                // Subtle difference features for scene 2
+                // The visual difference exists in Scene 2 at EXACT targetX and targetY
                 if (isAltered)
                   Positioned(
-                    top: height * 0.25,
-                    left: width * 0.25,
+                    left: targetX - 16,
+                    top: targetY - 16,
                     child: Container(
-                      width: 18,
-                      height: 18,
+                      width: 32,
+                      height: 32,
                       decoration: BoxDecoration(
                         color: meta.primaryColor,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.25),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.star_rounded,
+                          size: 20,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
 
-                // Green rings for found differences
-                ..._foundIndices.map((i) {
-                  final diff = _differences[i];
-                  return Positioned(
-                    left: diff.x * width - 30,
-                    top: diff.y * height - 30,
+                // Green celebration ring when found
+                if (_differenceFound)
+                  Positioned(
+                    left: targetX - 32,
+                    top: targetY - 32,
                     child: Container(
-                      width: 60,
-                      height: 60,
+                      width: 64,
+                      height: 64,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: const Color(0xFF2E8B57), width: 3.5),
-                        color: const Color(0xFF2E8B57).withValues(alpha: 0.2),
+                        color: const Color(0xFF2E8B57).withValues(alpha: 0.25),
                       ),
                       child: const Center(
-                        child: Icon(Icons.check, color: Color(0xFF2E8B57), size: 30),
+                        child: Icon(Icons.check, color: Color(0xFF2E8B57), size: 32),
                       ),
                     ),
-                  );
-                }),
+                  ),
               ],
             ),
           ),
@@ -278,10 +404,10 @@ class _FindDifferenceScreenState
       padding: const EdgeInsets.all(12),
       child: Text(
         Localizations.localeOf(context).languageCode == 'te'
-            ? 'ఏదైనా చిత్రంపై తేడాను నొక్కండి'
+            ? 'రెండు చిత్రాలను పరిశీలించి తేడా ఉన్న ప్రదేశాన్ని నొక్కండి'
             : (Localizations.localeOf(context).languageCode == 'hi'
-                ? 'किसी भी तस्वीर पर अंतर पर टैप करें'
-                : 'Tap difference on either image'),
+                ? 'दोनों तस्वीरों को देखकर अंतर वाले स्थान को स्पर्श करें'
+                : 'Look at both pictures and tap the place with the difference'),
         textAlign: TextAlign.center,
         style: const TextStyle(fontSize: 17, color: AppTheme.subtitleColor),
       ),

@@ -101,11 +101,20 @@ abstract class BaseGameScreenState<T extends BaseGameScreen> extends State<T> {
     }
   }
 
+  String? _feedbackExplanation;
+  String? _feedbackTitle;
+
   /// Called by subclass when user selects an answer or completes a round
-  Future<void> submitAnswer({required bool isCorrect}) async {
+  Future<void> submitAnswer({
+    required bool isCorrect,
+    String? explanation,
+    String? feedbackTitle,
+  }) async {
     if (_showFeedbackOverlay || controller.isSessionComplete) return;
 
     _lastRoundWasCorrect = isCorrect;
+    _feedbackExplanation = explanation;
+    _feedbackTitle = feedbackTitle;
     setState(() {
       _showFeedbackOverlay = true;
     });
@@ -369,19 +378,20 @@ abstract class BaseGameScreenState<T extends BaseGameScreen> extends State<T> {
               ),
               const SizedBox(height: 16),
               Text(
-                isCorrect ? loc.wellDone : loc.tryAgain,
+                _feedbackTitle ?? (isCorrect ? loc.wellDone : loc.tryAgain),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 28,
+                  fontSize: 26,
                   fontWeight: FontWeight.bold,
                   color: isCorrect ? const Color(0xFF2E8B57) : AppTheme.primaryColor,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                isCorrect ? loc.encouragementPositive : loc.encouragementGentle,
+                _feedbackExplanation ??
+                    (isCorrect ? loc.encouragementPositive : loc.encouragementGentle),
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 20, color: AppTheme.subtitleColor),
+                style: const TextStyle(fontSize: 18, color: AppTheme.subtitleColor),
               ),
             ],
           ),

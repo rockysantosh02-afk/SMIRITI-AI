@@ -159,26 +159,6 @@ coverage.xml
 *.secret
 *.private
 
-# ============================
-# LARGE / GENERATED FILES
-# ============================
-*.png
-*.jpg
-*.jpeg
-!*assets/**
-*.wav
-*.mp3
-*.pdf
-*.zip
-*.tar.gz
-*.rar
-!assets/**
-!lib/assets/**
-
-# ============================
-# WORK IN PROGRESS
-# ============================
-*.wip
 *.draft
 *.bak
 *.backup

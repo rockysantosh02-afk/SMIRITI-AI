@@ -193,7 +193,26 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Smriti AI'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/branding/smriti_logo_mark.png',
+              height: 28,
+              width: 28,
+              fit: BoxFit.contain,
+              semanticLabel: 'SMRITI-AI logo',
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'SMRITI-AI',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+          ],
+        ),
         automaticallyImplyLeading: false,
         actions: [
           SyncDebugIndicator(
@@ -217,6 +236,24 @@ class _DashboardHomeScreenState extends State<DashboardHomeScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // SMRITI-AI Primary Branding
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4, bottom: 20),
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isTablet = MediaQuery.sizeOf(context).width > 600;
+                      return Image.asset(
+                        'assets/branding/smriti_logo.png',
+                        height: isTablet ? 84 : 64,
+                        fit: BoxFit.contain,
+                        semanticLabel: 'SMRITI-AI logo',
+                      );
+                    },
+                  ),
+                ),
+              ),
+
               // Greeting
               Text(
                 '${_getGreeting(loc)}, $_userName',
@@ -789,7 +826,39 @@ class _SettingsSheet extends StatelessWidget {
                 ],
               ),
               
-              const SizedBox(height: 40),
+              const SizedBox(height: 36),
+              // SMRITI-AI Branding
+              Center(
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/branding/smriti_logo.png',
+                      height: 52,
+                      fit: BoxFit.contain,
+                      semanticLabel: 'SMRITI-AI logo',
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'SMRITI-AI',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.0,
+                        color: AppTheme.primaryColor,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    const Text(
+                      'Memory support made simple',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppTheme.subtitleColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
               const Divider(),
               const SizedBox(height: 16),
               

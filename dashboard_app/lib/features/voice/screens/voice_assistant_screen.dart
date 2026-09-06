@@ -571,23 +571,34 @@ class _VoiceAssistantScreenState extends State<VoiceAssistantScreen>
 
       debugPrint('[REMINDER] Reminder persisted successfully with id=$reminderId');
 
-      final notifId = notificationIdFromReminderId(reminderId);
-      final hasPermission = await _notificationService.hasPermission();
-      if (!hasPermission) {
-        await _notificationService.requestPermission();
+      bool scheduleSuccess = false;
+      try {
+        final notifId = notificationIdFromReminderId(reminderId);
+        final hasPermission = await _notificationService.hasPermission();
+        if (!hasPermission) {
+          await _notificationService.requestPermission();
+        }
+
+        scheduleSuccess = await _notificationService.scheduleReminder(
+          notificationId: notifId,
+          title: 'Reminder: $title',
+          body: 'It is time for your reminder: $title',
+          scheduledDate: dt,
+        );
+
+        debugPrint('[REMINDER] Local notification scheduled with id=$notifId at $dt (success: $scheduleSuccess)');
+      } catch (notifErr) {
+        debugPrint('[REMINDER] Notification scheduling exception: $notifErr');
+        scheduleSuccess = false;
       }
 
-      await _notificationService.scheduleReminder(
-        notificationId: notifId,
-        title: 'Reminder: $title',
-        body: 'It is time for your reminder: $title',
-        scheduledDate: dt,
-      );
-
-      debugPrint('[REMINDER] Local notification scheduled with id=$notifId at $dt');
-
-      final prompt = VoicePrompts.get(VoicePrompts.reminderCreated, langCode);
-      await respondToUser(prompt, languageCode: langCode);
+      if (scheduleSuccess) {
+        final prompt = VoicePrompts.get(VoicePrompts.reminderCreated, langCode);
+        await respondToUser(prompt, languageCode: langCode);
+      } else {
+        final prompt = VoicePrompts.get(VoicePrompts.reminderSavedNoNotification, langCode);
+        await respondToUser(prompt, languageCode: langCode);
+      }
     } catch (e, stack) {
       // FIX #10: NEVER FAKE SUCCESS
       debugPrint('[REMINDER] Error persisting or scheduling reminder: $e\n$stack');

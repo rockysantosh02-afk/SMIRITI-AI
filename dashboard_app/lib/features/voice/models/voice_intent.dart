@@ -15,6 +15,12 @@ enum VoiceIntent {
   /// Navigate to reminders screen
   openReminders,
 
+  /// Navigate to settings
+  openSettings,
+
+  /// Navigate to user profile
+  openProfile,
+
   /// Create or schedule a new reminder
   setReminder,
 

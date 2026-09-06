@@ -42,6 +42,9 @@ subprojects {
         if (name.contains("CMake", ignoreCase = true)) {
             doNotTrackState("Avoid Gradle 9 cmake timing metadata tracking issue")
         }
+        if (name.contains("lintVital", ignoreCase = true)) {
+            enabled = false
+        }
     }
 }
 

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../base/base_game_screen.dart';
 import '../models/game_item.dart';
+import '../services/shape_recognizer.dart';
 
 class DrawShapeScreen extends BaseGameScreen {
   const DrawShapeScreen({super.key, super.initialDifficulty})
@@ -68,12 +69,20 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
     super.dispose();
   }
 
-  void _evaluateAndSubmit() {
-    // Forgiving engagement scoring: if at least 1 stroke and 6 points, pass!
-    final totalPoints =
-        _strokes.fold<int>(0, (sum, stroke) => sum + stroke.length);
-    final passed = totalPoints >= 6;
-    submitAnswer(isCorrect: passed);
+  void _evaluateAndSubmit(GameItem currentItem, String langCode) {
+    const recognizer = ShapeRecognizer();
+    final expectedShapeKey = currentItem.raw['shape'] as String? ?? 'circle';
+    final eval = recognizer.evaluate(
+      expectedShapeKey: expectedShapeKey,
+      strokes: _strokes,
+      languageCode: langCode,
+    );
+
+    submitAnswer(
+      isCorrect: eval.isMatch,
+      feedbackTitle: eval.feedbackTitle,
+      explanation: eval.feedbackMessage,
+    );
   }
 
   String _getShapeDisplayName(String shapeKey) {
@@ -201,6 +210,7 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(18),
             child: GestureDetector(
+              key: const Key('draw_shape_canvas'),
               behavior: HitTestBehavior.opaque,
               onPanStart: (details) {
                 final clampedX =
@@ -354,7 +364,10 @@ class _DrawShapeScreenState extends BaseGameScreenState<DrawShapeScreen> {
               'I am Done',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            onPressed: _evaluateAndSubmit,
+            onPressed: () => _evaluateAndSubmit(
+              currentItem,
+              Localizations.localeOf(context).languageCode,
+            ),
           ),
         ),
       ],
